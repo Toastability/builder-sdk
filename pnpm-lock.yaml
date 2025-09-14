@@ -174,7 +174,7 @@ importers:
         specifier: 25.3.4
         version: 25.3.4(typescript@5.7.3)
       jotai:
-        specifier: 2.13.1
+        specifier: ^2.12.1
         version: 2.13.1(@babel/core@7.26.0)(@babel/template@7.27.2)(@types/react@18.3.18)(react@19.1.0)
       lodash:
         specifier: ^4.17.21
