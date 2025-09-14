@@ -13,6 +13,7 @@ export default defineConfig({
   },
   build: {
     emptyOutDir: true,
+    cssCodeSplit: false,
     lib: {
       entry: {
         core: resolve(__dirname, "src/core/main/index.ts"),
@@ -21,6 +22,7 @@ export default defineConfig({
         "web-blocks": resolve(__dirname, "src/web-blocks/index.ts"),
         tailwind: resolve(__dirname, "src/tailwind/index.ts"),
         runtime: resolve(__dirname, "src/runtime.ts"),
+        styles: resolve(__dirname, "src/styles.ts"),
       },
       formats: ["es", "cjs"],
     },
@@ -31,6 +33,12 @@ export default defineConfig({
           "react-dom": "ReactDom",
           react: "React",
           "react/jsx-runtime": "ReactJsxRuntime",
+        },
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name && assetInfo.name.endsWith(".css")) {
+            return "sdk.css";
+          }
+          return "assets/[name][extname]";
         },
       },
 

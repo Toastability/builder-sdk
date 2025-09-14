@@ -1,5 +1,5 @@
 {
-  "name": "@chaibuilder/sdk",
+  "name": "@opensite/builder-sdk",
   "description": "AI Enabled Open source visual builder",
   "private": false,
   "author": "Suraj Air",
@@ -9,12 +9,17 @@
   "type": "module",
   "repository": {
     "type": "git",
-    "url": "https://github.com/chaibuilder/sdk.git"
+    "url": "https://github.com/Toastability/builder-sdk.git"
+  },
+  "publishConfig": {
+    "access": "restricted"
   },
   "files": [
     "dist"
   ],
   "main": "dist/core.js",
+  "module": "dist/core.js",
+  "types": "dist/core.d.ts",
   "sideEffects": false,
   "scripts": {
     "dev": "vite",
@@ -29,7 +34,7 @@
     "e2e:report": "playwright show-report",
     "e2e:ui": "playwright test --ui",
     "prepare": "husky",
-    "postinstall": "pnpm build"
+    "prepack": "pnpm build"
   },
   "exports": {
     ".": {
@@ -69,11 +74,14 @@
   },
   "peerDependencies": {
     "@chaibuilder/runtime": "2.2.0",
-    "@types/react": "*",
-    "@types/react-dom": "*",
-    "jotai": "2.12.1",
+    "@rjsf/core": "5.24.12",
+    "@rjsf/utils": "5.24.12",
+    "@rjsf/validator-ajv8": "5.24.12",
+    "jotai": "^2.12.1",
     "react": "^18.0 || ^19.0",
-    "react-dom": "^18.0 || ^19.0"
+    "react-dom": "^18.0 || ^19.0",
+    "@types/react": "*",
+    "@types/react-dom": "*"
   },
   "peerDependenciesMeta": {
     "@types/react": {
@@ -84,7 +92,6 @@
     }
   },
   "dependencies": {
-    "@chaibuilder/runtime": "2.2.0",
     "@floating-ui/dom": "1.7.3",
     "@floating-ui/react-dom": "2.1.5",
     "@mhsdesign/jit-browser-tailwindcss": "0.4.2",
@@ -112,9 +119,6 @@
     "@radix-ui/react-toggle": "^1.1.9",
     "@radix-ui/react-tooltip": "^1.2.7",
     "@react-hookz/web": "25.1.1",
-    "@rjsf/core": "5.24.12",
-    "@rjsf/utils": "5.24.12",
-    "@rjsf/validator-ajv8": "5.24.12",
     "@tailwindcss/aspect-ratio": "^0.4.2",
     "@tailwindcss/container-queries": "^0.1.1",
     "@tailwindcss/forms": "^0.5.10",
@@ -139,7 +143,6 @@
     "fuse.js": "7.1.0",
     "himalaya": "^1.1.0",
     "i18next": "25.3.4",
-    "jotai": "2.13.1",
     "lodash": "^4.17.21",
     "lodash-es": "4.17.21",
     "lucide-react": "0.539.0",
@@ -204,6 +207,6 @@
     "workerDirectory": "public"
   },
   "engines": {
-    "node": ">=21.0.0"
+    "node": ">=18.18.0"
   }
 }
