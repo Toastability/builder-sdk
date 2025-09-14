@@ -28,7 +28,8 @@
     "e2e": "playwright test",
     "e2e:report": "playwright show-report",
     "e2e:ui": "playwright test --ui",
-    "prepare": "husky"
+    "prepare": "husky",
+    "postinstall": "pnpm build"
   },
   "exports": {
     ".": {
