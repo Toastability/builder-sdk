@@ -31,7 +31,7 @@ export const CoreBlock = ({
   const translatedLabel = t(label || type);
   const displayLabel = capitalize(translatedLabel);
   const iconSource = iconUrl ?? icon;
-  const iconClassName = "w-4 h-4 mx-auto";
+  const iconClassName = icon ? "w-4 h-4 mx-auto" : "w-full h-[200px] mx-auto";
   const iconContent = (() => {
     if (isString(iconSource) && iconSource.trim().length > 0) {
       return (
