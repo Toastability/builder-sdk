@@ -7,8 +7,8 @@ import { syncBlocksWithDefaults } from "@chaibuilder/runtime";
 import { BoxIcon } from "@radix-ui/react-icons";
 import { useFeature } from "flagged";
 import { useAtom } from "jotai";
-import { capitalize, has, isFunction, omit } from "lodash-es";
-import { createElement } from "react";
+import { capitalize, has, isFunction, isString, omit } from "lodash-es";
+import { cloneElement, createElement, isValidElement } from "react";
 import { useTranslation } from "react-i18next";
 
 export const CoreBlock = ({
@@ -23,10 +23,38 @@ export const CoreBlock = ({
   position?: number;
 }) => {
   const [, setDraggedBlock] = useAtom(draggedBlockAtom);
-  const { type, icon, label } = block;
+  const { type, icon, iconUrl, label } = block;
   const { addCoreBlock, addPredefinedBlock } = useAddBlock();
   const [, setSelected] = useSelectedBlockIds();
   const { clearHighlight } = useBlockHighlight();
+  const { t } = useTranslation();
+  const translatedLabel = t(label || type);
+  const displayLabel = capitalize(translatedLabel);
+  const iconSource = iconUrl ?? icon;
+  const iconClassName = "w-4 h-4 mx-auto";
+  const iconContent = (() => {
+    if (isString(iconSource) && iconSource.trim().length > 0) {
+      return (
+        <img
+          src={iconSource}
+          alt={translatedLabel}
+          className={`${iconClassName} object-contain`}
+        />
+      );
+    }
+
+    if (isValidElement<{ className?: string }>(iconSource)) {
+      return cloneElement(iconSource, {
+        className: [iconSource.props?.className, iconClassName].filter(Boolean).join(" "),
+      });
+    }
+
+    if (iconSource) {
+      return createElement(iconSource, { className: iconClassName });
+    }
+
+    return <BoxIcon className={iconClassName} />;
+  })();
   const addBlockToPage = () => {
     if (has(block, "blocks")) {
       const blocks = isFunction(block.blocks) ? block.blocks() : block.blocks;
@@ -37,7 +65,6 @@ export const CoreBlock = ({
     pubsub.publish(CHAI_BUILDER_EVENTS.CLOSE_ADD_BLOCK);
   };
   const dnd = useFeature("dnd");
-  const { t } = useTranslation();
   return (
     <>
       <Tooltip>
@@ -58,14 +85,14 @@ export const CoreBlock = ({
             }}
             draggable={dnd ? "true" : "false"}
             className={
-              "cursor-pointer space-y-2 rounded-lg border border-border p-3 text-center hover:bg-slate-300/50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400 dark:border-gray-700 dark:text-white dark:hover:bg-slate-800/50 dark:disabled:bg-gray-900 dark:disabled:text-foreground"
+              "cursor-pointer builder-sdk-core-block-btn space-y-2 rounded-lg border border-border p-3 text-center hover:bg-slate-300/50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400 dark:border-gray-700 dark:text-white dark:hover:bg-slate-800/50 dark:disabled:bg-gray-900 dark:disabled:text-foreground"
             }>
-            {createElement(icon || BoxIcon, { className: "w-4 h-4 mx-auto" })}
-            <p className="truncate text-xs">{capitalize(t(label || type))}</p>
+            {iconContent}
+            <p className="truncate text-xs">{displayLabel}</p>
           </button>
         </TooltipTrigger>
         <TooltipContent>
-          <p>{t(label || type)}</p>
+          <p>{translatedLabel}</p>
         </TooltipContent>
       </Tooltip>
     </>

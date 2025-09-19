@@ -71,5 +71,28 @@ If you like the project, you can assist us in expanding. ChaiBuilder is a collab
 <a href="https://www.buymeacoffee.com/chaibuilder" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 30px !important;width: 117px !important;" ></a>
 
 
+## Commit Message Guidelines
+This repository uses Husky with commitlint to enforce [Conventional Commit](https://www.conventionalcommits.org/) style messages. Every commit must include a **type** and a **subject** in the form `type: subject`.
+
+Common commit types you can use:
+
+- `feat`: add a new feature
+- `fix`: patch a bug
+- `docs`: documentation-only changes
+- `chore`: tooling or maintenance updates
+- `refactor`: code changes that neither fix a bug nor add a feature
+- `test`: add or update tests
+
+Example messages that will pass the hook:
+
+```text
+feat: add CMS support for block icon URLs
+fix: prevent undefined error when cloning block icons
+docs: expand README with commit message examples
+```
+
+If your commit spans multiple areas, split it into logical commits so each message remains focused and descriptive.
+
+
 ## Acknowledgments
 Chai Builder stands on the shoulders of many open-source libraries and tools. We extend our gratitude to the developers and maintainers of these projects for their contributions.

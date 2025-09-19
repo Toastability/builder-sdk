@@ -33,7 +33,7 @@ export const AddBlocksDialog = () => {
     <AlertDialog open={open} onOpenChange={() => (open ? setOpen(false) : "")}>
       <AlertDialogContent className="max-w-5xl overflow-hidden border-border">
         <AlertDialogHeader className="flex flex-row items-center justify-between">
-          <AlertDialogTitle className="text-foreground">{t("Add blocks")}</AlertDialogTitle>
+          <AlertDialogTitle className="text-foreground">{t("Component Library")}</AlertDialogTitle>
           <button
             onClick={() => setOpen(false)}
             className="text-gray-500 hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300">

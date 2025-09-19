@@ -131,7 +131,7 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position, gridCols
   }, [sortedGroups, selectedGroup]);
 
   return (
-    <div className="mx-auto flex h-full w-full max-w-3xl flex-col">
+    <div className="mx-auto flex h-full w-full flex-col">
       {/* Search at top */}
       <div className="sticky top-0 z-10 bg-background/80 px-4 py-2 backdrop-blur-sm">
         <Input
@@ -288,14 +288,14 @@ const AddBlocksPanel = ({
           {hasUiLibraries && <TabsTrigger value="library">{t("Library")}</TabsTrigger>}
           <TabsTrigger value="core">{t("Blocks")}</TabsTrigger>
           {hasPartialBlocks && <TabsTrigger value="partials">{t("Partials")}</TabsTrigger>}
-          {canImportHTML ? <TabsTrigger value="html">{t("Import")}</TabsTrigger> : null}
+          {/* {canImportHTML ? <TabsTrigger value="html">{t("Import")}</TabsTrigger> : null} */}
           {map(addBlockAdditionalTabs, (tab) => (
             <TabsTrigger key={`tab-add-block-${tab.id}`} value={tab.id}>
               {React.createElement(tab.tab)}
             </TabsTrigger>
           ))}
         </TabsList>
-        <TabsContent value="core" className="h-full max-h-full flex-1 pb-20">
+        <TabsContent value="core" className="h-full max-h-full flex-1 pb-[42px]">
           <div className="-mx-1.5 h-full max-h-full overflow-hidden">
             <div className="mt-2 h-full w-full">
               <DefaultChaiBlocks gridCols={"grid-cols-4"} parentId={parentId} position={position} />
@@ -303,12 +303,12 @@ const AddBlocksPanel = ({
           </div>
         </TabsContent>
         {hasUiLibraries && (
-          <TabsContent value="library" className="h-full max-h-full flex-1 pb-20">
+          <TabsContent value="library" className="h-full max-h-full flex-1 pb-[42px]">
             <UILibrariesPanel parentId={parentId} position={position} />
           </TabsContent>
         )}
         {hasPartialBlocks && (
-          <TabsContent value="partials" className="h-full max-h-full flex-1 pb-20">
+          <TabsContent value="partials" className="h-full max-h-full flex-1 pb-[42px]">
             <div className="-mx-1.5 h-full max-h-full overflow-hidden">
               <div className="mt-2 h-full w-full">
                 <PartialBlocks gridCols={"grid-cols-4"} parentId={parentId} position={position} />
@@ -317,7 +317,7 @@ const AddBlocksPanel = ({
           </TabsContent>
         )}
         {canImportHTML ? (
-          <TabsContent value="html" className="h-full max-h-full flex-1 pb-20">
+          <TabsContent value="html" className="h-full max-h-full flex-1 pb-[42px]">
             <ImportHTML parentId={parentId} position={position} />
           </TabsContent>
         ) : null}
