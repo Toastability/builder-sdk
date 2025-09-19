@@ -29,6 +29,7 @@ const StaticCanvas = () => {
   const [, setCanvasIframe] = useAtom(canvasIframeAtom);
   const loadingCanvas = useBuilderProp("loading", false);
   const htmlDir = useBuilderProp("htmlDir", "ltr");
+  const deviceWrapperEnabled = useBuilderProp("deviceWrapperEnabled", true);
 
   const setNewWidth = useCallback(
     (newWidth: number) => {
@@ -49,44 +50,99 @@ const StaticCanvas = () => {
     return initialHTML;
   }, [htmlDir]);
 
+  // If wrapper is disabled via builder prop, render legacy container
+  if (!deviceWrapperEnabled) {
+    return (
+      <ResizableCanvasWrapper onMount={setNewWidth} onResize={setNewWidth}>
+        <div
+          onMouseLeave={() => setTimeout(() => highlight(""), 300)}
+          className="relative mx-auto h-full w-full overflow-hidden"
+          ref={wrapperRef}>
+          {/*// @ts-ignore*/}
+          <ChaiFrame
+            contentDidMount={() => setCanvasIframe(iframeRef.current as HTMLIFrameElement)}
+            ref={iframeRef as any}
+            id="canvas-iframe"
+            style={{ ...scale, ...(isEmpty(scale) ? { width: `${width}px` } : {}) }}
+            className="relative mx-auto box-content h-full w-full max-w-full shadow-lg transition-all duration-300 ease-linear"
+            initialContent={iframeContent}>
+            <KeyboardHandler />
+            <BlockSelectionHighlighter />
+            <HeadTags />
+            <Provider>
+              <Canvas>
+                {loadingCanvas ? (
+                  <div className="h-full p-4">
+                    <Skeleton className="h-full" />
+                  </div>
+                ) : (
+                  <StaticBlocksRenderer />
+                )}
+                <AddBlockAtBottom />
+                <br />
+                <br />
+                <br />
+              </Canvas>
+              <CanvasEventsWatcher />
+            </Provider>
+            <div id="placeholder" className="pointer-events-none absolute z-[99999] max-w-full bg-green-500 transition-transform" />
+          </ChaiFrame>
+        </div>
+      </ResizableCanvasWrapper>
+    );
+  }
+
   return (
     <ResizableCanvasWrapper onMount={setNewWidth} onResize={setNewWidth}>
-      <div
-        onMouseLeave={() => setTimeout(() => highlight(""), 300)}
-        className="relative mx-auto h-full w-full overflow-hidden"
-        ref={wrapperRef}>
-        {/*// @ts-ignore*/}
-        <ChaiFrame
-          contentDidMount={() => setCanvasIframe(iframeRef.current as HTMLIFrameElement)}
-          ref={iframeRef as any}
-          id="canvas-iframe"
-          style={{ ...scale, ...(isEmpty(scale) ? { width: `${width}px` } : {}) }}
-          className="relative mx-auto box-content h-full w-full max-w-full shadow-lg transition-all duration-300 ease-linear"
-          initialContent={iframeContent}>
-          <KeyboardHandler />
-          <BlockSelectionHighlighter />
-          <HeadTags />
-          <Provider>
-            <Canvas>
-              {loadingCanvas ? (
-                <div className="h-full p-4">
-                  <Skeleton className="h-full" />
-                </div>
-              ) : (
-                <StaticBlocksRenderer />
-              )}
-              <AddBlockAtBottom />
-              <br />
-              <br />
-              <br />
-            </Canvas>
-            <CanvasEventsWatcher />
-          </Provider>
+      {/* Device wrapper to mimic a real page viewport */}
+      <div className="builder-sdk-device-wrapper relative mx-auto h-full w-full overflow-auto px-2">
+        <div className="builder-sdk-device-shell mx-auto my-4 max-h-[85vh] overflow-hidden rounded-xl border bg-background shadow-sm">
+          <div className="builder-sdk-device-chrome flex h-8 items-center gap-2 border-b px-3">
+            <div className="flex items-center gap-1.5 pr-2">
+              <span className="h-3 w-3 rounded-full bg-red-400"></span>
+              <span className="h-3 w-3 rounded-full bg-yellow-400"></span>
+              <span className="h-3 w-3 rounded-full bg-green-400"></span>
+            </div>
+            <div className="h-4 flex-1 rounded bg-muted/50" />
+          </div>
           <div
-            id="placeholder"
-            className="pointer-events-none absolute z-[99999] max-w-full bg-green-500 transition-transform"
-          />
-        </ChaiFrame>
+            onMouseLeave={() => setTimeout(() => highlight(""), 300)}
+            className="builder-sdk-device-body relative mx-auto h-full w-full overflow-hidden"
+            ref={wrapperRef}>
+            {/*// @ts-ignore*/}
+            <ChaiFrame
+              contentDidMount={() => setCanvasIframe(iframeRef.current as HTMLIFrameElement)}
+              ref={iframeRef as any}
+              id="canvas-iframe"
+              style={{ ...scale, ...(isEmpty(scale) ? { width: `${width}px` } : {}) }}
+              className="relative mx-auto box-content h-full w-full max-w-full transition-all duration-300 ease-linear"
+              initialContent={iframeContent}>
+              <KeyboardHandler />
+              <BlockSelectionHighlighter />
+              <HeadTags />
+              <Provider>
+                <Canvas>
+                  {loadingCanvas ? (
+                    <div className="h-full p-4">
+                      <Skeleton className="h-full" />
+                    </div>
+                  ) : (
+                    <StaticBlocksRenderer />
+                  )}
+                  <AddBlockAtBottom />
+                  <br />
+                  <br />
+                  <br />
+                </Canvas>
+                <CanvasEventsWatcher />
+              </Provider>
+              <div
+                id="placeholder"
+                className="pointer-events-none absolute z-[99999] max-w-full bg-green-500 transition-transform"
+              />
+            </ChaiFrame>
+          </div>
+        </div>
       </div>
     </ResizableCanvasWrapper>
   );

@@ -1,6 +1,8 @@
 import { atom, useAtom } from "jotai";
 
-export const sidebarActivePanelAtom = atom<string>("outline");
+// Default to the new Components panel so the component library
+// renders automatically when the editor loads
+export const sidebarActivePanelAtom = atom<string>("components");
 sidebarActivePanelAtom.debugLabel = "sidebarActivePanelAtom";
 
 export const useSidebarActivePanel = () => {

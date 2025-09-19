@@ -20,6 +20,7 @@ import { atomWithStorage } from "jotai/utils";
 import { capitalize, debounce, filter, find, map, reject, sortBy, values } from "lodash-es";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { motion } from "framer-motion";
 
 const CORE_GROUPS = ["basic", "typography", "media", "layout", "form", "advanced", "other"];
 
@@ -32,6 +33,8 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position, gridCols
   const parentType = find(allBlocks, (block) => block._id === parentId)?._type;
   const [selectedGroup, setSelectedGroup] = useState<string | null>("all");
   const [hoveredGroup, setHoveredGroup] = useState<string | null>(null);
+  const [panelLeft, setPanelLeft] = useState<number>(328); // default; recalculated on mount
+  const [panelTop, setPanelTop] = useState<number>(50); // matches topbar height
   const debouncedSelectRef = useRef<any>(null);
 
   // Focus search input on mount and tab change
@@ -61,6 +64,22 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position, gridCols
         debouncedSelectRef.current.cancel();
       }
     };
+  }, []);
+
+  // Calculate preview panel coordinates so it slides out just to the right
+  // of the sidebar + left panel. Recompute on mount and on resize.
+  useEffect(() => {
+    const calc = () => {
+      const leftPanel = document.getElementById("left-panel");
+      const sidebar = document.getElementById("sidebar");
+      const topbar = document.querySelector<HTMLElement>(".builder-sdk-topbar");
+      const left = (sidebar?.getBoundingClientRect().width || 48) + (leftPanel?.getBoundingClientRect().width || 280);
+      setPanelLeft(left);
+      setPanelTop(topbar?.getBoundingClientRect().height || 50);
+    };
+    calc();
+    window.addEventListener("resize", calc);
+    return () => window.removeEventListener("resize", calc);
   }, []);
 
   // Handle hover - update hovered group immediately but debounce the selection
@@ -218,6 +237,45 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position, gridCols
           </ScrollArea>
         </div>
       </div>
+
+      {/* Hover Preview Panel: slides out when a group is hovered */}
+      {hoveredGroup && hoveredGroup !== "all" && (
+        <motion.div
+          initial={{ x: -20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.2, ease: "easeOut" }}
+          onMouseLeave={handleGroupLeave}
+          className="builder-sdk-hover-preview z-40"
+          style={{
+            position: "fixed",
+            top: panelTop,
+            left: panelLeft,
+            height: `calc(100vh - ${panelTop}px)`,
+            width: 440,
+          }}>
+          <div className="flex h-full w-full flex-col border-l border-border bg-background shadow-xl">
+            <div className="flex items-center justify-between border-b border-border px-4 py-3 text-sm font-medium">
+              <span>{capitalize(t(hoveredGroup.toLowerCase()))}</span>
+            </div>
+            <ScrollArea className="h-full max-h-full">
+              <div className="space-y-4 p-4">
+                {reject(
+                  filter(values(filteredBlocks), { group: hoveredGroup }),
+                  { hidden: true },
+                ).map((block) => (
+                  <CoreBlock
+                    key={`hover-${hoveredGroup}-${block.type}`}
+                    parentId={parentId}
+                    position={position}
+                    block={block}
+                    disabled={false}
+                  />
+                ))}
+              </div>
+            </ScrollArea>
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 };

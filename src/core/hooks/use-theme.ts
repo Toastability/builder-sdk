@@ -59,3 +59,9 @@ const rightPanelAtom = atom<"block" | "theme" | "ai" | "settings">("block");
 export const useRightPanel = () => {
   return useAtom(rightPanelAtom);
 };
+
+// Controls whether the right panel should take full width on mobile
+const rightPanelFullWidthMobileAtom = atom<boolean>(false);
+export const useRightPanelFullWidthMobile = () => {
+  return useAtom(rightPanelFullWidthMobileAtom);
+};

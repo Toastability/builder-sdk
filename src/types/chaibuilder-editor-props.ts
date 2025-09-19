@@ -208,6 +208,12 @@ export interface ChaiBuilderEditorProps {
   minViewportWidth?: number | false;
 
   /**
+   * Enable device wrapper chrome around the canvas (browser-like frame).
+   * Default: true
+   */
+  deviceWrapperEnabled?: boolean;
+
+  /**
    * Loading state
    */
   loading?: boolean;
@@ -226,6 +232,13 @@ export interface ChaiBuilderEditorProps {
    * Import HTML support
    */
   importHTMLSupport?: boolean;
+
+  /**
+   * Default behavior for mobile: when viewing block settings, expand the right panel to take
+   * the full width of the screen. This can be toggled by the user in the topbar.
+   * Default: false
+   */
+  defaultRightPanelFullWidthOnMobile?: boolean;
 
   /**
    * AI context

@@ -5,16 +5,29 @@ import { DarkMode } from "@/core/components/canvas/topbar/dark-mode";
 import { DataBinding } from "@/core/components/canvas/topbar/data-binding";
 import { UndoRedo } from "@/core/components/canvas/topbar/undo-redo";
 import { useBuilderProp, useCanvasZoom } from "@/core/hooks";
+import { useRightPanelFullWidthMobile } from "@/core/hooks/use-theme";
 import { Separator } from "@/ui/shadcn/components/ui/separator";
+import { Button } from "@/ui/shadcn/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/ui/shadcn/components/ui/tooltip";
 import { ZoomInIcon } from "@radix-ui/react-icons";
 import { useFeature } from "flagged";
 import { round } from "lodash-es";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { Maximize2, Minimize2 } from "lucide-react";
 
 const CanvasTopBar: React.FC = () => {
   const darkModeSupport = useBuilderProp("darkMode", true);
   const aiChat = useFeature("aiChat");
   const [zoom] = useCanvasZoom();
+  const [fullWidth, setFullWidth] = useRightPanelFullWidthMobile();
+  const [windowWidth, setWindowWidth] = useState<number>(typeof window !== "undefined" ? window.innerWidth : 1200);
+  const isMobile = windowWidth < 768;
+
+  useEffect(() => {
+    const onResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
 
   return (
     <div className="flex h-10 items-center justify-between border-b border-border bg-background/70 px-2 builder-sdk-canvas-topbar">
@@ -36,6 +49,22 @@ const CanvasTopBar: React.FC = () => {
         <DataBinding />
       </div>
       <div className="flex h-full items-center space-x-2 builder-sdk-canvas-topbar-right">
+        {isMobile && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant={fullWidth ? "default" : "ghost"}
+                  size="icon"
+                  onClick={() => setFullWidth(!fullWidth)}
+                  className="builder-sdk-toggle-rightpanel-mobile">
+                  {fullWidth ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">{fullWidth ? "Collapse settings" : "Expand settings"}</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
         <ClearCanvas />
         {!aiChat ? <AiAssistant /> : null}
       </div>

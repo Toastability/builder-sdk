@@ -36,7 +36,7 @@ const BlockActionLabel = ({ block, label }: any) => {
   const dnd = useFeature("dnd");
   return (
     <div
-      className="mr-10 flex cursor-default items-center space-x-1 px-1"
+      className="builder-canvas-action-label mr-10 flex cursor-default items-center space-x-1 px-1"
       draggable={dnd ? "true" : "false"}
       onDragStart={(ev) => {
         ev.dataTransfer.setData("text/plain", JSON.stringify(pick(block, ["_id", "_type", "_name"])));
@@ -47,7 +47,7 @@ const BlockActionLabel = ({ block, label }: any) => {
           setHighlighted(null);
         }, 200);
       }}>
-      <DragHandleDots2Icon />
+      <DragHandleDots2Icon className="builder-canvas-action-button" />
       {label}
     </div>
   );
@@ -160,6 +160,19 @@ const BlockFloatingSelector = ({ block, selectedBlockElement }: BlockActionProps
 
   if (!selectedBlockElement || !block || editingBlockId) return null;
 
+  // Determine the applied canvas scale by comparing rendered vs. layout width
+  const uiScale = (() => {
+    try {
+      if (!selectedBlockElement) return 1;
+      const rect = selectedBlockElement.getBoundingClientRect();
+      const layoutW = selectedBlockElement.offsetWidth || 1;
+      const s = rect.width / layoutW;
+      return s || 1;
+    } catch (e) {
+      return 1;
+    }
+  })();
+
   return (
     <>
       <div
@@ -176,30 +189,34 @@ const BlockFloatingSelector = ({ block, selectedBlockElement }: BlockActionProps
           setHighlighted(null);
         }}
         onKeyDown={(e) => e.stopPropagation()}
-        className="isolate z-[999] flex h-6 items-center bg-blue-500 py-2 text-xs text-white">
-        {parentId && (
-          <ArrowUpIcon
-            className="hover:scale-105"
-            onClick={() => {
-              setStyleBlocks([]);
-              setSelectedIds([parentId]);
-            }}
-          />
-        )}
-        <BlockActionLabel label={label} block={block} />
+        className="builder-canvas-action-root isolate z-[999] flex items-center text-xs">
+        <div
+          className="builder-canvas-action-bar flex h-6 items-center bg-blue-500 py-2 text-white"
+          style={{ transform: `scale(${1 / uiScale})`, transformOrigin: "top left" }}>
+          {parentId && (
+            <ArrowUpIcon
+              className="builder-canvas-action-button hover:scale-105"
+              onClick={() => {
+                setStyleBlocks([]);
+                setSelectedIds([parentId]);
+              }}
+            />
+          )}
+          <BlockActionLabel label={label} block={block} />
 
-        <div className="flex items-center gap-2 pl-1 pr-1.5">
-          <AddBlockDropdown block={block}>
-            <PlusIcon className="hover:scale-105" />
-          </AddBlockDropdown>
-          {canDuplicateBlock(get(block, "_type", "")) && hasPermission(PERMISSIONS.ADD_BLOCK) ? (
-            <CopyIcon className="hover:scale-105" onClick={() => duplicateBlock([block?._id])} />
-          ) : null}
-          {canDeleteBlock(get(block, "_type", "")) && hasPermission(PERMISSIONS.DELETE_BLOCK) ? (
-            <TrashIcon className="hover:scale-105" onClick={() => removeBlock([block?._id])} />
-          ) : null}
+          <div className="builder-canvas-action-buttons flex items-center gap-2 pl-1 pr-1.5">
+            <AddBlockDropdown block={block}>
+              <PlusIcon className="builder-canvas-action-button hover:scale-105" />
+            </AddBlockDropdown>
+            {canDuplicateBlock(get(block, "_type", "")) && hasPermission(PERMISSIONS.ADD_BLOCK) ? (
+              <CopyIcon className="builder-canvas-action-button hover:scale-105" onClick={() => duplicateBlock([block?._id])} />
+            ) : null}
+            {canDeleteBlock(get(block, "_type", "")) && hasPermission(PERMISSIONS.DELETE_BLOCK) ? (
+              <TrashIcon className="builder-canvas-action-button hover:scale-105" onClick={() => removeBlock([block?._id])} />
+            ) : null}
 
-          {hasPermission(PERMISSIONS.MOVE_BLOCK) && <BlockController block={block} updateFloatingBar={update} />}
+            {hasPermission(PERMISSIONS.MOVE_BLOCK) && <BlockController block={block} updateFloatingBar={update} />}
+          </div>
         </div>
       </div>
     </>

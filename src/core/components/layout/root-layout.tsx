@@ -7,12 +7,13 @@ import { AddBlocksDialog } from "@/core/components/layout/add-blocks-dialog";
 import { NoopComponent } from "@/core/components/noop-component";
 import SettingsPanel from "@/core/components/settings/settings-panel";
 import ThemeConfigPanel from "@/core/components/sidepanels/panels/theme-configuration/ThemeConfigPanel";
+import { DefaultChaiBlocks } from "@/core/components/sidepanels/panels/add-blocks/default-blocks";
 import { CHAI_BUILDER_EVENTS } from "@/core/events";
 import { useChaiSidebarPanels } from "@/core/extensions/sidebar-panels";
 import { useTopBarComponent } from "@/core/extensions/top-bar";
 import { useBuilderProp, useSidebarActivePanel } from "@/core/hooks";
 import { usePubSub } from "@/core/hooks/use-pub-sub";
-import { useRightPanel } from "@/core/hooks/use-theme";
+import { useRightPanel, useRightPanelFullWidthMobile } from "@/core/hooks/use-theme";
 import { isDevelopment } from "@/core/import-html/general";
 import { useChaiFeatureFlag } from "@/core/main";
 import { Button } from "@/ui/shadcn/components/ui/button";
@@ -23,7 +24,7 @@ import { LightningBoltIcon } from "@radix-ui/react-icons";
 import { useFeature } from "flagged";
 import { motion } from "framer-motion";
 import { compact, find, first, get } from "lodash-es";
-import { Layers, Palette, SparklesIcon, X } from "lucide-react";
+import { Layers, Palette, SparklesIcon, X, Blocks } from "lucide-react";
 import React, {
   ComponentType,
   createElement,
@@ -47,6 +48,14 @@ const OutlineButton = ({ isActive, show }: { isActive: boolean; show: () => void
   );
 };
 
+const ComponentsButton = ({ isActive, show }: { isActive: boolean; show: () => void; panelId: string }) => {
+  return (
+    <Button variant={isActive ? "default" : "ghost"} size="icon" onClick={show}>
+      <Blocks className="h-5 w-5" />
+    </Button>
+  );
+};
+
 const AiButton = ({ isActive, show }: { isActive: boolean; show: () => void; panelId: string }) => {
   return (
     <Button variant={isActive ? "default" : "ghost"} size="icon" onClick={show}>
@@ -66,11 +75,26 @@ function useSidebarDefaultPanels() {
   const aiChat = useFeature("aiChat");
   const aiChatLeft = useChaiFeatureFlag("enable-ai-chat-left");
   return useMemo(() => {
-    const items = [];
+    const items = [] as any[];
+
+    // New default: Components (Component Library)
+    items.push({
+      id: "components",
+      label: "Component Library",
+      isInternal: true,
+      width: DEFAULT_PANEL_WIDTH,
+      button: ComponentsButton,
+      panel: () => (
+        <div className="-mt-8">
+          {/* The Component Library shows groups on the left and blocks on the right */}
+          <DefaultChaiBlocks gridCols="grid-cols-1" />
+        </div>
+      ),
+    });
 
     items.push({
       id: "outline",
-      label: "Outline",
+      label: "Structure",
       isInternal: true,
       width: DEFAULT_PANEL_WIDTH,
       button: OutlineButton,
@@ -119,10 +143,14 @@ function useSidebarDefaultPanels() {
 const RootLayout: ComponentType = () => {
   const TopBar = useTopBarComponent();
   const [activePanel, setActivePanel] = useSidebarActivePanel();
-  const lastStandardPanelRef = useRef<string | null>("outline"); // Default to "outline"
+  const lastStandardPanelRef = useRef<string | null>("components"); // Default to "components"
   const [lastStandardPanelWidth, setLastStandardPanelWidth] = useState(DEFAULT_PANEL_WIDTH);
 
   const [panel, setRightPanel] = useRightPanel();
+  const [fullWidthSettingsMobile, setFullWidthSettingsMobile] = useRightPanelFullWidthMobile();
+  const defaultFullWidthMobile = useBuilderProp("defaultRightPanelFullWidthOnMobile", false);
+  const [windowWidth, setWindowWidth] = useState<number>(typeof window !== "undefined" ? window.innerWidth : 1200);
+  const isMobile = windowWidth < 768; // md breakpoint
 
   usePubSub(CHAI_BUILDER_EVENTS.SHOW_BLOCK_SETTINGS, () => {
     setActivePanel("outline");
@@ -131,6 +159,23 @@ const RootLayout: ComponentType = () => {
   const defaultPanels = useSidebarDefaultPanels();
   const topPanels = useChaiSidebarPanels("top");
   const bottomPanels = useChaiSidebarPanels("bottom");
+
+  // Track window size for responsive panels
+  useEffect(() => {
+    const onResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  // Initialize mobile full-width preference from builder prop
+  useEffect(() => {
+    setFullWidthSettingsMobile(!!defaultFullWidthMobile);
+  }, [defaultFullWidthMobile, setFullWidthSettingsMobile]);
+
+  // Collapse left panel by default on mobile
+  useEffect(() => {
+    if (isMobile) setActivePanel(null);
+  }, [isMobile]);
 
   /**
    * Prevents the context menu from appearing in production mode.
@@ -172,13 +217,14 @@ const RootLayout: ComponentType = () => {
   // Determine the width to use for the left panel
   const leftPanelWidth = useMemo(() => {
     if (activePanel === null) return 0;
-
+    const sidebarWidth = 48; // w-12
+    if (isMobile) {
+      return Math.max(0, windowWidth - sidebarWidth);
+    }
     const currentPanelItem = find(allPanels, { id: activePanel });
     const isStandardPanel = get(currentPanelItem, "view", "standard") === "standard";
-
-    // If current panel is standard, use its width, otherwise use the last standard panel's width
     return isStandardPanel ? panelWidth : lastStandardPanelWidth;
-  }, [activePanel, panelWidth, lastStandardPanelWidth, allPanels]);
+  }, [activePanel, panelWidth, lastStandardPanelWidth, allPanels, windowWidth, isMobile]);
 
   const handleNonStandardPanelClose = useCallback(() => {
     // Return to the last used standard panel when closing a non-standard panel
@@ -186,12 +232,12 @@ const RootLayout: ComponentType = () => {
   }, [setActivePanel]);
 
   const closeNonStandardPanel = useCallback(() => {
-    setActivePanel("outline");
+    setActivePanel("components");
   }, [setActivePanel]);
 
   useEffect(() => {
     if (!find(allPanels, { id: activePanel })) {
-      setActivePanel("outline");
+      setActivePanel("components");
     }
   }, [activePanel, allPanels]);
 
@@ -214,7 +260,7 @@ const RootLayout: ComponentType = () => {
             </Suspense>
           </div>
           <main className="relative flex h-[calc(100vh-56px)] max-w-full flex-1 flex-row builder-sdk-main">
-            <div id="sidebar" className="flex w-12 flex-col items-center justify-between border-r border-border py-2 builder-sdk-sidebar">
+            <div id="sidebar" className="relative z-50 flex w-12 flex-col items-center justify-between border-r border-border py-2 builder-sdk-sidebar">
               <div className="flex flex-col gap-y-1">
                 {[defaultPanels, topPanels].flat().map((item, index) => (
                   <Tooltip key={"button-top-" + index}>
@@ -283,8 +329,16 @@ const RootLayout: ComponentType = () => {
             <motion.div
               id="right-panel"
               className="h-full max-h-full border-l border-border builder-sdk-right-panel"
-              initial={{ width: activePanel === "ai" ? 0 : DEFAULT_PANEL_WIDTH }}
-              animate={{ width: activePanel === "ai" ? 0 : DEFAULT_PANEL_WIDTH }}
+              initial={{ width: isMobile ? 0 : panel === "ai" ? 0 : DEFAULT_PANEL_WIDTH }}
+              animate={{
+                width: isMobile
+                  ? panel === "block"
+                    ? fullWidthSettingsMobile
+                      ? windowWidth
+                      : 0
+                    : windowWidth
+                  : panel === "ai" ? 0 : DEFAULT_PANEL_WIDTH,
+              }}
               transition={{ duration: 0.3, ease: "easeInOut" }}>
               <div className="no-scrollbar overflow h-full max-h-full overflow-hidden builder-sdk-right-panel-inner">
                 <div className="flex h-full max-h-full flex-col overflow-hidden p-3 builder-sdk-right-panel-content">
