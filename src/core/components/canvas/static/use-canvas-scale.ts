@@ -8,6 +8,13 @@ export const useCanvasScale = (dimension: { height: number; width: number }) => 
   const [scale, setScale] = useState({});
   const updateScale = useCallback(() => {
     const { width, height } = dimension;
+    // Guard against invalid measurements
+    if (!width || !canvasWidth || width <= 0 || canvasWidth <= 0) {
+      setScale({});
+      setZoom(100);
+      return;
+    }
+
     if (width < canvasWidth) {
       const newScale: number = parseFloat((width / canvasWidth).toFixed(2).toString());
       let heightObj = {};

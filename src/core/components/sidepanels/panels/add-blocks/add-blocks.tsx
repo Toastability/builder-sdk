@@ -7,8 +7,8 @@ import { PartialBlocks } from "@/core/components/sidepanels/panels/add-blocks/pa
 import { CHAI_BUILDER_EVENTS } from "@/core/events";
 import { useChaiAddBlockTabs } from "@/core/extensions/add-block-tabs";
 import { useChaiLibraries } from "@/core/extensions/libraries";
-import { canAcceptChildBlock, canBeNestedInside } from "@/core/functions/block-helpers";
-import { useBlocksStore, useBuilderProp, usePermissions } from "@/core/hooks";
+// removed unused helpers
+import { useBuilderProp, usePermissions } from "@/core/hooks";
 import { usePartialBlocksList } from "@/core/hooks/use-partial-blocks-store";
 import { mergeClasses, PERMISSIONS } from "@/core/main";
 import { pubsub } from "@/core/pubsub";
@@ -17,7 +17,7 @@ import { ScrollArea } from "@/ui/shadcn/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/shadcn/components/ui/tabs";
 import { useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
-import { capitalize, debounce, filter, find, map, reject, sortBy, values } from "lodash-es";
+import { capitalize, debounce, filter, map, reject, sortBy, values } from "lodash-es";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
@@ -25,13 +25,13 @@ import { motion } from "framer-motion";
 const CORE_GROUPS = ["basic", "typography", "media", "layout", "form", "advanced", "other"];
 const panelTop = 50;
 
-export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position, gridCols = "grid-cols-2" }: any) => {
+export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position }: any) => {
   const { t } = useTranslation();
-  const [allBlocks] = useBlocksStore();
+  // const [allBlocks] = useBlocksStore();
   const [searchTerm, setSearchTerm] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [tab] = useAtom(addBlockTabAtom);
-  const parentType = find(allBlocks, (block) => block._id === parentId)?._type;
+  // const parentType = find(allBlocks, (block) => block._id === parentId)?._type;
   const [selectedGroup, setSelectedGroup] = useState<string | null>("all");
   const [hoveredGroup, setHoveredGroup] = useState<string | null>(null);
   const [panelLeft, setPanelLeft] = useState<number>(327); // default; recalculated on mount
@@ -73,7 +73,7 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position, gridCols
     const calc = () => {
       const leftPanel = document.getElementById("left-panel");
       const sidebar = document.getElementById("sidebar");
-      const topbar = document.querySelector<HTMLElement>(".builder-sdk-topbar");
+      // const topbar = document.querySelector<HTMLElement>(".builder-sdk-topbar");
       const left = (sidebar?.getBoundingClientRect().width || 48) + (leftPanel?.getBoundingClientRect().width || 280);
       setPanelLeft(left);
       // setPanelTop(topbar?.getBoundingClientRect().height || 50);
@@ -134,21 +134,8 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position, gridCols
     [filteredGroups],
   );
 
-  // Filter blocks based on selected group
-  const displayedBlocks = useMemo(() => {
-    if (selectedGroup === "all") {
-      return filteredBlocks;
-    }
-    return filter(values(filteredBlocks), { group: selectedGroup });
-  }, [filteredBlocks, selectedGroup]);
-
-  // Filter groups for display based on selected group
-  const displayedGroups = useMemo(() => {
-    if (selectedGroup === "all") {
-      return sortedGroups;
-    }
-    return [selectedGroup];
-  }, [sortedGroups, selectedGroup]);
+  // NOTE: displayedBlocks/displayedGroups were unused after UI refactor.
+  // Keeping logic simple and removing unused memos to satisfy linting.
 
   return (
     <div className="mx-auto flex h-full w-full min-w-[200px] flex-col builder-sdk-add-blocks-panel">
