@@ -259,7 +259,7 @@ const RootLayout: ComponentType = () => {
               <TopBar />
             </Suspense>
           </div>
-          <main className="relative flex h-[calc(100vh-56px)] max-w-full flex-1 flex-row builder-sdk-main">
+          <main className="relative flex h-[calc(100dvh-48px)] max-w-full flex-1 flex-row builder-sdk-main">
             <div id="sidebar" className="relative z-50 flex w-12 flex-col items-center justify-between border-r border-border py-2 builder-sdk-sidebar">
               <div className="flex flex-col gap-y-1">
                 {[defaultPanels, topPanels].flat().map((item, index) => (

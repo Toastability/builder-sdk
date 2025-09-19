@@ -23,6 +23,7 @@ import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 
 const CORE_GROUPS = ["basic", "typography", "media", "layout", "form", "advanced", "other"];
+const panelTop = 50;
 
 export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position, gridCols = "grid-cols-2" }: any) => {
   const { t } = useTranslation();
@@ -33,8 +34,8 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position, gridCols
   const parentType = find(allBlocks, (block) => block._id === parentId)?._type;
   const [selectedGroup, setSelectedGroup] = useState<string | null>("all");
   const [hoveredGroup, setHoveredGroup] = useState<string | null>(null);
-  const [panelLeft, setPanelLeft] = useState<number>(328); // default; recalculated on mount
-  const [panelTop, setPanelTop] = useState<number>(50); // matches topbar height
+  const [panelLeft, setPanelLeft] = useState<number>(327); // default; recalculated on mount
+  // const [panelTop, setPanelTop] = useState<number>(50); // matches topbar height
   const debouncedSelectRef = useRef<any>(null);
 
   // Focus search input on mount and tab change
@@ -75,7 +76,7 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position, gridCols
       const topbar = document.querySelector<HTMLElement>(".builder-sdk-topbar");
       const left = (sidebar?.getBoundingClientRect().width || 48) + (leftPanel?.getBoundingClientRect().width || 280);
       setPanelLeft(left);
-      setPanelTop(topbar?.getBoundingClientRect().height || 50);
+      // setPanelTop(topbar?.getBoundingClientRect().height || 50);
     };
     calc();
     window.addEventListener("resize", calc);
@@ -150,7 +151,7 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position, gridCols
   }, [sortedGroups, selectedGroup]);
 
   return (
-    <div className="mx-auto flex h-full w-full flex-col builder-sdk-add-blocks-panel">
+    <div className="mx-auto flex h-full w-full min-w-[200px] flex-col builder-sdk-add-blocks-panel">
       {/* Search at top */}
       <div className="sticky top-0 z-10 bg-background/80 p-2 backdrop-blur-sm builder-sdk-add-blocks-search">
         <Input
@@ -163,10 +164,10 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position, gridCols
         />
       </div>
 
-      <div className="sticky top-10 flex h-[calc(100%-48px)] overflow-hidden builder-sdk-add-blocks-body">
+      <div className="sticky top-10 flex h-[calc(100%-48px)] overflow-hidden builder-sdk-add-blocks-body py-[25px]">
         {/* Sidebar for groups */}
         {sortedGroups.length > 0 && (
-          <div className="w-1/4 min-w-[120px] border-r border-border builder-sdk-add-blocks-groups">
+          <div className="w-full builder-sdk-add-blocks-groups">
             <ScrollArea className="h-full">
               <div className="space-y-1 p-2">
                 <button
@@ -197,43 +198,6 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position, gridCols
             </ScrollArea>
           </div>
         )}
-
-        {/* Main content area */}
-        <div className={"h-full w-3/4 flex-1 overflow-hidden builder-sdk-add-blocks-content " + (hoveredGroup && hoveredGroup !== "all" ? "invisible" : "") }>
-          <ScrollArea id="add-blocks-scroll-area" className="no-scrollbar mr-4 h-full builder-sdk-add-blocks-scroll">
-            {filteredGroups.length === 0 && searchTerm ? (
-              <div className="flex flex-col items-center justify-center p-8 text-center text-muted-foreground">
-                <p>
-                  {t("No blocks found matching")} "{searchTerm}"
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-6 p-4 builder-sdk-add-blocks-sections">
-                {displayedGroups.map((group) => (
-                  <div key={group} className="space-y-3">
-                    <h3 className="px-1 text-sm font-medium">{capitalize(t(group.toLowerCase()))}</h3>
-                    <div className={"grid gap-2 " + gridCols + " builder-sdk-add-blocks-grid"}>
-                      {reject(
-                        selectedGroup === "all" ? filter(values(displayedBlocks), { group }) : values(displayedBlocks),
-                        { hidden: true },
-                      ).map((block) => (
-                        <CoreBlock
-                          key={block.type}
-                          parentId={parentId}
-                          position={position}
-                          block={block}
-                          disabled={
-                            !canAcceptChildBlock(parentType, block.type) || !canBeNestedInside(parentType, block.type)
-                          }
-                        />
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </ScrollArea>
-        </div>
       </div>
 
       {/* Hover Preview Panel: slides out when a group is hovered */}
@@ -249,15 +213,15 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position, gridCols
             position: "fixed",
             top: panelTop,
             left: panelLeft,
-            height: `calc(100vh - ${panelTop}px)`,
-            width: 440,
+            height: `calc(100dvh - ${panelTop}px)`,
+            width: 350,
           }}>
           <div className="flex h-full w-full flex-col border-l border-border bg-background shadow-xl">
-            <div className="flex items-center justify-between border-b border-border px-4 py-3 text-sm font-medium">
+            <div className="flex items-center justify-between border-b border-border px-4 h-10 text-sm font-medium">
               <span>{capitalize(t(hoveredGroup.toLowerCase()))}</span>
             </div>
             <ScrollArea className="h-full max-h-full">
-              <div className="space-y-4 p-4">
+              <div className="space-y-4">
                 {reject(
                   filter(values(filteredBlocks), { group: hoveredGroup }),
                   { hidden: true },
