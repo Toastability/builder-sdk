@@ -28,14 +28,14 @@ export const ClearCanvas = () => {
   }, [setNewBlocks]);
 
   return (
-    <div className="flex items-center">
+    <div className="flex items-center builder-sdk-clear-canvas">
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <Button size="sm" variant="ghost" className="flex items-center gap-x-1">
+          <Button size="sm" variant="ghost" className="flex items-center gap-x-1 builder-sdk-clear-canvas-btn">
             <EraserIcon /> {t("Clear")}
           </Button>
         </AlertDialogTrigger>
-        <AlertDialogContent className={"border-border"}>
+        <AlertDialogContent className={"border-border builder-sdk-clear-canvas-dialog"}>
           <AlertDialogHeader>
             <AlertDialogTitle className="text-foreground">{t("Clear whole canvas? ")}</AlertDialogTitle>
             <AlertDialogDescription>{t("Are you sure you want to clear the page?")}</AlertDialogDescription>

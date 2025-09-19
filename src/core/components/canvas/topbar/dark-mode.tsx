@@ -5,7 +5,7 @@ import { Moon, SunIcon } from "lucide-react";
 export function DarkMode() {
   const [darkMode, setDarkMode] = useDarkMode();
   return (
-    <div className="flex items-center">
+    <div className="flex items-center builder-sdk-dark-mode-toggle">
       <SunIcon className="size-4 shrink-0" />
       <Switch
         id="dark-mode-switch"

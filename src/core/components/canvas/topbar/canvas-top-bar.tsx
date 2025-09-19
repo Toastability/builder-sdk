@@ -17,8 +17,8 @@ const CanvasTopBar: React.FC = () => {
   const [zoom] = useCanvasZoom();
 
   return (
-    <div className="flex h-10 items-center justify-between border-b border-border bg-background/70 px-2">
-      <div className="flex h-full space-x-2">
+    <div className="flex h-10 items-center justify-between border-b border-border bg-background/70 px-2 builder-sdk-canvas-topbar">
+      <div className="flex h-full space-x-2 builder-sdk-canvas-topbar-left">
         <Breakpoints canvas openDelay={400} />
         <Separator orientation="vertical" />
         {darkModeSupport ? (
@@ -35,7 +35,7 @@ const CanvasTopBar: React.FC = () => {
         <UndoRedo />
         <DataBinding />
       </div>
-      <div className="flex h-full items-center space-x-2">
+      <div className="flex h-full items-center space-x-2 builder-sdk-canvas-topbar-right">
         <ClearCanvas />
         {!aiChat ? <AiAssistant /> : null}
       </div>

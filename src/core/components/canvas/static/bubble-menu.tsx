@@ -47,7 +47,10 @@ const BubbleMenuButton = ({ icon, title, onClick, isActive }: BubbleMenuButtonPr
   return (
     <button
       onClick={onClick}
-      className={cn("rounded-md p-1.5 transition-colors duration-200", isActive ? "bg-white/20" : "hover:bg-white/10")}
+      className={cn(
+        "rounded-md p-1.5 transition-colors duration-200 builder-sdk-bubble-menu-btn",
+        isActive ? "bg-white/20" : "hover:bg-white/10",
+      )}
       title={title}>
       <Icon className="h-4 w-4" />
     </button>
@@ -69,7 +72,7 @@ export const BubbleMenu = ({ editor }: BubbleMenuProps) => {
   };
 
   return (
-    <div className="flex items-center overflow-hidden rounded-lg border border-blue-500/20 bg-blue-600 text-white shadow-lg">
+    <div className="flex items-center overflow-hidden rounded-lg border border-blue-500/20 bg-blue-600 text-white shadow-lg builder-sdk-bubble-menu">
       <div className="flex items-center p-1">
         <BubbleMenuButton
           icon="bold"

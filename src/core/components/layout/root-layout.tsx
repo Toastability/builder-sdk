@@ -203,18 +203,18 @@ const RootLayout: ComponentType = () => {
   );
 
   return (
-    <div dir={htmlDir} className="h-screen max-h-full w-screen overflow-x-hidden bg-background text-foreground">
+    <div dir={htmlDir} className="h-screen max-h-full w-screen overflow-x-hidden bg-background text-foreground builder-sdk-root">
       <TooltipProvider>
         <div
           onContextMenu={preventContextMenu}
-          className="flex h-screen max-h-full flex-col bg-background text-foreground">
-          <div className="flex h-[50px] w-screen items-center border-b border-border">
+          className="flex h-screen max-h-full flex-col bg-background text-foreground builder-sdk-shell">
+          <div className="flex h-[50px] w-screen items-center border-b border-border builder-sdk-topbar">
             <Suspense>
               <TopBar />
             </Suspense>
           </div>
-          <main className="relative flex h-[calc(100vh-56px)] max-w-full flex-1 flex-row">
-            <div id="sidebar" className="flex w-12 flex-col items-center justify-between border-r border-border py-2">
+          <main className="relative flex h-[calc(100vh-56px)] max-w-full flex-1 flex-row builder-sdk-main">
+            <div id="sidebar" className="flex w-12 flex-col items-center justify-between border-r border-border py-2 builder-sdk-sidebar">
               <div className="flex flex-col gap-y-1">
                 {[defaultPanels, topPanels].flat().map((item, index) => (
                   <Tooltip key={"button-top-" + index}>
@@ -256,17 +256,17 @@ const RootLayout: ComponentType = () => {
             {/* Side Panel */}
             <motion.div
               id="left-panel"
-              className="h-full max-h-full border-r border-border"
+              className="h-full max-h-full border-r border-border builder-sdk-left-panel"
               initial={{ width: leftPanelWidth }}
               animate={{ width: leftPanelWidth }}
               transition={{ duration: 0.3, ease: "easeInOut" }}>
               {activePanel !== null && get(activePanelItem, "view", "standard") === "standard" && (
-                <div className="no-scrollbar flex h-full flex-col overflow-hidden px-3 py-2">
+                <div className="no-scrollbar flex h-full flex-col overflow-hidden px-3 py-2 builder-sdk-left-panel-content">
                   <div
-                    className={`absolute top-2 flex h-10 items-center space-x-1 py-2 text-base font-bold ${get(activePanelItem, "isInternal", false) ? "" : "w-64"}`}>
+                    className={`absolute top-2 flex h-10 items-center space-x-1 py-2 text-base font-bold ${get(activePanelItem, "isInternal", false) ? "" : "w-64"} builder-sdk-left-panel-header`}>
                     <span>{t(get(activePanelItem, "label", ""))}</span>
                   </div>
-                  <div className="no-scrollbar h-full max-h-full overflow-y-auto pt-10">
+                  <div className="no-scrollbar h-full max-h-full overflow-y-auto pt-10 builder-sdk-left-panel-scroll">
                     <Suspense fallback={<div>Loading...</div>}>
                       {React.createElement(get(activePanelItem, "panel", NoopComponent), {})}
                     </Suspense>
@@ -274,7 +274,7 @@ const RootLayout: ComponentType = () => {
                 </div>
               )}
             </motion.div>
-            <div id="canvas-container" className="flex h-full max-h-full flex-1 flex-col bg-slate-800/20">
+            <div id="canvas-container" className="flex h-full max-h-full flex-1 flex-col bg-slate-800/20 builder-sdk-canvas-container">
               <CanvasTopBar />
               <Suspense>
                 <CanvasArea />
@@ -282,13 +282,13 @@ const RootLayout: ComponentType = () => {
             </div>
             <motion.div
               id="right-panel"
-              className="h-full max-h-full border-l border-border"
+              className="h-full max-h-full border-l border-border builder-sdk-right-panel"
               initial={{ width: activePanel === "ai" ? 0 : DEFAULT_PANEL_WIDTH }}
               animate={{ width: activePanel === "ai" ? 0 : DEFAULT_PANEL_WIDTH }}
               transition={{ duration: 0.3, ease: "easeInOut" }}>
-              <div className="no-scrollbar overflow h-full max-h-full overflow-hidden">
-                <div className="flex h-full max-h-full flex-col overflow-hidden p-3">
-                  <h2 className="-mt-1 flex items-center space-x-1 text-base font-bold">
+              <div className="no-scrollbar overflow h-full max-h-full overflow-hidden builder-sdk-right-panel-inner">
+                <div className="flex h-full max-h-full flex-col overflow-hidden p-3 builder-sdk-right-panel-content">
+                  <h2 className="-mt-1 flex items-center space-x-1 text-base font-bold builder-sdk-right-panel-header">
                     <div className="flex grow items-center gap-2">
                       <div className="flex w-full items-center justify-between gap-2">
                         {panel === "ai" ? (
@@ -315,7 +315,7 @@ const RootLayout: ComponentType = () => {
                       </div>
                     </div>
                   </h2>
-                  <div className="flex h-full max-h-full w-full">
+                  <div className="flex h-full max-h-full w-full builder-sdk-right-panel-body">
                     <Suspense fallback={<div>Loading...</div>}>
                       {panel === "ai" ? <AskAI /> : panel === "theme" ? <ThemeConfigPanel /> : <SettingsPanel />}
                     </Suspense>
@@ -331,7 +331,7 @@ const RootLayout: ComponentType = () => {
           <Sheet open={true} onOpenChange={() => handleNonStandardPanelClose()}>
             <SheetContent
               side="left"
-              className="flex flex-col gap-0 p-0 sm:max-w-full"
+              className="flex flex-col gap-0 p-0 sm:max-w-full builder-sdk-drawer-panel"
               style={{ width: `${panelWidth}px` }}>
               <SheetHeader className="border-b border-border px-2 py-2.5">
                 <SheetTitle className="flex items-center gap-2">
@@ -339,7 +339,7 @@ const RootLayout: ComponentType = () => {
                   <span>{t(get(activePanelItem, "label", ""))}</span>
                 </SheetTitle>
               </SheetHeader>
-              <div className="h-full max-h-full overflow-y-auto p-4">
+              <div className="h-full max-h-full overflow-y-auto p-4 builder-sdk-drawer-panel-body">
                 <Suspense fallback={<div>Loading...</div>}>
                   {React.createElement(get(activePanelItem, "panel", NoopComponent), {
                     close: closeNonStandardPanel,
@@ -352,14 +352,14 @@ const RootLayout: ComponentType = () => {
         {/* Modal View */}
         {activePanel !== null && get(activePanelItem, "view") === "modal" && (
           <Dialog open={true} onOpenChange={() => handleNonStandardPanelClose()}>
-            <DialogContent className="gap-0 p-0" style={{ maxWidth: `${panelWidth}px` }}>
+            <DialogContent className="gap-0 p-0 builder-sdk-modal-panel" style={{ maxWidth: `${panelWidth}px` }}>
               <DialogHeader className="border-b border-border px-2 py-3.5">
                 <DialogTitle className="flex items-center gap-2">
                   <span className="inline-block">{get(activePanelItem, "icon", null)}</span>
                   <span>{t(get(activePanelItem, "label", ""))}</span>
                 </DialogTitle>
               </DialogHeader>
-              <div className="max-h-[70vh] overflow-y-auto p-4">
+              <div className="max-h-[70vh] overflow-y-auto p-4 builder-sdk-modal-panel-body">
                 <Suspense fallback={<div>Loading...</div>}>
                   {React.createElement(get(activePanelItem, "panel", NoopComponent), {
                     close: closeNonStandardPanel,
@@ -372,19 +372,19 @@ const RootLayout: ComponentType = () => {
         {/* Overlay View */}
         {activePanel !== null && get(activePanelItem, "view") === "overlay" && (
           <motion.div
-            className="absolute bottom-0 left-12 right-0 top-0 z-50"
+            className="absolute bottom-0 left-12 right-0 top-0 z-50 builder-sdk-overlay"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.3 }}>
             <div className="h-full w-full">
               <motion.div
-                className="flex h-full w-full flex-col bg-background"
+                className="flex h-full w-full flex-col bg-background builder-sdk-overlay-content"
                 initial={{ y: -20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: 20, opacity: 0 }}
                 transition={{ duration: 0.3, delay: 0.1 }}>
-                <div className="flex h-[50px] items-center justify-between border-b border-border p-4">
+                <div className="flex h-[50px] items-center justify-between border-b border-border p-4 builder-sdk-overlay-header">
                   <div className="-ml-2 flex items-center gap-2 text-lg font-bold">
                     <span className="rtl:ml-2 rtl:inline-block">{get(activePanelItem, "icon", null)}</span>
                     <span>{t(get(activePanelItem, "label", ""))}</span>
@@ -393,7 +393,7 @@ const RootLayout: ComponentType = () => {
                     <X className="h-5 w-5" />
                   </Button>
                 </div>
-                <div className="flex-1 overflow-y-auto p-4">
+                <div className="flex-1 overflow-y-auto p-4 builder-sdk-overlay-body">
                   <Suspense fallback={<div>Loading...</div>}>
                     {React.createElement(get(activePanelItem, "panel", NoopComponent), {
                       close: closeNonStandardPanel,

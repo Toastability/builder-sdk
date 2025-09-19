@@ -22,7 +22,7 @@ const ImportHTML = ({ parentId, position }: { parentId?: string; position?: numb
   };
 
   return (
-    <Card className="border-border/0 p-0 shadow-none">
+    <Card className="border-border/0 p-0 shadow-none builder-sdk-import-html-panel">
       <CardHeader className="p-3">
         <CardDescription>{t("Use HTML snippets from Tailwind CSS component libraries")}</CardDescription>
       </CardHeader>

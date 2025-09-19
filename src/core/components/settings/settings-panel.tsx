@@ -45,7 +45,7 @@ const SettingsPanel: React.FC = () => {
 
   if (isNull(selectedBlock)) {
     return (
-      <div className="p-4 text-center">
+      <div className="p-4 text-center builder-sdk-settings-panel">
         <div className="space-y-4 rounded-xl p-4 text-muted-foreground">
           <MixerHorizontalIcon className="mx-auto text-3xl" />
           <h1>{t("Please select a block to edit settings or styles")}</h1>
@@ -56,7 +56,7 @@ const SettingsPanel: React.FC = () => {
 
   if (isSettingsDisabled && isStylesDisabled) {
     return (
-      <div className="p-4 text-center">
+      <div className="p-4 text-center builder-sdk-settings-panel">
         <div className="space-y-4 rounded-xl p-4 text-muted-foreground">
           <MixerHorizontalIcon className="mx-auto text-3xl" />
           <h1>{t("You don't have permission to edit settings or styles")}</h1>
@@ -70,7 +70,7 @@ const SettingsPanel: React.FC = () => {
   if (isStylesDisabled) {
     return (
       <ErrorBoundary fallback={<FallbackError />} onError={onErrorFn}>
-        <div className="no-scrollbar h-full max-h-min w-full overflow-y-auto">
+        <div className="no-scrollbar h-full max-h-min w-full overflow-y-auto builder-sdk-settings-panel">
           <BlockSettings />
           <br />
           <br />
@@ -83,7 +83,7 @@ const SettingsPanel: React.FC = () => {
   if (isSettingsDisabled) {
     return (
       <ErrorBoundary fallback={<FallbackError />} onError={onErrorFn}>
-        <div className="no-scrollbar h-full max-h-min w-full overflow-y-auto overflow-x-hidden">
+        <div className="no-scrollbar h-full max-h-min w-full overflow-y-auto overflow-x-hidden builder-sdk-settings-panel">
           <div className="flex w-full items-center justify-end">
             <ResetStylesButton />
           </div>
@@ -100,7 +100,7 @@ const SettingsPanel: React.FC = () => {
   // Show both tabs if both permissions are enabled
   return (
     <ErrorBoundary fallback={<FallbackError />} onError={onErrorFn}>
-      <Tabs defaultValue="settings" className="flex flex-1 flex-col">
+      <Tabs defaultValue="settings" className="flex flex-1 flex-col builder-sdk-settings-tabs">
         <div className="flex items-center justify-between">
           <TabsList className="grid h-auto w-full grid-cols-2 p-1 py-1">
             <TabsTrigger value="settings" className="text-xs">
@@ -116,14 +116,14 @@ const SettingsPanel: React.FC = () => {
             </TabsTrigger>
           </TabsList>
         </div>
-        <TabsContent value="settings" className="no-scrollbar h-full max-h-min overflow-y-auto">
+        <TabsContent value="settings" className="no-scrollbar h-full max-h-min overflow-y-auto builder-sdk-settings-tab-settings">
           <BlockSettings />
           <br />
           <br />
         </TabsContent>
         <TabsContent
           value="styles"
-          className="no-scrollbar h-full max-h-min max-w-full overflow-y-auto overflow-x-hidden">
+          className="no-scrollbar h-full max-h-min max-w-full overflow-y-auto overflow-x-hidden builder-sdk-settings-tab-styles">
           <BlockStyling />
           <BlockAttributesToggle />
           <br />

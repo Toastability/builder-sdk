@@ -179,7 +179,7 @@ export const Breakpoints = ({
 
   if (breakpoints.length < 4) {
     return (
-      <div className="flex items-center rounded-md">
+      <div className="flex items-center rounded-md builder-sdk-breakpoints">
         {map(breakpoints, (bp) => (
           <BreakpointCard
             canvas={canvas}
@@ -194,8 +194,8 @@ export const Breakpoints = ({
   }
 
   return (
-    <div className="flex w-full items-center justify-between rounded-md">
-      <div className="flex items-center">
+    <div className="flex w-full items-center justify-between rounded-md builder-sdk-breakpoints">
+      <div className="flex items-center builder-sdk-breakpoints-buttons">
         {map(
           breakpoints.filter((bp: BreakpointItemType) => includes(selectedBreakpoints, toUpper(bp.breakpoint))),
           (bp: BreakpointItemType) => (
@@ -213,11 +213,11 @@ export const Breakpoints = ({
       </div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <span className="cursor-pointer px-2.5 hover:opacity-80">
+          <span className="cursor-pointer px-2.5 hover:opacity-80 builder-sdk-breakpoints-menu-trigger">
             <DotsVerticalIcon className="scale-90 transform" />
           </span>
         </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-56 border-border text-xs">
+        <DropdownMenuContent className="w-56 border-border text-xs builder-sdk-breakpoints-menu">
           <DropdownMenuLabel>{t("Screen sizes")}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           {map(breakpoints, (bp: BreakpointItemType) => (

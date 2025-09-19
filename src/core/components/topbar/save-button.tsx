@@ -16,7 +16,7 @@ export const SaveButton = () => {
         savePage();
       }}
       className={cn(
-        "flex h-auto w-fit items-center gap-x-2 p-1 px-2",
+        "flex h-auto w-fit items-center gap-x-2 p-1 px-2 builder-sdk-save-button-btn",
         // CHANGED sate
         "bg-gray-200 text-gray-500 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400",
         {
@@ -33,5 +33,5 @@ export const SaveButton = () => {
       </span>
     </Button>
   );
-  return <div className="flex items-center">{button}</div>;
+  return <div className="flex items-center builder-sdk-save-button">{button}</div>;
 };

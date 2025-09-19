@@ -193,7 +193,7 @@ const ListTree = () => {
   if (isEmpty(treeData))
     return (
       <div>
-        <div className="mt-10 flex h-full w-full items-center justify-center p-8 text-center">
+        <div className="mt-10 flex h-full w-full items-center justify-center p-8 text-center builder-sdk-outline-empty">
           <p className="mb-1.5 text-sm">
             {t("This page is empty")}
             <br />
@@ -214,16 +214,16 @@ const ListTree = () => {
 
   return (
     <>
-      <div className={cn("flex h-full select-none flex-col space-y-1")} onClick={() => clearSelection()}>
+      <div className={cn("flex h-full select-none flex-col space-y-1 builder-sdk-outline-panel")} onClick={() => clearSelection()}>
         <div
           id="outline-view "
-          className="no-scrollbar h-full overflow-y-auto text-sm"
+          className="no-scrollbar h-full overflow-y-auto text-sm builder-sdk-outline-tree"
           onKeyDown={(e) => {
             if (!treeRef.current.isEditing) {
               handleKeyDown(e);
             }
           }}>
-          <div className="mb-2 flex items-center justify-end gap-x-2 pb-2 text-sm text-muted-foreground">
+          <div className="mb-2 flex items-center justify-end gap-x-2 pb-2 text-sm text-muted-foreground builder-sdk-outline-controls">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button

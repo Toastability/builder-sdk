@@ -7,4 +7,6 @@ export interface CoreBlock {
   type: string;
   _name?: string;
   partialBlockId?: string;
+  iconUrl?: string;
+  icon?: any;
 }

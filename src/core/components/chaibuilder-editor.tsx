@@ -126,7 +126,7 @@ const ChaiBuilderEditor: React.FC<ChaiBuilderEditorProps> = (props: ChaiBuilderE
   const onErrorFn = props.onError || noop;
   const minViewportWidth = props.minViewportWidth ?? false;
   return (
-    <div className="h-screen w-screen">
+    <div className="h-screen w-screen builder-sdk-editor">
       <ErrorBoundary fallback={<FallbackError />} onError={onErrorFn}>
         {minViewportWidth !== false ? <ScreenTooSmall /> : null}
         <ChaiBuilderComponent {...props} />

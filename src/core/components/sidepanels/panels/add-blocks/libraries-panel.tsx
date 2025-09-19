@@ -110,7 +110,7 @@ const BlockCard = ({
           draggable={dnd ? "true" : "false"}
           onDragStart={handleDragStart}
           className={clsx(
-            "relative mt-2 cursor-pointer overflow-hidden rounded-md border border-border duration-200 hover:border-blue-500 hover:shadow-xl",
+            "relative mt-2 cursor-pointer overflow-hidden rounded-md border border-border duration-200 hover:border-blue-500 hover:shadow-xl builder-sdk-library-block-card",
           )}>
           {isAdding && (
             <div className="absolute flex h-full w-full items-center justify-center bg-black/70">
@@ -228,8 +228,8 @@ const UILibrarySection = ({ parentId, position }: { parentId?: string; position?
 
   return (
     <>
-      <div className="flex h-full max-h-full flex-col">
-        <div className="flex items-center gap-2 border-border py-2">
+      <div className="flex h-full max-h-full flex-col builder-sdk-libraries-panel">
+        <div className="flex items-center gap-2 border-border py-2 builder-sdk-libraries-search">
           <div className="relative w-full">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
@@ -248,14 +248,14 @@ const UILibrarySection = ({ parentId, position }: { parentId?: string; position?
           </div>
         </div>
 
-        <div className="relative flex h-full max-h-full flex-1 overflow-hidden bg-background">
+        <div className="relative flex h-full max-h-full flex-1 overflow-hidden bg-background builder-sdk-libraries-body">
           <div className={"flex h-full flex-1 pt-2"}>
-            <div className={"flex h-full max-h-full w-60 min-w-60 max-w-60 flex-col gap-1 px-1 pr-2"}>
+            <div className={"flex h-full max-h-full w-60 min-w-60 max-w-60 flex-col gap-1 px-1 pr-2 builder-sdk-libraries-groups"}>
               <UILibrariesSelect library={library?.id} setLibrary={setLibrary} uiLibraries={uiLibraries} />
               <div className="mt-2 flex h-full max-h-full w-full flex-1 flex-col">
                 <span className="text-xs font-bold text-gray-500">{t("Groups")}</span>
                 <hr className="mt-1 border-border" />
-                <div className="no-scrollbar mt-2 h-full max-h-full flex-1 overflow-y-auto pb-20">
+                <div className="no-scrollbar mt-2 h-full max-h-full flex-1 overflow-y-auto pb-20 builder-sdk-libraries-groups-scroll">
                   {isEmpty(mergedGroups) ? (
                     <div className="mt-4 flex flex-col items-center justify-center gap-3 p-4 text-center">
                       {searchQuery ? (
@@ -279,7 +279,7 @@ const UILibrarySection = ({ parentId, position }: { parentId?: string; position?
                         role="button"
                         onClick={() => setGroup(group)}
                         className={cn(
-                          "flex w-full cursor-pointer items-center justify-between rounded-md p-2 text-sm text-foreground transition-all ease-in-out hover:bg-gray-200 dark:hover:bg-gray-800",
+                          "flex w-full cursor-pointer items-center justify-between rounded-md p-2 text-sm text-foreground transition-all ease-in-out hover:bg-gray-200 dark:hover:bg-gray-800 builder-sdk-libraries-group-item",
                           group === selectedGroup ? "bg-primary text-primary-foreground hover:bg-primary/80" : "",
                         )}>
                         <span>{capitalize(t(group.toLowerCase()))}</span>
@@ -290,16 +290,16 @@ const UILibrarySection = ({ parentId, position }: { parentId?: string; position?
                 </div>
               </div>
             </div>
-            <div className="flex h-full max-h-full w-full flex-col border-l border-border">
+            <div className="flex h-full max-h-full w-full flex-col border-l border-border builder-sdk-libraries-blocks">
               <ScrollArea
                 onMouseEnter={() => (timeoutRef.current ? clearTimeout(timeoutRef.current) : null)}
-                className="z-10 flex h-full max-h-full w-full flex-col gap-2 transition-all ease-linear">
+                className="z-10 flex h-full max-h-full w-full flex-col gap-2 transition-all ease-linear builder-sdk-libraries-scroll">
                 {isEmpty(blocks) && !isEmpty(mergedGroups) ? (
                   <div className="flex h-full flex-col items-center justify-center p-6 text-center">
                     <p className="text-sm">{t("No blocks found in this group")}</p>
                   </div>
                 ) : (
-                  <div className="grid w-full grid-cols-2 gap-2 px-2">
+                  <div className="grid w-full grid-cols-2 gap-2 px-2 builder-sdk-libraries-grid">
                     <div className="flex flex-col gap-1">
                       {firstBlocks.map((block: ChaiLibraryBlock, index: number) => (
                         <BlockCard

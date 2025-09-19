@@ -139,7 +139,7 @@ const BlockController = ({ block, updateFloatingBar }: { block: ChaiBlock; updat
           <ControlIcon
             key={key}
             onClick={() => moveBlock(key as any)}
-            className={`${isDisabled ? "pointer-events-none cursor-not-allowed opacity-50" : "duration-300 hover:scale-95 hover:opacity-80"}`}
+            className={`${isDisabled ? "pointer-events-none cursor-not-allowed opacity-50" : "duration-300 hover:scale-95 hover:opacity-80"} builder-sdk-block-controller-btn`}
           />
         );
       })}

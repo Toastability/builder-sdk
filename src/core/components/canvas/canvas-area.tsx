@@ -14,8 +14,8 @@ const CanvasArea: React.FC = () => {
   const [codeEditor] = useCodeEditor();
   const onErrorFn = useBuilderProp("onError", noop);
   return (
-    <div className="flex h-full max-h-full w-full flex-1 flex-col">
-      <div className="relative flex h-full max-h-full flex-col overflow-hidden bg-gray-100/40 px-2">
+    <div className="flex h-full max-h-full w-full flex-1 flex-col builder-sdk-canvas-area">
+      <div className="relative flex h-full max-h-full flex-col overflow-hidden bg-gray-100/40 px-2 builder-sdk-canvas-inner">
         <Suspense fallback={<Skeleton className="h-full" />}>
           <ErrorBoundary fallback={<FallbackError />} onError={onErrorFn}>
             <StaticCanvas />

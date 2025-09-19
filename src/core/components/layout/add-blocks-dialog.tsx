@@ -31,7 +31,7 @@ export const AddBlocksDialog = () => {
 
   return (
     <AlertDialog open={open} onOpenChange={() => (open ? setOpen(false) : "")}>
-      <AlertDialogContent className="max-w-5xl overflow-hidden border-border">
+      <AlertDialogContent className="max-w-5xl overflow-hidden border-border builder-sdk-add-blocks-dialog">
         <AlertDialogHeader className="flex flex-row items-center justify-between">
           <AlertDialogTitle className="text-foreground">{t("Component Library")}</AlertDialogTitle>
           <button
@@ -40,7 +40,7 @@ export const AddBlocksDialog = () => {
             <Cross2Icon className="h-6 w-6" />
           </button>
         </AlertDialogHeader>
-        <div className="no-scrollbar h-[500px] max-h-full overflow-hidden">
+        <div className="no-scrollbar h-[500px] max-h-full overflow-hidden builder-sdk-add-blocks-dialog-content">
           <AddBlocksPanel parentId={parentId} position={position} showHeading={false} />
         </div>
       </AlertDialogContent>

@@ -67,7 +67,7 @@ export function QuickPrompts({ onClick }: { onClick: (prompt: string) => void })
   }
 
   return (
-    <div className={loading ? "pointer-events-none opacity-50" : ""}>
+    <div className={(loading ? "pointer-events-none opacity-50 " : "") + "builder-sdk-quick-prompts"}>
       <ul className="space-y-2">
         {quickPrompts.map(({ name, icon: Icon, subMenus, prompt }: any) =>
           subMenus ? (

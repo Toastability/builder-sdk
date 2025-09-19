@@ -11,6 +11,8 @@ import { capitalize, has, isFunction, isString, omit } from "lodash-es";
 import { cloneElement, createElement, isValidElement } from "react";
 import { useTranslation } from "react-i18next";
 
+export const DEFAULT_THUMB = "https://edge.dashtrack.com/assets/files/record/280372/wxhpm4vrbai4het99bem7kqvuov9"
+
 export const CoreBlock = ({
   block,
   disabled,
@@ -30,7 +32,12 @@ export const CoreBlock = ({
   const { t } = useTranslation();
   const translatedLabel = t(label || type);
   const displayLabel = capitalize(translatedLabel);
-  const iconSource = iconUrl ?? icon;
+  // Prefer a valid iconUrl, then icon component/element; otherwise fall back to DEFAULT_THUMB
+  const iconSource = (() => {
+    if (isString(iconUrl) && iconUrl.trim().length > 0) return iconUrl;
+    if (icon) return icon;
+    return DEFAULT_THUMB;
+  })();
   const iconClassName = icon ? "w-4 h-4 mx-auto" : "w-full h-[200px] mx-auto";
   const iconContent = (() => {
     if (isString(iconSource) && iconSource.trim().length > 0) {
@@ -53,6 +60,7 @@ export const CoreBlock = ({
       return createElement(iconSource, { className: iconClassName });
     }
 
+    // Final safeguard; should rarely be hit due to DEFAULT_THUMB fallback
     return <BoxIcon className={iconClassName} />;
   })();
   const addBlockToPage = () => {

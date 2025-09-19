@@ -131,9 +131,9 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position, gridCols
   }, [sortedGroups, selectedGroup]);
 
   return (
-    <div className="mx-auto flex h-full w-full flex-col">
+    <div className="mx-auto flex h-full w-full flex-col builder-sdk-add-blocks-panel">
       {/* Search at top */}
-      <div className="sticky top-0 z-10 bg-background/80 px-4 py-2 backdrop-blur-sm">
+      <div className="sticky top-0 z-10 bg-background/80 px-4 py-2 backdrop-blur-sm builder-sdk-add-blocks-search">
         <Input
           ref={searchInputRef}
           type="search"
@@ -144,10 +144,10 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position, gridCols
         />
       </div>
 
-      <div className="sticky top-10 flex h-[calc(100%-48px)] overflow-hidden">
+      <div className="sticky top-10 flex h-[calc(100%-48px)] overflow-hidden builder-sdk-add-blocks-body">
         {/* Sidebar for groups */}
         {sortedGroups.length > 0 && (
-          <div className="w-1/4 min-w-[120px] border-r border-border">
+          <div className="w-1/4 min-w-[120px] border-r border-border builder-sdk-add-blocks-groups">
             <ScrollArea className="h-full">
               <div className="space-y-1 p-2">
                 <button
@@ -182,8 +182,8 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position, gridCols
         )}
 
         {/* Main content area */}
-        <div className="h-full w-3/4 flex-1 overflow-hidden">
-          <ScrollArea id="add-blocks-scroll-area" className="no-scrollbar mr-4 h-full">
+        <div className="h-full w-3/4 flex-1 overflow-hidden builder-sdk-add-blocks-content">
+          <ScrollArea id="add-blocks-scroll-area" className="no-scrollbar mr-4 h-full builder-sdk-add-blocks-scroll">
             {filteredGroups.length === 0 && searchTerm ? (
               <div className="flex flex-col items-center justify-center p-8 text-center text-muted-foreground">
                 <p>
@@ -191,11 +191,11 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position, gridCols
                 </p>
               </div>
             ) : (
-              <div className="space-y-6 p-4">
+              <div className="space-y-6 p-4 builder-sdk-add-blocks-sections">
                 {displayedGroups.map((group) => (
                   <div key={group} className="space-y-3">
                     <h3 className="px-1 text-sm font-medium">{capitalize(t(group.toLowerCase()))}</h3>
-                    <div className={"grid gap-2 " + gridCols}>
+                    <div className={"grid gap-2 " + gridCols + " builder-sdk-add-blocks-grid"}>
                       {reject(
                         selectedGroup === "all" ? filter(values(displayedBlocks), { group }) : values(displayedBlocks),
                         { hidden: true },
@@ -267,9 +267,9 @@ const AddBlocksPanel = ({
   }, [tab, hasUiLibraries, setTab]);
 
   return (
-    <div className={mergeClasses("flex h-full w-full flex-col overflow-hidden", className)}>
+    <div className={mergeClasses("flex h-full w-full flex-col overflow-hidden builder-sdk-add-blocks-container", className)}>
       {showHeading ? (
-        <div className="mb-2 flex flex-col justify-between rounded-md bg-background/30 p-1">
+        <div className="mb-2 flex flex-col justify-between rounded-md bg-background/30 p-1 builder-sdk-add-blocks-header">
           <h1 className="flex flex-col items-baseline px-1 text-xl font-semibold xl:flex-col">{t("Add block")}</h1>
           <span className="p-0 text-xs font-light leading-3 opacity-80 xl:pl-1">
             {tab === "html" ? t("Enter or paste TailwindCSS HTML snippet") : t("Click to add block to page")}
@@ -283,8 +283,8 @@ const AddBlocksPanel = ({
           setTab(_tab);
         }}
         value={tab}
-        className={"flex h-full max-h-full flex-col overflow-hidden"}>
-        <TabsList className={"flex w-full items-center"}>
+        className={"flex h-full max-h-full flex-col overflow-hidden builder-sdk-add-blocks-tabs"}>
+        <TabsList className={"flex w-full items-center builder-sdk-add-blocks-tabs-list"}>
           {hasUiLibraries && <TabsTrigger value="library">{t("Library")}</TabsTrigger>}
           <TabsTrigger value="core">{t("Blocks")}</TabsTrigger>
           {hasPartialBlocks && <TabsTrigger value="partials">{t("Partials")}</TabsTrigger>}
@@ -295,7 +295,7 @@ const AddBlocksPanel = ({
             </TabsTrigger>
           ))}
         </TabsList>
-        <TabsContent value="core" className="h-full max-h-full flex-1 pb-[42px]">
+        <TabsContent value="core" className="h-full max-h-full flex-1 pb-[42px] builder-sdk-add-blocks-tab-core">
           <div className="-mx-1.5 h-full max-h-full overflow-hidden">
             <div className="mt-2 h-full w-full">
               <DefaultChaiBlocks
@@ -307,12 +307,12 @@ const AddBlocksPanel = ({
           </div>
         </TabsContent>
         {hasUiLibraries && (
-          <TabsContent value="library" className="h-full max-h-full flex-1 pb-[42px]">
+          <TabsContent value="library" className="h-full max-h-full flex-1 pb-[42px] builder-sdk-add-blocks-tab-library">
             <UILibrariesPanel parentId={parentId} position={position} />
           </TabsContent>
         )}
         {hasPartialBlocks && (
-          <TabsContent value="partials" className="h-full max-h-full flex-1 pb-[42px]">
+          <TabsContent value="partials" className="h-full max-h-full flex-1 pb-[42px] builder-sdk-add-blocks-tab-partials">
             <div className="-mx-1.5 h-full max-h-full overflow-hidden">
               <div className="mt-2 h-full w-full">
                 <PartialBlocks gridCols={"grid-cols-4"} parentId={parentId} position={position} />
@@ -321,7 +321,7 @@ const AddBlocksPanel = ({
           </TabsContent>
         )}
         {canImportHTML ? (
-          <TabsContent value="html" className="h-full max-h-full flex-1 pb-[42px]">
+          <TabsContent value="html" className="h-full max-h-full flex-1 pb-[42px] builder-sdk-add-blocks-tab-html">
             <ImportHTML parentId={parentId} position={position} />
           </TabsContent>
         ) : null}
