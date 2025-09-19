@@ -23,7 +23,7 @@ export const HotKeys = () => {
       <DialogTrigger>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button className={`mb-2 rounded-lg p-2 transition-colors`} variant="ghost">
+            <Button className={`mb-2 rounded-lg p-2 transition-colors`} variant="link">
               <KeyboardIcon className="size-4" />
             </Button>
           </TooltipTrigger>

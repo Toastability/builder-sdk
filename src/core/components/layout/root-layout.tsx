@@ -260,7 +260,7 @@ const RootLayout: ComponentType = () => {
             </Suspense>
           </div>
           <main className="relative flex h-[calc(100dvh-48px)] max-w-full flex-1 flex-row builder-sdk-main">
-            <div id="sidebar" className="relative z-50 flex w-12 flex-col items-center justify-between border-r border-border py-2 builder-sdk-sidebar">
+            <div id="sidebar" className="relative z-50 flex w-12 flex-col items-center justify-between border-r border-border p-2 builder-sdk-sidebar">
               <div className="flex flex-col gap-y-1">
                 {[defaultPanels, topPanels].flat().map((item, index) => (
                   <Tooltip key={"button-top-" + index}>
@@ -303,8 +303,8 @@ const RootLayout: ComponentType = () => {
             <motion.div
               id="left-panel"
               className="h-full max-h-full border-r border-border builder-sdk-left-panel"
-              initial={{ width: leftPanelWidth }}
-              animate={{ width: leftPanelWidth }}
+              initial={{ width: leftPanelWidth, minWidth: leftPanelWidth }}
+              animate={{ width: leftPanelWidth, minWidth: leftPanelWidth }}
               transition={{ duration: 0.3, ease: "easeInOut" }}>
               {activePanel !== null && get(activePanelItem, "view", "standard") === "standard" && (
                 <div className="no-scrollbar flex h-full flex-col overflow-hidden builder-sdk-left-panel-content">

@@ -23,7 +23,7 @@ import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 
 const CORE_GROUPS = ["basic", "typography", "media", "layout", "form", "advanced", "other"];
-const panelTop = 50;
+const panelTop = 48;
 
 export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position }: any) => {
   const { t } = useTranslation();
@@ -156,7 +156,7 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position }: any) =
         {sortedGroups.length > 0 && (
           <div className="w-full builder-sdk-add-blocks-groups">
             <ScrollArea className="h-full">
-              <div className="space-y-1 p-2">
+              <div className="space-y-1 p-0">
                 <button
                   key="sidebar-all"
                   onClick={() => handleGroupClick("all")}
@@ -204,11 +204,11 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position }: any) =
             width: 350,
           }}>
           <div className="flex h-full w-full flex-col border-l border-border bg-background shadow-xl">
-            <div className="flex items-center justify-between border-b border-border px-4 h-10 text-sm font-medium">
+            <div className="flex items-center justify-between border-b border-border p-4 h-10 text-sm font-medium">
               <span>{capitalize(t(hoveredGroup.toLowerCase()))}</span>
             </div>
             <ScrollArea className="h-full max-h-full">
-              <div className="space-y-4">
+              <div className="space-y-4 p-4">
                 {reject(
                   filter(values(filteredBlocks), { group: hoveredGroup }),
                   { hidden: true },

@@ -31,8 +31,8 @@ export const ClearCanvas = () => {
     <div className="flex items-center builder-sdk-clear-canvas">
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <Button size="sm" variant="ghost" className="flex items-center gap-x-1 builder-sdk-clear-canvas-btn">
-            <EraserIcon /> {t("Clear")}
+          <Button size="sm" variant="link" className="flex items-center gap-x-1 builder-sdk-clear-canvas-btn">
+            <EraserIcon />
           </Button>
         </AlertDialogTrigger>
         <AlertDialogContent className={"border-border builder-sdk-clear-canvas-dialog"}>
