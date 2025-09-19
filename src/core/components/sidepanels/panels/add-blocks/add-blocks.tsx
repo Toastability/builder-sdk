@@ -298,7 +298,11 @@ const AddBlocksPanel = ({
         <TabsContent value="core" className="h-full max-h-full flex-1 pb-[42px]">
           <div className="-mx-1.5 h-full max-h-full overflow-hidden">
             <div className="mt-2 h-full w-full">
-              <DefaultChaiBlocks gridCols={"grid-cols-4"} parentId={parentId} position={position} />
+              <DefaultChaiBlocks
+                gridCols={"grid-cols-1 sm:grid-cols-2"}
+                parentId={parentId}
+                position={position}
+              />
             </div>
           </div>
         </TabsContent>
