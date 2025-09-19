@@ -173,7 +173,6 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position, gridCols
                   key="sidebar-all"
                   onClick={() => handleGroupClick("all")}
                   onMouseEnter={() => handleGroupHover("all")}
-                  onMouseLeave={handleGroupLeave}
                   className={`w-full rounded-md px-2 py-1.5 text-left text-sm font-medium ${
                     selectedGroup === "all" || hoveredGroup === "all"
                       ? "bg-primary text-primary-foreground"
@@ -186,7 +185,6 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position, gridCols
                     key={`sidebar-${group}`}
                     onClick={() => handleGroupClick(group)}
                     onMouseEnter={() => handleGroupHover(group)}
-                    onMouseLeave={handleGroupLeave}
                     className={`w-full rounded-md px-2 py-1.5 text-left text-sm ${
                       selectedGroup === group || hoveredGroup === group
                         ? "bg-primary text-primary-foreground"
@@ -201,7 +199,7 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position, gridCols
         )}
 
         {/* Main content area */}
-        <div className="h-full w-3/4 flex-1 overflow-hidden builder-sdk-add-blocks-content">
+        <div className={"h-full w-3/4 flex-1 overflow-hidden builder-sdk-add-blocks-content " + (hoveredGroup && hoveredGroup !== "all" ? "invisible" : "") }>
           <ScrollArea id="add-blocks-scroll-area" className="no-scrollbar mr-4 h-full builder-sdk-add-blocks-scroll">
             {filteredGroups.length === 0 && searchTerm ? (
               <div className="flex flex-col items-center justify-center p-8 text-center text-muted-foreground">
@@ -245,6 +243,7 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position, gridCols
           animate={{ x: 0, opacity: 1 }}
           transition={{ duration: 0.2, ease: "easeOut" }}
           onMouseLeave={handleGroupLeave}
+          onMouseEnter={() => setHoveredGroup(hoveredGroup)}
           className="builder-sdk-hover-preview z-40"
           style={{
             position: "fixed",

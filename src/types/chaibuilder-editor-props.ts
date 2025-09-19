@@ -214,6 +214,24 @@ export interface ChaiBuilderEditorProps {
   deviceWrapperEnabled?: boolean;
 
   /**
+   * Optional content to render when there are no blocks on the canvas.
+   * Useful for onboarding instructions, actions, or AI panel shortcuts.
+   */
+  emptyState?: React.ReactNode;
+
+  /**
+   * Page metadata editor for the browser URL bar. When provided, the top
+   * browser chrome renders the title and permalink and opens a dialog to edit.
+   */
+  pageMeta?: {
+    title?: string;
+    permalink?: string;
+    onTitleChange?: (val: string) => void;
+    onPermalinkChange?: (val: string) => void;
+    permalinkErrorMessage?: string;
+  } | null;
+
+  /**
    * Loading state
    */
   loading?: boolean;

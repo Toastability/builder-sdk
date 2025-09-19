@@ -307,15 +307,18 @@ const RootLayout: ComponentType = () => {
               animate={{ width: leftPanelWidth }}
               transition={{ duration: 0.3, ease: "easeInOut" }}>
               {activePanel !== null && get(activePanelItem, "view", "standard") === "standard" && (
-                <div className="no-scrollbar flex h-full flex-col overflow-hidden px-3 py-2 builder-sdk-left-panel-content">
+                <div className="no-scrollbar flex h-full flex-col overflow-hidden builder-sdk-left-panel-content">
+                  {/* Header container now takes full width with background */}
                   <div
-                    className={`absolute top-2 flex h-10 items-center space-x-1 py-2 text-base font-bold ${get(activePanelItem, "isInternal", false) ? "" : "w-64"} builder-sdk-left-panel-header`}>
+                    className={`sticky top-0 z-10 flex h-10 items-center space-x-1 border-b border-border bg-background px-3 py-2 text-base font-bold ${get(activePanelItem, "isInternal", false) ? "" : "w-full"} builder-sdk-left-panel-header`}>
                     <span>{t(get(activePanelItem, "label", ""))}</span>
                   </div>
-                  <div className="no-scrollbar h-full max-h-full overflow-y-auto pt-10 builder-sdk-left-panel-scroll">
-                    <Suspense fallback={<div>Loading...</div>}>
-                      {React.createElement(get(activePanelItem, "panel", NoopComponent), {})}
-                    </Suspense>
+                  <div className="no-scrollbar h-full max-h-full overflow-y-auto builder-sdk-left-panel-scroll">
+                    <div className="px-3 py-2">
+                      <Suspense fallback={<div>Loading...</div>}>
+                        {React.createElement(get(activePanelItem, "panel", NoopComponent), {})}
+                      </Suspense>
+                    </div>
                   </div>
                 </div>
               )}

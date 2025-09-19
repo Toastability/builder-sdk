@@ -11,13 +11,20 @@ import { ResizableCanvasWrapper } from "@/core/components/canvas/static/resizabl
 import { StaticBlocksRenderer } from "@/core/components/canvas/static/static-blocks-renderer";
 import { useCanvasScale } from "@/core/components/canvas/static/use-canvas-scale";
 import { ChaiFrame } from "@/core/frame";
-import { useBuilderProp, useCanvasDisplayWidth, useHighlightBlockId } from "@/core/hooks";
+import { useBuilderProp, useCanvasDisplayWidth, useCanvasZoom, useHighlightBlockId } from "@/core/hooks";
 import { Skeleton } from "@/ui/shadcn/components/ui/skeleton";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/ui/shadcn/components/ui/dialog";
+import { Input } from "@/ui/shadcn/components/ui/input";
+import { Button } from "@/ui/shadcn/components/ui/button";
 import { useAtom } from "jotai";
 import { isEmpty } from "lodash-es";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Provider } from "react-wrap-balancer";
 import { CanvasEventsWatcher } from "./canvas-events-watcher";
+import { Breakpoints } from "@/core/components/canvas/topbar/canvas-breakpoints";
+import { UndoRedo } from "@/core/components/canvas/topbar/undo-redo";
+import { ClearCanvas } from "@/core/components/canvas/topbar/clear-canvas";
+import { round } from "lodash-es";
 
 const StaticCanvas = () => {
   const [width] = useCanvasDisplayWidth();
@@ -30,6 +37,9 @@ const StaticCanvas = () => {
   const loadingCanvas = useBuilderProp("loading", false);
   const htmlDir = useBuilderProp("htmlDir", "ltr");
   const deviceWrapperEnabled = useBuilderProp("deviceWrapperEnabled", true);
+  const pageMeta = useBuilderProp("pageMeta", null as any);
+  const emptyState = useBuilderProp("emptyState", null as any);
+  const [zoom] = useCanvasZoom();
 
   const setNewWidth = useCallback(
     (newWidth: number) => {
@@ -78,6 +88,7 @@ const StaticCanvas = () => {
                 ) : (
                   <StaticBlocksRenderer />
                 )}
+                {emptyState ? emptyState : null}
                 <AddBlockAtBottom />
                 <br />
                 <br />
@@ -96,23 +107,84 @@ const StaticCanvas = () => {
     <ResizableCanvasWrapper onMount={setNewWidth} onResize={setNewWidth}>
       {/* Device wrapper to mimic a real page viewport */}
       <div className="builder-sdk-device-wrapper relative mx-auto h-full w-full overflow-auto">
-        <div className="builder-sdk-device-shell mx-auto my-4 overflow-hidden rounded-xl border bg-background shadow-sm"
-        style={{
-          maxHeight: `calc(100dvh - 150px)`,
-          height: `calc(100dvh - 150px)`,
-        }}
-        >
-          <div className="builder-sdk-device-chrome flex h-8 items-center gap-2 border-b px-3">
+        <div
+          className="builder-sdk-device-shell mx-auto my-4 overflow-hidden rounded-xl border bg-background shadow-sm"
+          style={{
+            maxHeight: `calc(100dvh - 150px)`,
+            height: `calc(100dvh - 150px)`,
+            // Make the shell width respond to selected device width
+            width: `${Math.min(width, dimension.width || width)}px`,
+          }}>
+          {/* Browser chrome */}
+          <div className="builder-sdk-device-chrome flex h-10 items-center gap-2 border-b px-3">
+            {/* traffic lights */}
             <div className="flex items-center gap-1.5 pr-2">
               <span className="h-3 w-3 rounded-full bg-red-400"></span>
               <span className="h-3 w-3 rounded-full bg-yellow-400"></span>
               <span className="h-3 w-3 rounded-full bg-green-400"></span>
             </div>
-            <div className="h-4 flex-1 rounded bg-muted/50" />
+
+            {/* URL bar -> clickable title/permalink */}
+            <div className="flex min-w-0 flex-1 items-center">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <button
+                    type="button"
+                    className="group flex w-full items-center justify-start gap-2 truncate rounded-md border bg-muted/40 px-3 py-1.5 text-left text-xs hover:bg-muted/60"
+                    title={pageMeta?.permalink || "Edit page meta"}>
+                    <span className="truncate font-semibold text-foreground/90">
+                      {pageMeta?.title || "Untitled"}
+                    </span>
+                    <span className="truncate text-muted-foreground">{pageMeta?.permalink || "/permalink"}</span>
+                  </button>
+                </DialogTrigger>
+                <DialogContent className="max-w-lg">
+                  <DialogHeader>
+                    <DialogTitle>Edit page details</DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4 py-2">
+                    <div className="space-y-1">
+                      <label className="text-xs font-medium text-muted-foreground">Title</label>
+                      <Input
+                        defaultValue={pageMeta?.title || ""}
+                        onChange={(e) => pageMeta?.onTitleChange && pageMeta.onTitleChange(e.target.value)}
+                        placeholder="Page title"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="text-xs font-medium text-muted-foreground">Permalink</label>
+                      <Input
+                        defaultValue={pageMeta?.permalink || ""}
+                        onChange={(e) => pageMeta?.onPermalinkChange && pageMeta.onPermalinkChange(e.target.value)}
+                        placeholder="/your-slug"
+                      />
+                      {pageMeta?.permalinkErrorMessage ? (
+                        <p className="text-xs text-destructive">{pageMeta.permalinkErrorMessage}</p>
+                      ) : null}
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button type="button" variant="default">
+                      Close
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+            </div>
+
+            {/* Controls moved from canvas topbar to the shell, aligned right */}
+            <div className="flex items-center gap-2">
+              <Breakpoints canvas openDelay={400} tooltip={false} />
+              <div className="flex w-12 cursor-default items-center justify-center gap-x-1 text-xs text-muted-foreground">
+                {round(zoom as any, 0)}%
+              </div>
+              <UndoRedo />
+              <ClearCanvas />
+            </div>
           </div>
           <div
             onMouseLeave={() => setTimeout(() => highlight(""), 300)}
-            className="builder-sdk-device-body relative mx-auto h-full w-full overflow-hidden"
+            className="builder-sdk-device-body relative mx-auto h-full w-full overflow-auto"
             ref={wrapperRef}>
             {/*// @ts-ignore*/}
             <ChaiFrame
@@ -134,6 +206,8 @@ const StaticCanvas = () => {
                   ) : (
                     <StaticBlocksRenderer />
                   )}
+                  {/* Optional empty state from client */}
+                  {emptyState ? emptyState : null}
                   <AddBlockAtBottom />
                   <br />
                   <br />
