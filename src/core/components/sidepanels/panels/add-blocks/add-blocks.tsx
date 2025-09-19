@@ -152,7 +152,7 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position, gridCols
   return (
     <div className="mx-auto flex h-full w-full flex-col builder-sdk-add-blocks-panel">
       {/* Search at top */}
-      <div className="sticky top-0 z-10 bg-background/80 px-4 py-2 backdrop-blur-sm builder-sdk-add-blocks-search">
+      <div className="sticky top-0 z-10 bg-background/80 p-2 backdrop-blur-sm builder-sdk-add-blocks-search">
         <Input
           ref={searchInputRef}
           type="search"

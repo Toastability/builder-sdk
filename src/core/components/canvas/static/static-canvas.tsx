@@ -95,8 +95,13 @@ const StaticCanvas = () => {
   return (
     <ResizableCanvasWrapper onMount={setNewWidth} onResize={setNewWidth}>
       {/* Device wrapper to mimic a real page viewport */}
-      <div className="builder-sdk-device-wrapper relative mx-auto h-full w-full overflow-auto px-2">
-        <div className="builder-sdk-device-shell mx-auto my-4 max-h-[85vh] overflow-hidden rounded-xl border bg-background shadow-sm">
+      <div className="builder-sdk-device-wrapper relative mx-auto h-full w-full overflow-auto">
+        <div className="builder-sdk-device-shell mx-auto my-4 overflow-hidden rounded-xl border bg-background shadow-sm"
+        style={{
+          maxHeight: `calc(100dvh - 150px)`,
+          height: `calc(100dvh - 150px)`,
+        }}
+        >
           <div className="builder-sdk-device-chrome flex h-8 items-center gap-2 border-b px-3">
             <div className="flex items-center gap-1.5 pr-2">
               <span className="h-3 w-3 rounded-full bg-red-400"></span>
