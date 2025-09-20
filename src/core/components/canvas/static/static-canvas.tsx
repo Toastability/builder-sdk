@@ -240,9 +240,6 @@ const StaticCanvas = () => {
             {/* Desktop/tablet controls */}
             <div className="hidden items-center gap-2 md:flex">
               <Breakpoints canvas openDelay={400} tooltip={false} />
-              <div className="flex w-12 cursor-default items-center justify-center gap-x-1 text-xs text-muted-foreground">
-                {round(zoom as any, 0)}%
-              </div>
               <UndoRedo />
               <ClearCanvas />
             </div>

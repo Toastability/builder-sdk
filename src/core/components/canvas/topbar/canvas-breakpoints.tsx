@@ -5,6 +5,7 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -156,6 +157,11 @@ export const Breakpoints = ({
   const { t } = useTranslation();
   const breakpoints = useBuilderProp("breakpoints", WEB_BREAKPOINTS);
 
+  const allowedCanvasBreakpoints = ["xs", "md", "xl"];
+  const canvasBreakpoints = canvas
+    ? breakpoints.filter((bp: BreakpointItemType) => allowedCanvasBreakpoints.includes(bp.breakpoint))
+    : breakpoints;
+
   const toggleBreakpoint = (newBreakPoint: string) => {
     if (selectedBreakpoints.includes(newBreakPoint)) {
       if (selectedBreakpoints.length > 2) {
@@ -176,6 +182,55 @@ export const Breakpoints = ({
   };
 
   const breakpoint = getBreakpointValue(canvas ? canvasDisplayWidth : currentWidth).toLowerCase();
+
+  if (canvas) {
+    if (canvasBreakpoints.length === 0) return null;
+
+    const activeBreakpoint = canvasBreakpoints.find((bp) => bp.breakpoint === breakpoint) ?? canvasBreakpoints[0];
+    const inactiveOptions = canvasBreakpoints.filter((bp) => bp.breakpoint !== activeBreakpoint.breakpoint);
+
+    if (breakpoint === "xs") {
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              size="sm"
+              className="h-7 w-7 rounded-md p-1"
+              variant="outline"
+              aria-label={t(activeBreakpoint.title)}>
+              {activeBreakpoint.icon}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-44">
+            {inactiveOptions.map((bp) => (
+              <DropdownMenuItem key={bp.breakpoint} onClick={() => handleCanvasWidthChange(bp.width)}>
+                <span className="flex items-center gap-2 text-xs">
+                  {bp.icon}
+                  {t(bp.title)}
+                </span>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    }
+
+    return (
+      <div className="flex items-center gap-1 builder-sdk-breakpoints">
+        {canvasBreakpoints.map((bp) => (
+          <BreakpointCard
+            canvas={canvas}
+            openDelay={openDelay}
+            tooltip={tooltip}
+            {...bp}
+            onClick={handleCanvasWidthChange}
+            key={bp.breakpoint}
+            currentBreakpoint={breakpoint}
+          />
+        ))}
+      </div>
+    );
+  }
 
   if (breakpoints.length < 4) {
     return (

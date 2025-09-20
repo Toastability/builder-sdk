@@ -1,4 +1,5 @@
 import { Breadcrumb } from "@/core/components/canvas/bread-crumb";
+import { CanvasTopBar } from "@/core/components/canvas/topbar/canvas-top-bar";
 import StaticCanvas from "@/core/components/canvas/static/static-canvas";
 import { FallbackError } from "@/core/components/fallback-error";
 import { useBuilderProp, useCodeEditor } from "@/core/hooks";
@@ -28,7 +29,7 @@ const CanvasArea: React.FC = () => {
             </Resizable>
           </Suspense>
         ) : null}
-        <Breadcrumb />
+        <Breadcrumb actions={<CanvasTopBar variant="inline" />} />
       </div>
     </div>
   );

@@ -16,7 +16,14 @@ import { round } from "lodash-es";
 import React, { useEffect, useState } from "react";
 import { Maximize2, Minimize2 } from "lucide-react";
 
-const CanvasTopBar: React.FC = () => {
+type CanvasTopBarVariant = "standalone" | "inline";
+
+interface CanvasTopBarProps {
+  variant?: CanvasTopBarVariant;
+  className?: string;
+}
+
+const CanvasTopBar: React.FC<CanvasTopBarProps> = ({ variant = "standalone", className }) => {
   const darkModeSupport = useBuilderProp("darkMode", true);
   const aiChat = useFeature("aiChat");
   const [zoom] = useCanvasZoom();
@@ -30,23 +37,46 @@ const CanvasTopBar: React.FC = () => {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
+  const containerClasses =
+    (variant === "standalone"
+      ? "builder-sdk-canvas-topbar flex h-10 items-center justify-between border-b border-border bg-background/70 px-2"
+      : "builder-sdk-canvas-topbar flex flex-wrap items-center justify-between gap-2") + (className ? ` ${className}` : "");
+
+  const leftClasses =
+    variant === "standalone"
+      ? "flex h-full items-center space-x-2 builder-sdk-canvas-topbar-left"
+      : "flex flex-wrap items-center gap-2 builder-sdk-canvas-topbar-left";
+
+  const rightClasses =
+    variant === "standalone"
+      ? "flex h-full items-center space-x-2 builder-sdk-canvas-topbar-right"
+      : "flex items-center gap-2 builder-sdk-canvas-topbar-right";
+
   return (
-    <div className="flex h-10 items-center justify-between border-b border-border bg-background/70 px-2 builder-sdk-canvas-topbar">
-      <div className="flex h-full space-x-2 builder-sdk-canvas-topbar-left">
+    <div className={containerClasses}>
+      <div className={leftClasses}>
         {/* Device icons, zoom, undo/redo moved into the device chrome */}
         {darkModeSupport ? (
           <>
             <DarkMode />
-            <Separator orientation="vertical" />
+            <Separator orientation="vertical" className={variant === "inline" ? "hidden md:flex" : undefined} />
           </>
         ) : null}
-        {/* Placeholder zoom indicator for spacing on wide screens */}
-        <div className="hidden w-12 items-center justify-center gap-x-1 space-x-0 text-gray-400 md:flex">
-          <ZoomInIcon className="h-3.5 w-3.5 flex-shrink-0" /> <div className="text-xs leading-3">{round(zoom, 0)}%</div>
-        </div>
+        {/* Zoom indicator */}
+        {variant === "standalone" ? (
+          <div className="hidden w-12 items-center justify-center gap-x-1 text-gray-400 md:flex">
+            <ZoomInIcon className="h-3.5 w-3.5 flex-shrink-0" />
+            <div className="text-xs leading-3">{round(zoom, 0)}%</div>
+          </div>
+        ) : (
+          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <ZoomInIcon className="h-3.5 w-3.5 flex-shrink-0" />
+            <span>{round(zoom, 0)}%</span>
+          </div>
+        )}
         <DataBinding />
       </div>
-      <div className="flex h-full items-center space-x-2 builder-sdk-canvas-topbar-right">
+      <div className={rightClasses}>
         {isMobile && (
           <TooltipProvider>
             <Tooltip>

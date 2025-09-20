@@ -1,7 +1,6 @@
 import { default as AIChatPanel } from "@/core/components/ai/ai-chat-panel";
 import { AskAI } from "@/core/components/ask-ai-panel";
 import CanvasArea from "@/core/components/canvas/canvas-area";
-import { CanvasTopBar } from "@/core/components/canvas/topbar/canvas-top-bar";
 import { Outline } from "@/core/components/index";
 import { AddBlocksDialog } from "@/core/components/layout/add-blocks-dialog";
 import { NoopComponent } from "@/core/components/noop-component";
@@ -324,7 +323,6 @@ const RootLayout: ComponentType = () => {
               )}
             </motion.div>
             <div id="canvas-container" className="flex h-full max-h-full flex-1 flex-col bg-slate-800/20 builder-sdk-canvas-container">
-              <CanvasTopBar />
               <Suspense>
                 <CanvasArea />
               </Suspense>
