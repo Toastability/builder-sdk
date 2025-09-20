@@ -84,7 +84,7 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position }: any) =
     document.addEventListener("mousedown", handleClickOutside);
 
     // Also listen inside the canvas iframe document (clicking on the canvas)
-    const iframeDoc = canvasIframe?.contentWindow?.document;
+    const iframeDoc = (canvasIframe as HTMLIFrameElement | null)?.contentWindow?.document;
     iframeDoc?.addEventListener("mousedown", handleClickOutside);
 
     return () => {
