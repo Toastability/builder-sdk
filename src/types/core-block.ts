@@ -7,6 +7,9 @@ export interface CoreBlock {
   type: string;
   _name?: string;
   partialBlockId?: string;
-  iconUrl?: string;
+  thumbData?: {
+    desktop: string;
+    mobile: string;
+  };
   icon?: any;
 }
