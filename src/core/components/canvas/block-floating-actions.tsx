@@ -112,6 +112,12 @@ const BlockFloatingSelector = ({ block, selectedBlockElement }: BlockActionProps
   const { hasPermission } = usePermissions();
   const { editingBlockId } = useInlineEditing();
   const { document } = useFrame();
+  // IMPORTANT: All hooks used by this component must be declared before any conditional return.
+  // Previously, useCanvasZoom() was invoked AFTER an early return which caused React to see
+  // a different number/order of hooks between renders (when selectedBlockElement/block became defined),
+  // triggering the runtime error: "Rendered more hooks than during the previous render.".
+  // Moving this hook (and any future hooks) above the early return keeps hook order stable.
+  const [zoomPercent] = useCanvasZoom();
 
   // * Floating element position and size
   const { floatingStyles, refs, update } = useFloating({
@@ -161,8 +167,7 @@ const BlockFloatingSelector = ({ block, selectedBlockElement }: BlockActionProps
 
   if (!selectedBlockElement || !block || editingBlockId) return null;
 
-  // Use global canvas zoom so controls remain readable when canvas scales
-  const [zoomPercent] = useCanvasZoom();
+  // zoomPercent already obtained above to preserve hook order
   const uiScale = Math.max(zoomPercent || 100, 1) / 100; // 1.0 at 100%
 
   return (
