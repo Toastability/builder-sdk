@@ -35,12 +35,21 @@ import { ClearCanvas } from "@/core/components/canvas/topbar/clear-canvas";
 import { round } from "lodash-es";
 import { DotsVerticalIcon, HamburgerMenuIcon } from "@radix-ui/react-icons";
 
+const COLLAPSED_LEFT_PANEL_WIDTH = 50; // px width for the icon-only sidebar
+const PRIMARY_LEFT_PANEL_WIDTH = 280; // px width for the main library panel
+const RIGHT_PANEL_WIDTH = 280; // px width for block/settings panel
+const CANVAS_HORIZONTAL_PADDING = 32; // derived from the surrounding Tailwind `p-4`
+const DESKTOP_BREAKPOINT = 768; // matches Tailwind `md`
+
 const StaticCanvas = () => {
   const [width] = useCanvasDisplayWidth();
   const [, highlight] = useHighlightBlockId();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [dimension, setDimension] = useState({ width: 0, height: 0 });
+  const [windowWidth, setWindowWidth] = useState(() =>
+    typeof window !== "undefined" ? window.innerWidth : 1200,
+  );
   const scale = useCanvasScale(dimension);
   const [, setCanvasIframe] = useAtom(canvasIframeAtom);
   const loadingCanvas = useBuilderProp("loading", false);
@@ -58,10 +67,18 @@ const StaticCanvas = () => {
   );
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
     if (!wrapperRef.current) return;
     const { clientWidth, clientHeight } = wrapperRef.current as HTMLDivElement;
     setDimension({ width: clientWidth, height: clientHeight });
-  }, [wrapperRef, width]);
+  }, [wrapperRef, width, windowWidth]);
 
   const iframeContent: string = useMemo(() => {
     let initialHTML = IframeInitialContent;
@@ -114,18 +131,29 @@ const StaticCanvas = () => {
 
   const [metaDialogOpen, setMetaDialogOpen] = useState(false);
 
+  const isDesktopViewport = windowWidth >= DESKTOP_BREAKPOINT;
+  const totalHorizontalOffsets = isDesktopViewport
+    ? COLLAPSED_LEFT_PANEL_WIDTH + PRIMARY_LEFT_PANEL_WIDTH + RIGHT_PANEL_WIDTH + CANVAS_HORIZONTAL_PADDING
+    : CANVAS_HORIZONTAL_PADDING;
+  const rawAvailableWidth = windowWidth - totalHorizontalOffsets;
+  const fallbackWidth = width || dimension.width || 0;
+  const availableCanvasWidth = rawAvailableWidth > 0 ? rawAvailableWidth : fallbackWidth;
+  const desiredWidth = width || availableCanvasWidth;
+  const shellWidth = Math.max(Math.min(desiredWidth, availableCanvasWidth), 0);
+  const computedMaxWidth = availableCanvasWidth > 0 ? availableCanvasWidth : fallbackWidth;
+
   return (
     <ResizableCanvasWrapper onMount={setNewWidth} onResize={setNewWidth}>
       {/* Device wrapper to mimic a real page viewport */}
       <div className="builder-sdk-device-wrapper relative mx-auto h-full w-full overflow-auto">
         <div
-          className="builder-sdk-device-shell mx-auto my-4 overflow-hidden rounded-xl border bg-background shadow-sm"
+          className="builder-sdk-device-shell mx-auto my-2 overflow-hidden rounded-xl border bg-background shadow-sm"
           style={{
-            maxHeight: `calc(100dvh - 150px)`,
-            height: `calc(100dvh - 150px)`,
+            maxHeight: `calc(100dvh - 140px)`,
+            height: `calc(100dvh - 140px)`,
             // Make the shell width respond to selected device width
-            width: `${Math.min(width, dimension.width || width)}px`,
-            maxWidth: "100%",
+            width: `${shellWidth}px`,
+            maxWidth: `${computedMaxWidth}px`,
           }}>
           {/* Browser chrome */}
           <div className="builder-sdk-device-chrome flex h-10 items-center gap-2 border-b px-3">
