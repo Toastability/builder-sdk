@@ -24,6 +24,7 @@ import { useAtom } from "jotai";
 import { first, get, isEmpty, pick } from "lodash-es";
 import { useEffect, useState } from "react";
 import { getElementByDataBlockId } from "./static/chai-canvas";
+import { useCanvasZoom } from "@/core/hooks";
 
 /**
  * @param block
@@ -160,18 +161,9 @@ const BlockFloatingSelector = ({ block, selectedBlockElement }: BlockActionProps
 
   if (!selectedBlockElement || !block || editingBlockId) return null;
 
-  // Determine the applied canvas scale by comparing rendered vs. layout width
-  const uiScale = (() => {
-    try {
-      if (!selectedBlockElement) return 1;
-      const rect = selectedBlockElement.getBoundingClientRect();
-      const layoutW = selectedBlockElement.offsetWidth || 1;
-      const s = rect.width / layoutW;
-      return s || 1;
-    } catch (e) {
-      return 1;
-    }
-  })();
+  // Use global canvas zoom so controls remain readable when canvas scales
+  const [zoomPercent] = useCanvasZoom();
+  const uiScale = Math.max(zoomPercent || 100, 1) / 100; // 1.0 at 100%
 
   return (
     <>

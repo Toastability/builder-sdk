@@ -1,4 +1,4 @@
-import { showPredefinedBlockCategoryAtom } from "@/core/atoms/ui";
+import { canvasIframeAtom, showPredefinedBlockCategoryAtom } from "@/core/atoms/ui";
 import { CoreBlock } from "@/core/components/sidepanels/panels/add-blocks/core-block";
 import { DefaultChaiBlocks } from "@/core/components/sidepanels/panels/add-blocks/default-blocks";
 import ImportHTML from "@/core/components/sidepanels/panels/add-blocks/import-html";
@@ -32,7 +32,7 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position }: any) =
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [tab] = useAtom(addBlockTabAtom);
   // const parentType = find(allBlocks, (block) => block._id === parentId)?._type;
-  const [selectedGroup, setSelectedGroup] = useState<string | null>("all");
+  const [selectedGroup, setSelectedGroup] = useState<string | null>(groups?.[0] ?? null);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [panelLeft, setPanelLeft] = useState<number>(327); // default; recalculated on mount
   const previewRef = useRef<HTMLDivElement | null>(null);
@@ -46,12 +46,9 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position }: any) =
     return () => clearTimeout(timeoutId);
   }, [tab]);
 
-  // Reset to "all" when searching
+  // On search, close any open preview; group selection stays as-is
   useEffect(() => {
-    if (searchTerm) {
-      setSelectedGroup("all");
-      setOpenGroup(null);
-    }
+    if (searchTerm) setOpenGroup(null);
   }, [searchTerm]);
 
   // Calculate preview panel coordinates so it slides out just to the right
@@ -71,6 +68,8 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position }: any) =
     return () => window.removeEventListener("resize", calc);
   }, []);
 
+  // Close preview panel when clicking outside it (including inside the canvas iframe)
+  const [canvasIframe] = useAtom(canvasIframeAtom);
   useEffect(() => {
     if (!openGroup) return;
 
@@ -81,18 +80,22 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position }: any) =
       setOpenGroup(null);
     };
 
+    // Listen on main document
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [openGroup]);
+
+    // Also listen inside the canvas iframe document (clicking on the canvas)
+    const iframeDoc = canvasIframe?.contentWindow?.document;
+    iframeDoc?.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      iframeDoc?.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [openGroup, canvasIframe]);
 
   // Immediate selection on click
   const handleGroupClick = useCallback((group: string) => {
     setSelectedGroup(group);
-    if (group === "all") {
-      setOpenGroup(null);
-      return;
-    }
-
     setOpenGroup((current) => (current === group ? null : group));
   }, []);
 
@@ -126,9 +129,9 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position }: any) =
   // Keeping logic simple and removing unused memos to satisfy linting.
 
   return (
-    <div className="mx-auto flex h-full w-full min-w-[200px] flex-col builder-sdk-add-blocks-panel">
+    <div className="builder-sdk-add-blocks-panel mx-auto flex h-full w-full min-w-[200px] flex-col">
       {/* Search at top */}
-      <div className="sticky top-0 z-10 bg-background/80 p-2 backdrop-blur-sm builder-sdk-add-blocks-search">
+      <div className="builder-sdk-add-blocks-search sticky top-0 z-10 bg-background/80 p-2 backdrop-blur-sm">
         <Input
           ref={searchInputRef}
           type="search"
@@ -139,22 +142,12 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position }: any) =
         />
       </div>
 
-      <div className="sticky top-10 flex h-[calc(100%-48px)] overflow-hidden builder-sdk-add-blocks-body py-[25px]">
+      <div className="builder-sdk-add-blocks-body sticky top-10 flex h-[calc(100%-48px)] overflow-hidden py-[25px]">
         {/* Sidebar for groups */}
         {sortedGroups.length > 0 && (
-          <div ref={groupListRef} className="w-full builder-sdk-add-blocks-groups">
+          <div ref={groupListRef} className="builder-sdk-add-blocks-groups w-full">
             <ScrollArea className="h-full">
               <div className="space-y-1 p-0">
-                <button
-                  key="sidebar-all"
-                  onClick={() => handleGroupClick("all")}
-                  className={`w-full rounded-sm px-2 py-1.5 text-left text-sm font-medium ${
-                    selectedGroup === "all"
-                      ? "bg-primary text-primary-foreground"
-                      : "hover:bg-primary/50 hover:text-primary-foreground"
-                  }`}>
-                  {t("All")}
-                </button>
                 {sortedGroups.map((group) => (
                   <button
                     key={`sidebar-${group}`}
@@ -173,8 +166,8 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position }: any) =
         )}
       </div>
 
-      {/* Hover Preview Panel: slides out when a group is hovered */}
-      {openGroup && openGroup !== "all" && (
+      {/* Component/Block Preview Panel: slides out when a group is clicked */}
+      {openGroup && (
         <motion.div
           initial={{ x: -20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
@@ -192,15 +185,16 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position }: any) =
             borderRight: "5px inset #5b5e65",
           }}>
           <div className="flex h-full w-full flex-col border-l border-border bg-background shadow-xl">
-            <div className="flex items-center justify-between border-b border-border p-4 h-10 text-sm font-medium">
+            <div
+              className="flex h-10 items-center justify-between border-b border-border p-4 text-sm font-medium"
+              style={{
+                backgroundColor: "rgba(0, 0, 0, 0.05)",
+              }}>
               <span>{capitalize(t(openGroup.toLowerCase()))}</span>
             </div>
             <ScrollArea className="h-full max-h-full">
-              <div className="space-y-4 p-4" style={{backgroundColor: "rgba(0, 0, 0, 0.05)"}}>
-                {reject(
-                  filter(values(filteredBlocks), { group: openGroup }),
-                  { hidden: true },
-                ).map((block) => (
+              <div className="space-y-4 p-4" style={{ backgroundColor: "rgba(0, 0, 0, 0.05)" }}>
+                {reject(filter(values(filteredBlocks), { group: openGroup }), { hidden: true }).map((block) => (
                   <CoreBlock
                     key={`hover-${openGroup}-${block.type}`}
                     parentId={parentId}
@@ -263,9 +257,13 @@ const AddBlocksPanel = ({
   }, [tab, hasUiLibraries, setTab]);
 
   return (
-    <div className={mergeClasses("flex h-full w-full flex-col overflow-hidden builder-sdk-add-blocks-container", className)}>
+    <div
+      className={mergeClasses(
+        "builder-sdk-add-blocks-container flex h-full w-full flex-col overflow-hidden",
+        className,
+      )}>
       {showHeading ? (
-        <div className="mb-2 flex flex-col justify-between rounded-md bg-background/30 p-1 builder-sdk-add-blocks-header">
+        <div className="builder-sdk-add-blocks-header mb-2 flex flex-col justify-between rounded-md bg-background/30 p-1">
           <h1 className="flex flex-col items-baseline px-1 text-xl font-semibold xl:flex-col">{t("Add block")}</h1>
           <span className="p-0 text-xs font-light leading-3 opacity-80 xl:pl-1">
             {tab === "html" ? t("Enter or paste TailwindCSS HTML snippet") : t("Click to add block to page")}
@@ -279,8 +277,8 @@ const AddBlocksPanel = ({
           setTab(_tab);
         }}
         value={tab}
-        className={"flex h-full max-h-full flex-col overflow-hidden builder-sdk-add-blocks-tabs"}>
-        <TabsList className={"flex w-full items-center builder-sdk-add-blocks-tabs-list"}>
+        className={"builder-sdk-add-blocks-tabs flex h-full max-h-full flex-col overflow-hidden"}>
+        <TabsList className={"builder-sdk-add-blocks-tabs-list flex w-full items-center"}>
           {hasUiLibraries && <TabsTrigger value="library">{t("Library")}</TabsTrigger>}
           <TabsTrigger value="core">{t("Blocks")}</TabsTrigger>
           {hasPartialBlocks && <TabsTrigger value="partials">{t("Partials")}</TabsTrigger>}
@@ -291,24 +289,24 @@ const AddBlocksPanel = ({
             </TabsTrigger>
           ))}
         </TabsList>
-        <TabsContent value="core" className="h-full max-h-full flex-1 pb-[42px] builder-sdk-add-blocks-tab-core">
+        <TabsContent value="core" className="builder-sdk-add-blocks-tab-core h-full max-h-full flex-1 pb-[42px]">
           <div className="-mx-1.5 h-full max-h-full overflow-hidden">
             <div className="mt-2 h-full w-full">
-              <DefaultChaiBlocks
-                gridCols={"grid-cols-1 sm:grid-cols-2"}
-                parentId={parentId}
-                position={position}
-              />
+              <DefaultChaiBlocks gridCols={"grid-cols-1 sm:grid-cols-2"} parentId={parentId} position={position} />
             </div>
           </div>
         </TabsContent>
         {hasUiLibraries && (
-          <TabsContent value="library" className="h-full max-h-full flex-1 pb-[42px] builder-sdk-add-blocks-tab-library">
+          <TabsContent
+            value="library"
+            className="builder-sdk-add-blocks-tab-library h-full max-h-full flex-1 pb-[42px]">
             <UILibrariesPanel parentId={parentId} position={position} />
           </TabsContent>
         )}
         {hasPartialBlocks && (
-          <TabsContent value="partials" className="h-full max-h-full flex-1 pb-[42px] builder-sdk-add-blocks-tab-partials">
+          <TabsContent
+            value="partials"
+            className="builder-sdk-add-blocks-tab-partials h-full max-h-full flex-1 pb-[42px]">
             <div className="-mx-1.5 h-full max-h-full overflow-hidden">
               <div className="mt-2 h-full w-full">
                 <PartialBlocks gridCols={"grid-cols-4"} parentId={parentId} position={position} />
@@ -317,7 +315,7 @@ const AddBlocksPanel = ({
           </TabsContent>
         )}
         {canImportHTML ? (
-          <TabsContent value="html" className="h-full max-h-full flex-1 pb-[42px] builder-sdk-add-blocks-tab-html">
+          <TabsContent value="html" className="builder-sdk-add-blocks-tab-html h-full max-h-full flex-1 pb-[42px]">
             <ImportHTML parentId={parentId} position={position} />
           </TabsContent>
         ) : null}

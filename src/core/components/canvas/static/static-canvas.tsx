@@ -61,6 +61,7 @@ const StaticCanvas = () => {
   const [zoom] = useCanvasZoom();
   const [blocks] = useBlocksStore();
   const hasBlocks = !isEmpty(blocks);
+  const showEmptyShell = Boolean(emptyState) && !hasBlocks;
 
   const setNewWidth = useCallback(
     (newWidth: number) => {
@@ -268,76 +269,87 @@ const StaticCanvas = () => {
             </div>
 
             {/* Controls moved from canvas topbar to the shell, aligned right */}
-            {/* Desktop/tablet controls */}
-            <div className="hidden items-center gap-2 md:flex">
-              <Breakpoints canvas openDelay={400} tooltip={false} />
-              <UndoRedo />
-              <ClearCanvas />
-            </div>
-            {/* Mobile: condense right-side actions */}
-            <div className="md:hidden">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Open actions menu">
-                    <DotsVerticalIcon />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56">
-                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <div className="px-2 py-1.5">
-                    <div className="mb-1 text-xs text-muted-foreground">Screen size</div>
-                    <Breakpoints canvas openDelay={0} tooltip={false} />
-                  </div>
-                  <DropdownMenuSeparator />
-                  <div className="px-2 py-1.5 text-xs text-muted-foreground">Zoom: {round(zoom as any, 0)}%</div>
-                  <DropdownMenuSeparator />
-                  <div className="flex items-center gap-2 px-2 py-1.5">
-                    <UndoRedo />
-                    <ClearCanvas />
-                  </div>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
+            {/* Hide actions entirely when showing the empty-state shell */}
+            {!showEmptyShell && (
+              <>
+                {/* Desktop/tablet controls */}
+                <div className="hidden items-center gap-2 md:flex">
+                  <Breakpoints canvas openDelay={400} tooltip={false} />
+                  <UndoRedo />
+                  <ClearCanvas />
+                </div>
+                {/* Mobile: condense right-side actions */}
+                <div className="md:hidden">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Open actions menu">
+                        <DotsVerticalIcon />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56">
+                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <div className="px-2 py-1.5">
+                        <div className="mb-1 text-xs text-muted-foreground">Screen size</div>
+                        <Breakpoints canvas openDelay={0} tooltip={false} />
+                      </div>
+                      <DropdownMenuSeparator />
+                      <div className="px-2 py-1.5 text-xs text-muted-foreground">Zoom: {round(zoom as any, 0)}%</div>
+                      <DropdownMenuSeparator />
+                      <div className="flex items-center gap-2 px-2 py-1.5">
+                        <UndoRedo />
+                        <ClearCanvas />
+                      </div>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              </>
+            )}
           </div>
           <div
             onMouseLeave={() => setTimeout(() => highlight(""), 300)}
             className="builder-sdk-device-body relative mx-auto h-full w-full overflow-auto"
             ref={wrapperRef}>
-            {/*// @ts-ignore*/}
-            <ChaiFrame
-              contentDidMount={() => setCanvasIframe(iframeRef.current as HTMLIFrameElement)}
-              ref={iframeRef as any}
-              id="canvas-iframe"
-              style={{ ...scale, ...(isEmpty(scale) ? { width: `${width}px` } : {}) }}
-              className="relative mx-auto box-content h-full w-full max-w-full transition-all duration-300 ease-linear"
-              initialContent={iframeContent}>
-              <KeyboardHandler />
-              <BlockSelectionHighlighter />
-              <HeadTags />
-              <Provider>
-                <Canvas>
-                  {loadingCanvas ? (
-                    <div className="h-full p-4">
-                      <Skeleton className="h-full" />
-                    </div>
-                  ) : (
-                    <StaticBlocksRenderer />
-                  )}
-                  {/* Optional empty state from client */}
-                  {emptyState && !hasBlocks ? emptyState : null}
-                  <AddBlockAtBottom />
-                  <br />
-                  <br />
-                  <br />
-                </Canvas>
-                <CanvasEventsWatcher />
-              </Provider>
-              <div
-                id="placeholder"
-                className="pointer-events-none absolute z-[99999] max-w-full bg-green-500 transition-transform"
-              />
-            </ChaiFrame>
+            {showEmptyShell ? (
+              <div className="relative mx-auto h-full w-full max-w-full">
+                {/* Render the provided empty state outside the iframe so it isn't scaled */}
+                <div className="p-6 md:p-10">{emptyState}</div>
+              </div>
+            ) : (
+              // Regular iframe-based canvas renderer
+              // @ts-ignore
+              <ChaiFrame
+                contentDidMount={() => setCanvasIframe(iframeRef.current as HTMLIFrameElement)}
+                ref={iframeRef as any}
+                id="canvas-iframe"
+                style={{ ...scale, ...(isEmpty(scale) ? { width: `${width}px` } : {}) }}
+                className="relative mx-auto box-content h-full w-full max-w-full transition-all duration-300 ease-linear"
+                initialContent={iframeContent}>
+                <KeyboardHandler />
+                <BlockSelectionHighlighter />
+                <HeadTags />
+                <Provider>
+                  <Canvas>
+                    {loadingCanvas ? (
+                      <div className="h-full p-4">
+                        <Skeleton className="h-full" />
+                      </div>
+                    ) : (
+                      <StaticBlocksRenderer />
+                    )}
+                    <AddBlockAtBottom />
+                    <br />
+                    <br />
+                    <br />
+                  </Canvas>
+                  <CanvasEventsWatcher />
+                </Provider>
+                <div
+                  id="placeholder"
+                  className="pointer-events-none absolute z-[99999] max-w-full bg-green-500 transition-transform"
+                />
+              </ChaiFrame>
+            )}
           </div>
         </div>
       </div>
