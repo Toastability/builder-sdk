@@ -17,7 +17,7 @@ import { ScrollArea } from "@/ui/shadcn/components/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/ui/shadcn/components/ui/tabs";
 import { useAtom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
-import { capitalize, debounce, filter, map, reject, sortBy, values } from "lodash-es";
+import { capitalize, filter, map, reject, sortBy, values } from "lodash-es";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
@@ -33,10 +33,10 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position }: any) =
   const [tab] = useAtom(addBlockTabAtom);
   // const parentType = find(allBlocks, (block) => block._id === parentId)?._type;
   const [selectedGroup, setSelectedGroup] = useState<string | null>("all");
-  const [hoveredGroup, setHoveredGroup] = useState<string | null>(null);
+  const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [panelLeft, setPanelLeft] = useState<number>(327); // default; recalculated on mount
-  // const [panelTop, setPanelTop] = useState<number>(50); // matches topbar height
-  const debouncedSelectRef = useRef<any>(null);
+  const previewRef = useRef<HTMLDivElement | null>(null);
+  const groupListRef = useRef<HTMLDivElement | null>(null);
 
   // Focus search input on mount and tab change
   useEffect(() => {
@@ -50,22 +50,9 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position }: any) =
   useEffect(() => {
     if (searchTerm) {
       setSelectedGroup("all");
-      setHoveredGroup(null);
+      setOpenGroup(null);
     }
   }, [searchTerm]);
-
-  // Initialize debounced function
-  useEffect(() => {
-    debouncedSelectRef.current = debounce((group: string) => {
-      setSelectedGroup(group);
-    }, 500);
-
-    return () => {
-      if (debouncedSelectRef.current) {
-        debouncedSelectRef.current.cancel();
-      }
-    };
-  }, []);
 
   // Calculate preview panel coordinates so it slides out just to the right
   // of the sidebar + left panel. Recompute on mount and on resize.
@@ -73,39 +60,40 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position }: any) =
     const calc = () => {
       const leftPanel = document.getElementById("left-panel");
       const sidebar = document.getElementById("sidebar");
-      // const topbar = document.querySelector<HTMLElement>(".builder-sdk-topbar");
-      const left = (sidebar?.getBoundingClientRect().width || 48) + (leftPanel?.getBoundingClientRect().width || 280);
-      setPanelLeft(left);
-      // setPanelTop(topbar?.getBoundingClientRect().height || 50);
+      const baseLeft =
+        (sidebar?.getBoundingClientRect().width || 48) + (leftPanel?.getBoundingClientRect().width || 280);
+      const isDesktop = window.innerWidth >= 768;
+      const adjustedLeft = isDesktop ? Math.max(baseLeft - 1, 0) : baseLeft;
+      setPanelLeft(adjustedLeft);
     };
     calc();
     window.addEventListener("resize", calc);
     return () => window.removeEventListener("resize", calc);
   }, []);
 
-  // Handle hover - update hovered group immediately but debounce the selection
-  const handleGroupHover = useCallback((group: string) => {
-    setHoveredGroup(group);
-    if (debouncedSelectRef.current) {
-      debouncedSelectRef.current(group);
-    }
-  }, []);
+  useEffect(() => {
+    if (!openGroup) return;
 
-  // Handle mouse leave - clear hovered group
-  const handleGroupLeave = useCallback(() => {
-    setHoveredGroup(null);
-    if (debouncedSelectRef.current) {
-      debouncedSelectRef.current.cancel();
-    }
-  }, []);
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Node;
+      if (previewRef.current?.contains(target)) return;
+      if (groupListRef.current?.contains(target)) return;
+      setOpenGroup(null);
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [openGroup]);
 
   // Immediate selection on click
   const handleGroupClick = useCallback((group: string) => {
-    if (debouncedSelectRef.current) {
-      debouncedSelectRef.current.cancel();
-    }
     setSelectedGroup(group);
-    setHoveredGroup(null);
+    if (group === "all") {
+      setOpenGroup(null);
+      return;
+    }
+
+    setOpenGroup((current) => (current === group ? null : group));
   }, []);
 
   const filteredBlocks = useMemo(
@@ -154,15 +142,14 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position }: any) =
       <div className="sticky top-10 flex h-[calc(100%-48px)] overflow-hidden builder-sdk-add-blocks-body py-[25px]">
         {/* Sidebar for groups */}
         {sortedGroups.length > 0 && (
-          <div className="w-full builder-sdk-add-blocks-groups">
+          <div ref={groupListRef} className="w-full builder-sdk-add-blocks-groups">
             <ScrollArea className="h-full">
               <div className="space-y-1 p-0">
                 <button
                   key="sidebar-all"
                   onClick={() => handleGroupClick("all")}
-                  onMouseEnter={() => handleGroupHover("all")}
-                  className={`w-full rounded-md px-2 py-1.5 text-left text-sm font-medium ${
-                    selectedGroup === "all" || hoveredGroup === "all"
+                  className={`w-full rounded-sm px-2 py-1.5 text-left text-sm font-medium ${
+                    selectedGroup === "all"
                       ? "bg-primary text-primary-foreground"
                       : "hover:bg-primary/50 hover:text-primary-foreground"
                   }`}>
@@ -172,9 +159,8 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position }: any) =
                   <button
                     key={`sidebar-${group}`}
                     onClick={() => handleGroupClick(group)}
-                    onMouseEnter={() => handleGroupHover(group)}
                     className={`w-full rounded-md px-2 py-1.5 text-left text-sm ${
-                      selectedGroup === group || hoveredGroup === group
+                      selectedGroup === group || openGroup === group
                         ? "bg-primary text-primary-foreground"
                         : "hover:bg-primary/50 hover:text-primary-foreground"
                     }`}>
@@ -188,13 +174,12 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position }: any) =
       </div>
 
       {/* Hover Preview Panel: slides out when a group is hovered */}
-      {hoveredGroup && hoveredGroup !== "all" && (
+      {openGroup && openGroup !== "all" && (
         <motion.div
           initial={{ x: -20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
-          transition={{ duration: 0.2, ease: "easeOut" }}
-          onMouseLeave={handleGroupLeave}
-          onMouseEnter={() => setHoveredGroup(hoveredGroup)}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          ref={previewRef}
           className="builder-sdk-hover-preview z-40"
           style={{
             position: "fixed",
@@ -202,19 +187,22 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position }: any) =
             left: panelLeft,
             height: `calc(100dvh - ${panelTop}px)`,
             width: 350,
+            backgroundColor: "rgba(0, 0, 0, 0.05)",
+            boxShadow: "25px 0px 42px -3px rgba(0,0,0,0.42)",
+            borderRight: "5px inset #5b5e65",
           }}>
           <div className="flex h-full w-full flex-col border-l border-border bg-background shadow-xl">
             <div className="flex items-center justify-between border-b border-border p-4 h-10 text-sm font-medium">
-              <span>{capitalize(t(hoveredGroup.toLowerCase()))}</span>
+              <span>{capitalize(t(openGroup.toLowerCase()))}</span>
             </div>
             <ScrollArea className="h-full max-h-full">
-              <div className="space-y-4 p-4">
+              <div className="space-y-4 p-4" style={{backgroundColor: "rgba(0, 0, 0, 0.05)"}}>
                 {reject(
-                  filter(values(filteredBlocks), { group: hoveredGroup }),
+                  filter(values(filteredBlocks), { group: openGroup }),
                   { hidden: true },
                 ).map((block) => (
                   <CoreBlock
-                    key={`hover-${hoveredGroup}-${block.type}`}
+                    key={`hover-${openGroup}-${block.type}`}
                     parentId={parentId}
                     position={position}
                     block={block}

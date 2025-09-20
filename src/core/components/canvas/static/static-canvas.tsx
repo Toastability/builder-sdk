@@ -32,6 +32,7 @@ import { CanvasEventsWatcher } from "./canvas-events-watcher";
 import { Breakpoints } from "@/core/components/canvas/topbar/canvas-breakpoints";
 import { UndoRedo } from "@/core/components/canvas/topbar/undo-redo";
 import { ClearCanvas } from "@/core/components/canvas/topbar/clear-canvas";
+import { useBlocksStore } from "@/core/history/use-blocks-store-undoable-actions";
 import { round } from "lodash-es";
 import { DotsVerticalIcon, HamburgerMenuIcon } from "@radix-ui/react-icons";
 
@@ -58,6 +59,8 @@ const StaticCanvas = () => {
   const pageMeta = useBuilderProp("pageMeta", null as any);
   const emptyState = useBuilderProp("emptyState", null as any);
   const [zoom] = useCanvasZoom();
+  const [blocks] = useBlocksStore();
+  const hasBlocks = !isEmpty(blocks);
 
   const setNewWidth = useCallback(
     (newWidth: number) => {
@@ -114,7 +117,7 @@ const StaticCanvas = () => {
                 ) : (
                   <StaticBlocksRenderer />
                 )}
-                {emptyState ? emptyState : null}
+                {emptyState && !hasBlocks ? emptyState : null}
                 <AddBlockAtBottom />
                 <br />
                 <br />
@@ -322,7 +325,7 @@ const StaticCanvas = () => {
                     <StaticBlocksRenderer />
                   )}
                   {/* Optional empty state from client */}
-                  {emptyState ? emptyState : null}
+                  {emptyState && !hasBlocks ? emptyState : null}
                   <AddBlockAtBottom />
                   <br />
                   <br />

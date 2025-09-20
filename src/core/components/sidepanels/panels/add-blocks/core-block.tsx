@@ -38,7 +38,7 @@ export const CoreBlock = ({
     if (icon) return icon;
     return DEFAULT_THUMB;
   })();
-  const iconClassName = icon ? "w-4 h-4 mx-auto" : "w-full h-auto";
+  const iconClassName = icon ? "w-12 h-12 mx-auto my-4 mx-auto" : "w-full h-auto";
   const iconContent = (() => {
     if (isString(iconSource) && iconSource.trim().length > 0) {
       return (
@@ -93,7 +93,7 @@ export const CoreBlock = ({
             }}
             draggable={dnd ? "true" : "false"}
             className={
-              "cursor-pointer builder-sdk-core-block-btn space-y-2 rounded-lg border border-border p-0 text-center hover:bg-slate-300/50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400 dark:border-gray-700 dark:text-white dark:hover:bg-slate-800/50 dark:disabled:bg-gray-900 dark:disabled:text-foreground"
+              "cursor-pointer w-full builder-sdk-core-block-btn space-y-2 rounded-lg border border-border p-0 text-center bg-white hover:bg-slate-300/50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400 dark:border-gray-700 dark:text-white dark:hover:bg-slate-800/50 dark:disabled:bg-gray-900 dark:disabled:text-foreground"
             }>
             {iconContent}
             <p className="truncate text-center w-full py-[20px] px-[10px] text-xs border-t">{displayLabel}</p>
