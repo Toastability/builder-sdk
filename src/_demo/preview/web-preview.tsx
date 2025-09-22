@@ -124,7 +124,7 @@ const BreakpointCard = ({ currentWidth, width, icon, setIframeWidth }: Breakpoin
     <Button
       className={clsx(width === currentWidth && "text-white", "border")}
       onClick={() => setIframeWidth(width)}
-      variant={width === currentWidth ? "default" : "ghost"}>
+      variant={width === currentWidth ? "default" : "link"}>
       {icon}
     </Button>
   );

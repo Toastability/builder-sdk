@@ -8,7 +8,7 @@ export default function RightTop() {
   return (
     <div className="flex items-center gap-2 rounded-lg bg-background p-2">
       <Button
-        variant={panel === "theme" ? "secondary" : "ghost"}
+        variant={panel === "theme" ? "secondary" : "link"}
         size="sm"
         className="gap-2"
         onClick={() => setRightPanel(panel !== "theme" ? "theme" : "block")}>

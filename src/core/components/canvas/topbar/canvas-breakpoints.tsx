@@ -110,7 +110,7 @@ const BreakpointCard = ({
         onClick={() => onClick(width)}
         size="sm"
         className="h-7 w-7 rounded-md p-1"
-        variant={breakpoint === currentBreakpoint ? "outline" : "ghost"}>
+        variant={breakpoint === currentBreakpoint ? "outline" : "link"}>
         {icon}
       </Button>
     );
@@ -123,7 +123,7 @@ const BreakpointCard = ({
           onClick={() => onClick(width)}
           size="sm"
           className="h-7 w-7 rounded-md p-1"
-          variant={breakpoint === currentBreakpoint ? "outline" : "ghost"}>
+          variant={breakpoint === currentBreakpoint ? "outline" : "link"}>
           {icon}
         </Button>
       </HoverCardTrigger>

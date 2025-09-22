@@ -41,7 +41,7 @@ const DEFAULT_PANEL_WIDTH = 280;
 
 const OutlineButton = ({ isActive, show }: { isActive: boolean; show: () => void; panelId: string }) => {
   return (
-    <Button variant={isActive ? "default" : "ghost"} size="icon" onClick={show}>
+    <Button variant={isActive ? "default" : "link"} size="icon" onClick={show}>
       <Layers size={20} />
     </Button>
   );
@@ -49,7 +49,7 @@ const OutlineButton = ({ isActive, show }: { isActive: boolean; show: () => void
 
 const ComponentsButton = ({ isActive, show }: { isActive: boolean; show: () => void; panelId: string }) => {
   return (
-    <Button variant={isActive ? "default" : "ghost"} size="icon" onClick={show}>
+    <Button variant={isActive ? "default" : "link"} size="icon" onClick={show}>
       <Blocks className="h-5 w-5" />
     </Button>
   );
@@ -57,14 +57,14 @@ const ComponentsButton = ({ isActive, show }: { isActive: boolean; show: () => v
 
 const AiButton = ({ isActive, show }: { isActive: boolean; show: () => void; panelId: string }) => {
   return (
-    <Button variant={isActive ? "default" : "ghost"} size="icon" onClick={show}>
+    <Button variant={isActive ? "default" : "link"} size="icon" onClick={show}>
       <LightningBoltIcon className="rtl:ml-2" />
     </Button>
   );
 };
 const AskAiButton = ({ isActive, show }: { isActive: boolean; show: () => void; panelId: string }) => {
   return (
-    <Button variant={isActive ? "default" : "ghost"} size="icon" onClick={show}>
+    <Button variant={isActive ? "default" : "link"} size="icon" onClick={show}>
       <SparklesIcon className="rtl:ml-2" />
     </Button>
   );
@@ -253,11 +253,11 @@ const RootLayout: ComponentType = () => {
         <div
           onContextMenu={preventContextMenu}
           className="flex h-screen max-h-full flex-col bg-background text-foreground builder-sdk-shell">
-          <div className="flex h-[50px] w-screen items-center border-b border-border builder-sdk-topbar">
+          {/* <div className="flex h-[50px] w-screen items-center border-b border-border builder-sdk-topbar">
             <Suspense>
               <TopBar />
             </Suspense>
-          </div>
+          </div> */}
           <main className="relative flex h-[calc(100dvh-48px)] max-w-full flex-1 flex-row builder-sdk-main">
             <div id="sidebar" className="relative z-50 flex w-12 flex-col items-center justify-between border-r border-border p-2 builder-sdk-sidebar">
               <div className="flex flex-col gap-y-1">
@@ -360,7 +360,7 @@ const RootLayout: ComponentType = () => {
                             </span>
                             <Button
                               onClick={() => setRightPanel("block")}
-                              variant="ghost"
+                              variant="link"
                               size="icon"
                               className="text-xs">
                               <X className="h-4 w-4 rtl:ml-2" />
@@ -444,7 +444,7 @@ const RootLayout: ComponentType = () => {
                     <span className="rtl:ml-2 rtl:inline-block">{get(activePanelItem, "icon", null)}</span>
                     <span>{t(get(activePanelItem, "label", ""))}</span>
                   </div>
-                  <Button onClick={() => handleNonStandardPanelClose()} variant="ghost" size="icon" className="">
+                  <Button onClick={() => handleNonStandardPanelClose()} variant="link" size="icon" className="">
                     <X className="h-5 w-5" />
                   </Button>
                 </div>

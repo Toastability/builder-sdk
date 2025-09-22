@@ -23,7 +23,7 @@ export const LanguageButton = () => {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild className="focus:outline-none">
-          <Button variant="ghost" size="sm" className="gap-2">
+          <Button variant="link" size="sm" className="gap-2">
             <Languages className="h-4 w-4" />
             {get(LANGUAGES, currentLang, currentLang)}
             <ChevronDown className="h-4 w-4" />

@@ -38,7 +38,7 @@ export const RepeaterBindingWidget = ({ value, onChange }: WidgetProps) => {
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
-              variant="ghost"
+              variant="link"
               size="icon"
               className="h-5 w-5 rounded-full bg-gray-200 text-gray-900 hover:bg-gray-300"
               onClick={() => onChange("")}>

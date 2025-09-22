@@ -5,7 +5,7 @@ import { CookieIcon, ThermometerIcon } from "lucide-react";
 
 const Panel1Button = ({ isActive, show }: { isActive: boolean; show: () => void }) => {
   return (
-    <Button variant={isActive ? "default" : "ghost"} size="icon" onClick={show}>
+    <Button variant={isActive ? "default" : "link"} size="icon" onClick={show}>
       <ThermometerIcon />
     </Button>
   );
@@ -20,7 +20,7 @@ registerChaiSidebarPanel("panel-1", {
 
 const WhenEmptyCanvasButton = ({ isActive, show }: { isActive: boolean; show: () => void }) => {
   return (
-    <Button variant={isActive ? "default" : "ghost"} size="icon" onClick={show}>
+    <Button variant={isActive ? "default" : "link"} size="icon" onClick={show}>
       <ThermometerIcon />
     </Button>
   );
@@ -53,7 +53,7 @@ const PopoverButton = () => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon">
+        <Button variant="link" size="icon">
           <ThermometerIcon />
         </Button>
       </PopoverTrigger>

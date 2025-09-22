@@ -224,10 +224,10 @@ export default React.memo(function AttrsEditor({
               <span className="max-w-[200px] text-wrap font-normal">{attr.value.toString()}</span>
             </div>
             <div className="flex-shrink-0 text-slate-400">
-              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => startEdit(index)}>
+              <Button variant="link" size="icon" className="h-6 w-6" onClick={() => startEdit(index)}>
                 <Edit2 className="h-3 w-3" />
               </Button>
-              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => removeAttribute(index)}>
+              <Button variant="link" size="icon" className="h-6 w-6" onClick={() => removeAttribute(index)}>
                 <X className="h-3 w-3" />
               </Button>
             </div>

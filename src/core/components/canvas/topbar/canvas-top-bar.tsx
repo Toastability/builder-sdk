@@ -82,7 +82,7 @@ const CanvasTopBar: React.FC<CanvasTopBarProps> = ({ variant = "standalone", cla
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
-                  variant={fullWidth ? "default" : "ghost"}
+                  variant={fullWidth ? "default" : "link"}
                   size="icon"
                   onClick={() => setFullWidth(!fullWidth)}
                   className="builder-sdk-toggle-rightpanel-mobile">

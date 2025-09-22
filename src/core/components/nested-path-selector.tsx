@@ -113,7 +113,7 @@ const PathDropdown = ({ data, onSelect, dataType }: NestedPathSelectorProps) => 
                 {dataType === "object" && option.type === "object" && (
                   <Button
                     size="sm"
-                    variant="ghost"
+                    variant="link"
                     className="h-6 px-2 hover:bg-primary hover:text-primary-foreground"
                     onClick={(e) => {
                       e.stopPropagation();

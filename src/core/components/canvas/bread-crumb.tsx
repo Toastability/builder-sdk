@@ -20,7 +20,7 @@ export const Breadcrumb = ({ actions }: BreadcrumbProps) => {
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <ol className="flex items-center whitespace-nowrap text-xs text-muted-foreground">
           <li className="inline-flex items-center">
-            <Button onClick={() => setSelected([])} variant={"ghost"} className="h-fit p-1 text-xs font-normal">
+            <Button onClick={() => setSelected([])} variant={"link"} className="h-fit p-1 text-xs font-normal">
               Body
             </Button>
             <ChevronRight className="rtl:rotate-180" size={16} />
@@ -32,7 +32,7 @@ export const Breadcrumb = ({ actions }: BreadcrumbProps) => {
                   highlightBlock(block?._id);
                 }}
                 onClick={() => setSelected([block?._id])}
-                variant={"ghost"}
+                variant={"link"}
                 className="h-fit gap-x-1 p-1 text-xs font-normal">
                 <TypeIcon type={block?._type} />
                 {block._name || block._type}

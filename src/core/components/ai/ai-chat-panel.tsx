@@ -181,7 +181,7 @@ export default function AIChatPanel() {
             <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
             <Button
               size="icon"
-              variant="ghost"
+              variant="link"
               className="absolute bottom-2 right-2 h-6 w-6"
               onClick={triggerFileInput}>
               <Image className="h-4 w-4 text-muted-foreground" />

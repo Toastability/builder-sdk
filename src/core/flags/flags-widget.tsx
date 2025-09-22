@@ -128,7 +128,7 @@ const ChaiFeatureFlagsWidgetComponent = ({
             </p>
           </div>
           <Button
-            variant="ghost"
+            variant="link"
             size="sm"
             onClick={close}
             className="absolute -right-2 -top-2 p-1 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">

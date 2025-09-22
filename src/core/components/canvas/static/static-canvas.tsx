@@ -221,7 +221,7 @@ const StaticCanvas = () => {
               <div className="md:hidden">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Open page menu">
+                    <Button variant="link" size="icon" className="h-7 w-7" aria-label="Open page menu">
                       <HamburgerMenuIcon />
                     </Button>
                   </DropdownMenuTrigger>
@@ -282,7 +282,7 @@ const StaticCanvas = () => {
                 <div className="md:hidden">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="h-7 w-7" aria-label="Open actions menu">
+                      <Button variant="link" size="icon" className="h-7 w-7" aria-label="Open actions menu">
                         <DotsVerticalIcon />
                       </Button>
                     </DropdownMenuTrigger>

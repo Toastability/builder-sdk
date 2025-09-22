@@ -17,7 +17,7 @@ export const DataBinding = () => {
     <div className="flex items-center">
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button className="rounded-full" variant="ghost" onClick={() => setDataBindingActive(!dataBindingActive)}>
+          <Button className="rounded-full" variant="link" onClick={() => setDataBindingActive(!dataBindingActive)}>
             <DatabaseZapIcon className={cn("h-4 w-4", dataBindingActive ? "text-green-500" : "text-gray-500")} />
           </Button>
         </TooltipTrigger>
