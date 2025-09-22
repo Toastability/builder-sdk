@@ -30,6 +30,7 @@ import {
   useUpdateBlocksProps,
 } from "@/core/hooks";
 import { pubsub } from "@/core/pubsub";
+import { useSidebarActivePanel } from "@/core/hooks";
 import { Button } from "@/ui/shadcn/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/shadcn/components/ui/tooltip";
 import { useDebouncedCallback } from "@react-hookz/web";
@@ -186,6 +187,8 @@ const ListTree = () => {
 
   const { hasPermission } = usePermissions();
 
+  const [, setActivePanel] = useSidebarActivePanel();
+
   if (isEmpty(treeData))
     return (
       <div>
@@ -197,7 +200,10 @@ const ListTree = () => {
             {hasPermission(PERMISSIONS.ADD_BLOCK) && (
               <Button
                 disabled={!hasPermission(PERMISSIONS.ADD_BLOCK)}
-                onClick={() => pubsub.publish(CHAI_BUILDER_EVENTS.OPEN_ADD_BLOCK)}
+                onClick={() => {
+                  // Open the new Component Library left panel instead of legacy dialog
+                  setActivePanel("components");
+                }}
                 variant="default"
                 size="sm">
                 + {t("Add Block")}

@@ -152,7 +152,7 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position }: any) =
                   <button
                     key={`sidebar-${group}`}
                     onClick={() => handleGroupClick(group)}
-                    className={`w-full rounded-sm px-2 py-1.5 text-left text-sm ${
+                    className={`w-full rounded-md px-2 py-1.5 text-left text-sm ${
                       selectedGroup === group || openGroup === group
                         ? "bg-black text-white"
                         : "hover:bg-black hover:text-white"
