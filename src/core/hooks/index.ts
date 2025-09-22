@@ -43,6 +43,12 @@ import { useWrapperBlock } from "@/core/hooks/use-wrapper-block";
 import { useTranslation } from "react-i18next";
 import { useInlineEditing } from "./use-inline-editing";
 import { useIsPageLoaded } from "@/core/hooks/use-is-page-loaded";
+import { atom, useAtom } from "jotai";
+
+// Atom to trigger a transient pulse highlight on the Components sidebar button
+export const componentsButtonPulseAtom = atom<number>(0);
+componentsButtonPulseAtom.debugLabel = "componentsButtonPulseAtom";
+export const useComponentsButtonPulse = () => useAtom(componentsButtonPulseAtom);
 export { useBlocksStoreUndoableActions } from "@/core/history/use-blocks-store-undoable-actions";
 export { useCanvasDisplayWidth, useScreenSizeWidth } from "@/core/hooks/use-screen-size-width";
 export { useSelectedLibrary } from "@/core/hooks/use-selected-library";

@@ -10,7 +10,7 @@ import { DefaultChaiBlocks } from "@/core/components/sidepanels/panels/add-block
 import { CHAI_BUILDER_EVENTS } from "@/core/events";
 import { useChaiSidebarPanels } from "@/core/extensions/sidebar-panels";
 // import { useTopBarComponent } from "@/core/extensions/top-bar";
-import { useBuilderProp, useSidebarActivePanel } from "@/core/hooks";
+import { useBuilderProp, useSidebarActivePanel, useComponentsButtonPulse } from "@/core/hooks";
 import { usePubSub } from "@/core/hooks/use-pub-sub";
 import { useRightPanel, useRightPanelFullWidthMobile } from "@/core/hooks/use-theme";
 import { isDevelopment } from "@/core/import-html/general";
@@ -48,8 +48,17 @@ const OutlineButton = ({ isActive, show }: { isActive: boolean; show: () => void
 };
 
 const ComponentsButton = ({ isActive, show }: { isActive: boolean; show: () => void; panelId: string }) => {
+  const [pulseCount] = useComponentsButtonPulse();
   return (
-    <Button variant={isActive ? "default" : "link"} size="icon" onClick={show}>
+    <Button
+      variant={isActive ? "default" : "link"}
+      size="icon"
+      onClick={show}
+      className={
+        pulseCount > 0 && !isActive
+          ? "relative after:absolute after:inset-0 after:animate-[ping_0.8s_ease-out] after:rounded-md after:bg-primary/40"
+          : undefined
+      }>
       <Blocks className="h-5 w-5" />
     </Button>
   );
