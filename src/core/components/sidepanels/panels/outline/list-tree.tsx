@@ -36,7 +36,7 @@ import { useDebouncedCallback } from "@react-hookz/web";
 import { useAtom } from "jotai";
 import { find, first, isEmpty } from "lodash-es";
 import { ChevronsDownUp, ChevronsUpDown, Eye, PlusIcon } from "lucide-react";
-import { MouseEvent, useEffect, useMemo, useRef, useState } from "react";
+import { MouseEvent, useCallback, useMemo, useRef, useState } from "react";
 import { MoveHandler, RenameHandler, Tree } from "react-arborist";
 import { useTranslation } from "react-i18next";
 import { PasteAtRootContextMenu } from "./paste-into-root";
@@ -59,14 +59,15 @@ const ListTree = () => {
   const [, setStyleBlocks] = useSelectedStylingBlocks();
   const { moveBlocks } = useBlocksStoreUndoableActions();
   const canMove = useCanMove();
-  const treeRef = useRef(null);
+  const treeRef = useRef<any>(null);
   const [, setTreeRef] = useAtom(treeRefAtom);
   const { t } = useTranslation();
   const [parentContext, setParentContext] = useState(null);
 
   const clearSelection = () => {
-    setIds([]);
-    setStyleBlocks([]);
+    // Avoid triggering state updates if already cleared
+    setIds((prev) => (prev.length ? [] : prev));
+    setStyleBlocks((prev) => (prev.length ? [] : prev));
   };
 
   const filteredTreeData = useMemo(() => {
@@ -92,8 +93,9 @@ const ListTree = () => {
   const onSelect = (nodes: any) => {
     if (nodes.length === 0) return;
     const nodeId = nodes[0] ? nodes[0].id : "";
-    setStyleBlocks([]);
-    setIds([nodeId]);
+    // Only update if selection actually changes
+    setStyleBlocks((prev) => (prev.length ? [] : prev));
+    setIds((prev) => (prev[0] === nodeId && prev.length === 1 ? prev : [nodeId]));
   };
 
   const onContextMenu = (e: MouseEvent<HTMLDivElement>) => {
@@ -170,23 +172,17 @@ const ListTree = () => {
     }
   };
 
-  useEffect(() => {
-    const updateTreeRef = () => {
-      if (treeRef.current) {
-        //@ts-ignore
-        setTreeRef(treeRef.current);
+  // Provide a stable callback ref to capture the Tree instance once
+  const treeCallbackRef = useCallback(
+    (instance: any) => {
+      if (instance && treeRef.current !== instance) {
+        treeRef.current = instance;
+        // Ensure jotai setter is invoked only once
+        (setTreeRef as (v: any) => void)(instance);
       }
-    };
-    //sets the ref once on mount if its available
-    updateTreeRef();
-
-    /**Sets up a MutationObserver to watch for DOM changes and try setting the ref again */
-    const observer = new MutationObserver(updateTreeRef);
-    observer.observe(document.body, { childList: true, subtree: true });
-
-    //disconnect observer on unmount
-    return () => observer.disconnect();
-  }, [setTreeRef]);
+    },
+    [setTreeRef],
+  );
 
   const { hasPermission } = usePermissions();
 
@@ -264,7 +260,7 @@ const ListTree = () => {
             </div>
           </div>
           <Tree
-            ref={treeRef}
+            ref={treeCallbackRef}
             height={window.innerHeight - 160}
             className="no-scrollbar !h-full max-w-full space-y-1 !overflow-y-auto !overflow-x-hidden"
             rowClassName="flex items-center h-full border-b border-transparent"
