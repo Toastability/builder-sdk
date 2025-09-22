@@ -255,7 +255,8 @@ const RootLayout: ComponentType = () => {
       <TooltipProvider>
         <div
           onContextMenu={preventContextMenu}
-          className="builder-sdk-shell flex h-screen max-h-full flex-col bg-background text-foreground">
+          className="builder-sdk-shell flex flex-col bg-background text-foreground"
+          style={{ maxHeight: "calc(100dvh - 3rem)", height: "calc(100dvh - 3rem)" }}>
           {/* <div className="flex h-[50px] w-screen items-center border-b border-border builder-sdk-topbar">
             <Suspense>
               <TopBar />

@@ -142,7 +142,7 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position }: any) =
         />
       </div>
 
-      <div className="builder-sdk-add-blocks-body sticky top-10 flex h-[calc(100%-48px)] overflow-hidden py-[25px]">
+      <div className="builder-sdk-add-blocks-body sticky flex h-full overflow-hidden py-6">
         {/* Sidebar for groups */}
         {sortedGroups.length > 0 && (
           <div ref={groupListRef} className="builder-sdk-add-blocks-groups w-full">
@@ -152,10 +152,10 @@ export const ChaiBuilderBlocks = ({ groups, blocks, parentId, position }: any) =
                   <button
                     key={`sidebar-${group}`}
                     onClick={() => handleGroupClick(group)}
-                    className={`w-full rounded-md px-2 py-1.5 text-left text-sm ${
+                    className={`w-full rounded-sm px-2 py-1.5 text-left text-sm ${
                       selectedGroup === group || openGroup === group
-                        ? "bg-primary text-primary-foreground"
-                        : "hover:bg-primary/50 hover:text-primary-foreground"
+                        ? "bg-black text-white"
+                        : "hover:bg-black hover:text-white"
                     }`}>
                     {capitalize(t(group.toLowerCase()))}
                   </button>
