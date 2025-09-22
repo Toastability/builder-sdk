@@ -308,7 +308,13 @@ const StaticCanvas = () => {
           </div>
           <div
             onMouseLeave={() => setTimeout(() => highlight(""), 300)}
-            className="builder-sdk-device-body relative mx-auto h-full w-full overflow-auto"
+            // NOTE: This container previously used `mx-auto overflow-auto`, which caused two issues:
+            // 1. Double scrollbars (outer wrapper + this div) when the iframe content exceeded height.
+            // 2. Horizontal scrolling / empty right-side space due to nested auto overflow behavior while centering.
+            // We remove `mx-auto` (centering is already handled by the shell) and make this a non-scrolling container
+            // during normal canvas usage so only the iframe's internal document scrolls. For the empty-state shell (no iframe),
+            // we still allow vertical scrolling so long empty states can be viewed. Horizontal overflow is always hidden.
+            className={`builder-sdk-device-body relative h-full w-full ${showEmptyShell ? "overflow-auto" : "overflow-hidden"}`}
             ref={wrapperRef}>
             {showEmptyShell ? (
               <div className="relative mx-auto h-full w-full max-w-full">
