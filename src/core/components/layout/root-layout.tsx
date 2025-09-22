@@ -9,7 +9,7 @@ import ThemeConfigPanel from "@/core/components/sidepanels/panels/theme-configur
 import { DefaultChaiBlocks } from "@/core/components/sidepanels/panels/add-blocks/default-blocks";
 import { CHAI_BUILDER_EVENTS } from "@/core/events";
 import { useChaiSidebarPanels } from "@/core/extensions/sidebar-panels";
-import { useTopBarComponent } from "@/core/extensions/top-bar";
+// import { useTopBarComponent } from "@/core/extensions/top-bar";
 import { useBuilderProp, useSidebarActivePanel } from "@/core/hooks";
 import { usePubSub } from "@/core/hooks/use-pub-sub";
 import { useRightPanel, useRightPanelFullWidthMobile } from "@/core/hooks/use-theme";
@@ -140,7 +140,7 @@ function useSidebarDefaultPanels() {
  * RootLayout is a React component that renders the main layout of the application.
  */
 const RootLayout: ComponentType = () => {
-  const TopBar = useTopBarComponent();
+  // const TopBar = useTopBarComponent();
   const [activePanel, setActivePanel] = useSidebarActivePanel();
   const lastStandardPanelRef = useRef<string | null>("components"); // Default to "components"
   const [lastStandardPanelWidth, setLastStandardPanelWidth] = useState(DEFAULT_PANEL_WIDTH);
