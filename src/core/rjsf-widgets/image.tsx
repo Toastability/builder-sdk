@@ -10,6 +10,12 @@ import { useLanguages, useSelectedBlock, useUpdateBlocksProps } from "../hooks";
 const PLACEHOLDER_IMAGE =
   "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZmlsbD0iI2Q1ZDdkYSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIFBsYWNlaG9sZGVyPC90ZXh0Pjwvc3ZnPg==";
 
+const stripCssUrl = (val?: string): string => {
+  if (!val || typeof val !== "string") return val as any;
+  const match = val.match(/^\s*url\((['\"]?)(.*?)\1\)\s*$/i);
+  return match ? match[2] : val;
+};
+
 const ImagePickerField = ({ value, onChange, id, onBlur }: WidgetProps) => {
   const { t } = useTranslation();
   const { selectedLang } = useLanguages();
@@ -54,12 +60,15 @@ const ImagePickerField = ({ value, onChange, id, onBlur }: WidgetProps) => {
     }
   }, [onChange, selectedBlock?._id, updateBlockProps]);
 
+  // Normalize any css url(...) values that may sneak into the saved value
+  const normalizedValue = stripCssUrl(value as any);
+
   return (
     <div className="mt-1.5 flex items-center gap-x-3">
-      {value ? (
+      {normalizedValue ? (
         <div className="group relative">
           <img
-            src={value}
+            src={normalizedValue}
             className={
               `h-20 w-20 overflow-hidden rounded-md border border-border object-cover transition duration-200 ` +
               (assetId && assetId !== "" ? "cursor-pointer group-hover:blur-sm" : "")
@@ -94,7 +103,7 @@ const ImagePickerField = ({ value, onChange, id, onBlur }: WidgetProps) => {
           <>
             <MediaManagerModal onSelect={handleSelect} assetId="">
               <small className="h-6 cursor-pointer rounded-md bg-secondary px-2 py-1 text-center text-xs text-secondary-foreground hover:bg-secondary/80">
-                {value || !isEmpty(value) ? t("Replace image") : t("Choose image")}
+                {normalizedValue || !isEmpty(normalizedValue) ? t("Replace image") : t("Choose image")}
               </small>
             </MediaManagerModal>
             <small className="-pl-4 pt-2 text-center text-xs text-secondary-foreground">OR</small>
@@ -108,9 +117,9 @@ const ImagePickerField = ({ value, onChange, id, onBlur }: WidgetProps) => {
           type="url"
           className="text-xs"
           placeholder={t("Enter image URL")}
-          value={value}
-          onBlur={({ target: { value: url } }) => onBlur(id, url)}
-          onChange={(e) => onChange(e.target.value)}
+          value={normalizedValue || ""}
+          onBlur={({ target: { value: url } }) => onBlur(id, stripCssUrl(url))}
+          onChange={(e) => onChange(stripCssUrl(e.target.value))}
         />
       </div>
     </div>
