@@ -23,7 +23,9 @@ const ImagePickerField = ({ value, onChange, id, onBlur }: WidgetProps) => {
   const updateBlockProps = useUpdateBlocksProps();
   const showImagePicker = true;
 
-  const propKey = id.split(".").pop() || "";
+  // Derive the actual schema property name from the RJSF id (e.g. root_backgroundImage -> backgroundImage)
+  const idWithoutRoot = id.replace(/^root_/, "");
+  const propKey = (idWithoutRoot.split("_").pop() || idWithoutRoot || "").trim();
   const propIdKey = selectedLang ? `_${propKey}Id-${selectedLang}` : `_${propKey}Id`;
 
   const hasImageBlockAssetId =
@@ -39,19 +41,27 @@ const ImagePickerField = ({ value, onChange, id, onBlur }: WidgetProps) => {
       const width = asset?.width;
       const height = asset?.height;
       if (selectedBlock?._id) {
-        const props = {
-          ...(width && { width: width }),
-          ...(height && { height: height }),
-          ...(asset.description && { alt: asset.description }),
-          // Persist a generic mediaReference so the server stores the association reliably
-          mediaReference: {
-            mediaRecordId: asset?.id ? Number(asset.id) : undefined,
+        const mrid = asset?.id && !isNaN(Number(asset.id)) ? Number(asset.id) : undefined;
+        const props: Record<string, any> = {};
+        // For primary image fields, attach helpful dimensions/alt
+        if (propKey === "image" || selectedBlock?._type === "Image") {
+          if (width) props.width = width;
+          if (height) props.height = height;
+          if (asset.description) props.alt = asset.description;
+        }
+        // handling asset id based on prop (e.g., _backgroundImageId, _imageId)
+        if (mrid) set(props, propIdKey, mrid);
+        // Attach canonical media reference at block level when we have a valid record id
+        if (mrid) {
+          props.mediaRecordId = mrid;
+          props.mediaReference = {
+            mediaRecordId: mrid,
             mediaToken: undefined,
-            fallbackUrl: asset?.url,
-          },
-        };
+            fallbackUrl: asset?.url || undefined,
+          };
+        }
         // handling asset id based on prop
-        set(props, propIdKey, asset.id);
+        // (already set above when mrid exists)
         // Only update if props are not empty
         if (isEmpty(props)) return;
         updateBlockProps([selectedBlock._id], props);
@@ -62,9 +72,16 @@ const ImagePickerField = ({ value, onChange, id, onBlur }: WidgetProps) => {
   const clearImage = useCallback(() => {
     onChange(PLACEHOLDER_IMAGE);
     if (selectedBlock?._id) {
-      updateBlockProps([selectedBlock._id], { assetId: "" });
+      const reset: Record<string, any> = { assetId: "" };
+      // Clear per-prop id as well
+      reset[propIdKey] = "";
+      // Clear canonical media reference metadata
+      reset.mediaReference = null;
+      reset.mediaRecordId = undefined;
+      reset.mediaToken = undefined;
+      updateBlockProps([selectedBlock._id], reset);
     }
-  }, [onChange, selectedBlock?._id, updateBlockProps]);
+  }, [onChange, propIdKey, selectedBlock?._id, updateBlockProps]);
 
   // Normalize any css url(...) values that may sneak into the saved value
   const normalizedValue = stripCssUrl(value as any);
