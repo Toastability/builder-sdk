@@ -43,6 +43,12 @@ const ImagePickerField = ({ value, onChange, id, onBlur }: WidgetProps) => {
           ...(width && { width: width }),
           ...(height && { height: height }),
           ...(asset.description && { alt: asset.description }),
+          // Persist a generic mediaReference so the server stores the association reliably
+          mediaReference: {
+            mediaRecordId: asset?.id ? Number(asset.id) : undefined,
+            mediaToken: undefined,
+            fallbackUrl: asset?.url,
+          },
         };
         // handling asset id based on prop
         set(props, propIdKey, asset.id);
