@@ -22,11 +22,30 @@ export const HeadTags = () => {
   const chaiThemeOptions = useThemeOptions();
   const [darkMode] = useDarkMode();
   const { document: iframeDoc, window: iframeWin } = useFrame();
+  const skipThemeVars = useMemo(() => {
+    try {
+      // If host has injected site variables (Dashtrack), avoid overriding with SDK defaults.
+      // We detect a known style id used by host injection.
+      return Boolean(iframeDoc?.getElementById("dt-builder-site-inline"));
+    } catch {
+      return false;
+    }
+  }, [iframeDoc]);
 
   useEffect(() => {
     if (darkMode) iframeDoc?.documentElement.classList.add("dark");
     else iframeDoc?.documentElement.classList.remove("dark");
   }, [darkMode, iframeDoc]);
+
+  // If host/page already injected site theme variables, remove SDK's fallback style tag to prevent overrides.
+  useEffect(() => {
+    try {
+      if (!iframeDoc) return;
+      if (!skipThemeVars) return;
+      const existing = iframeDoc.getElementById("chai-theme");
+      if (existing && existing.parentNode) existing.parentNode.removeChild(existing);
+    } catch {}
+  }, [skipThemeVars, iframeDoc]);
 
   useEffect(() => {
     // @ts-ignore
@@ -66,11 +85,19 @@ export const HeadTags = () => {
         }),
       ],
     };
+    // Try to refresh Tailwind runtime if present (CDN script).
+    try {
+      // @ts-ignore
+      if (typeof iframeWin.tailwind.refresh === "function") {
+        // @ts-ignore
+        iframeWin.tailwind.refresh();
+      }
+    } catch {}
   }, [chaiTheme, chaiThemeOptions, iframeWin]);
 
   return (
     <>
-      <CssThemeVariables theme={chaiTheme as ChaiBuilderThemeValues} />
+      {!skipThemeVars && <CssThemeVariables theme={chaiTheme as ChaiBuilderThemeValues} />}
       <Fonts />
       <SelectedBlocks />
       <SelectedStylingBlocks />
