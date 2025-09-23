@@ -22,35 +22,14 @@ export const HeadTags = () => {
   const chaiThemeOptions = useThemeOptions();
   const [darkMode] = useDarkMode();
   const { document: iframeDoc, window: iframeWin } = useFrame();
-  const [hasSiteVars, setHasSiteVars] = useState(false);
-  // Observe the iframe HEAD for presence of dt-builder-site-inline
-  useEffect(() => {
-    if (!iframeDoc) return;
-    const head = iframeDoc.head;
-    if (!head) return;
-    const update = () => {
-      try { setHasSiteVars(Boolean(iframeDoc.getElementById("dt-builder-site-inline"))); } catch {}
-    };
-    update();
-    const obs = new MutationObserver(update);
-    try { obs.observe(head, { childList: true, subtree: true }); } catch {}
-    return () => { try { obs.disconnect(); } catch {} };
-  }, [iframeDoc]);
+  // (no-op observer now; we no longer remove SDK theme if site vars exist)
 
   useEffect(() => {
     if (darkMode) iframeDoc?.documentElement.classList.add("dark");
     else iframeDoc?.documentElement.classList.remove("dark");
   }, [darkMode, iframeDoc]);
 
-  // If host/page already injected site theme variables, remove SDK's fallback style tag to prevent overrides.
-  useEffect(() => {
-    try {
-      if (!iframeDoc) return;
-      if (!hasSiteVars) return;
-      const existing = iframeDoc.getElementById("chai-theme");
-      if (existing && existing.parentNode) existing.parentNode.removeChild(existing);
-    } catch {}
-  }, [hasSiteVars, iframeDoc]);
+  // Keep SDK theme variables present; site vars injected later (by host) should override via cascade order.
 
   useEffect(() => {
     // @ts-ignore
@@ -108,17 +87,13 @@ export const HeadTags = () => {
     const STYLE_ID = "chai-theme";
     try {
       const existing = head.querySelector(`#${STYLE_ID}`) as HTMLStyleElement | null;
-      if (hasSiteVars) {
-        if (existing) existing.remove();
-        return;
-      }
       const css = getChaiThemeCssVariables(chaiTheme as ChaiBuilderThemeValues);
       let el = existing || iframeDoc.createElement("style");
       el.id = STYLE_ID;
       el.textContent = css;
       if (!existing) head.appendChild(el);
     } catch {}
-  }, [iframeDoc, chaiTheme, hasSiteVars]);
+  }, [iframeDoc, chaiTheme]);
 
   // Inject fonts (links + @font-face) into iframe HEAD
   useEffect(() => {
