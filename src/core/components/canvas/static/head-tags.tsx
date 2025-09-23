@@ -14,7 +14,7 @@ import containerQueries from "@tailwindcss/container-queries";
 import forms from "@tailwindcss/forms";
 import typography from "@tailwindcss/typography";
 import { filter, get, has, map } from "lodash-es";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import plugin from "tailwindcss/plugin";
 
 export const HeadTags = () => {
