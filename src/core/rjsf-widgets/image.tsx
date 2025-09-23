@@ -49,6 +49,15 @@ const ImagePickerField = ({ value, onChange, id, onBlur }: WidgetProps) => {
           if (height) props.height = height;
           if (asset.description) props.alt = asset.description;
         }
+        // Always set the actual prop to the raw URL so payload carries it explicitly
+        props[propKey] = asset.url;
+        // For background images, also reflect immediate inline style for canvas
+        if (propKey === "backgroundImage") {
+          const prevStyle = (selectedBlock as any)?.style && typeof (selectedBlock as any).style === 'object'
+            ? { ...(selectedBlock as any).style }
+            : {};
+          props.style = { ...prevStyle, backgroundImage: `url('${asset.url}')` };
+        }
         // handling asset id based on prop (e.g., _backgroundImageId, _imageId)
         if (mrid) set(props, propIdKey, mrid);
         // Attach canonical media reference at block level when we have a valid record id
@@ -70,7 +79,7 @@ const ImagePickerField = ({ value, onChange, id, onBlur }: WidgetProps) => {
   };
 
   const clearImage = useCallback(() => {
-    onChange(PLACEHOLDER_IMAGE);
+    onChange(propKey === 'image' ? PLACEHOLDER_IMAGE : "");
     if (selectedBlock?._id) {
       const reset: Record<string, any> = { assetId: "" };
       // Clear per-prop id as well
@@ -79,6 +88,14 @@ const ImagePickerField = ({ value, onChange, id, onBlur }: WidgetProps) => {
       reset.mediaReference = null;
       reset.mediaRecordId = undefined;
       reset.mediaToken = undefined;
+      reset[propKey] = propKey === 'image' ? PLACEHOLDER_IMAGE : "";
+      if (propKey === 'backgroundImage') {
+        const prevStyle = (selectedBlock as any)?.style && typeof (selectedBlock as any).style === 'object'
+          ? { ...(selectedBlock as any).style }
+          : {};
+        delete (prevStyle as any).backgroundImage;
+        reset.style = prevStyle;
+      }
       updateBlockProps([selectedBlock._id], reset);
     }
   }, [onChange, propIdKey, selectedBlock?._id, updateBlockProps]);
