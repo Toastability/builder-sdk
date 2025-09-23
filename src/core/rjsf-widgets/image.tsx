@@ -5,7 +5,8 @@ import { first, get, set, has, isArray, isEmpty } from "lodash-es";
 import { Edit2Icon, X } from "lucide-react";
 import { useCallback } from "react";
 import { useTranslation } from "react-i18next";
-import { useLanguages, useSelectedBlock, useUpdateBlocksProps } from "../hooks";
+import { useLanguages, useSelectedBlock } from "../hooks";
+import { useUpdateMultipleBlocksProps } from "@/core/hooks/use-update-blocks-props";
 
 const PLACEHOLDER_IMAGE =
   "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAwIiBoZWlnaHQ9IjQwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZjNmNGY2Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSIxNiIgZmlsbD0iI2Q1ZDdkYSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkltYWdlIFBsYWNlaG9sZGVyPC90ZXh0Pjwvc3ZnPg==";
@@ -20,7 +21,7 @@ const ImagePickerField = ({ value, onChange, id, onBlur }: WidgetProps) => {
   const { t } = useTranslation();
   const { selectedLang } = useLanguages();
   const selectedBlock = useSelectedBlock();
-  const updateBlockProps = useUpdateBlocksProps();
+  const updateBlockProps = useUpdateMultipleBlocksProps();
   const showImagePicker = true;
 
   // Derive the actual schema property name from the RJSF id (e.g. root_backgroundImage -> backgroundImage)
@@ -59,7 +60,12 @@ const ImagePickerField = ({ value, onChange, id, onBlur }: WidgetProps) => {
           props.style = { ...prevStyle, backgroundImage: `url('${asset.url}')` };
         }
         // handling asset id based on prop (e.g., _backgroundImageId, _imageId)
-        if (mrid) set(props, propIdKey, mrid);
+        if (mrid) {
+          // Always write base id key
+          set(props, `_${propKey}Id`, mrid);
+          // Also write language-specific id if applicable
+          if (selectedLang) set(props, propIdKey, mrid);
+        }
         // Attach canonical media reference at block level when we have a valid record id
         if (mrid) {
           props.mediaRecordId = mrid;
@@ -73,7 +79,7 @@ const ImagePickerField = ({ value, onChange, id, onBlur }: WidgetProps) => {
         // (already set above when mrid exists)
         // Only update if props are not empty
         if (isEmpty(props)) return;
-        updateBlockProps([selectedBlock._id], props);
+        updateBlockProps([{ _id: selectedBlock._id, ...props }]);
       }
     }
   };
@@ -82,8 +88,9 @@ const ImagePickerField = ({ value, onChange, id, onBlur }: WidgetProps) => {
     onChange(propKey === 'image' ? PLACEHOLDER_IMAGE : "");
     if (selectedBlock?._id) {
       const reset: Record<string, any> = { assetId: "" };
-      // Clear per-prop id as well
-      reset[propIdKey] = "";
+      // Clear per-prop id as well (both base and language-specific)
+      reset[`_${propKey}Id`] = "";
+      if (selectedLang) reset[propIdKey] = "";
       // Clear canonical media reference metadata
       reset.mediaReference = null;
       reset.mediaRecordId = undefined;
@@ -96,7 +103,7 @@ const ImagePickerField = ({ value, onChange, id, onBlur }: WidgetProps) => {
         delete (prevStyle as any).backgroundImage;
         reset.style = prevStyle;
       }
-      updateBlockProps([selectedBlock._id], reset);
+      updateBlockProps([{ _id: selectedBlock._id, ...reset }]);
     }
   }, [onChange, propIdKey, selectedBlock?._id, updateBlockProps]);
 
