@@ -2,8 +2,8 @@ import {
   getChaiThemeOptions,
   getThemeCustomFontFace,
   getThemeFontsUrls,
+  getChaiThemeCssVariables,
 } from "@/core/components/canvas/static/chai-theme-helpers";
-import { CssThemeVariables } from "@/core/components/css-theme-var";
 import { useFrame } from "@/core/frame";
 import { useDarkMode, useSelectedBlockIds, useSelectedStylingBlocks } from "@/core/hooks";
 import { useTheme, useThemeOptions } from "@/core/hooks/use-theme";
@@ -14,7 +14,7 @@ import containerQueries from "@tailwindcss/container-queries";
 import forms from "@tailwindcss/forms";
 import typography from "@tailwindcss/typography";
 import { filter, get, has, map } from "lodash-es";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import plugin from "tailwindcss/plugin";
 
 export const HeadTags = () => {
@@ -22,14 +22,19 @@ export const HeadTags = () => {
   const chaiThemeOptions = useThemeOptions();
   const [darkMode] = useDarkMode();
   const { document: iframeDoc, window: iframeWin } = useFrame();
-  const skipThemeVars = useMemo(() => {
-    try {
-      // If host has injected site variables (Dashtrack), avoid overriding with SDK defaults.
-      // We detect a known style id used by host injection.
-      return Boolean(iframeDoc?.getElementById("dt-builder-site-inline"));
-    } catch {
-      return false;
-    }
+  const [hasSiteVars, setHasSiteVars] = useState(false);
+  // Observe the iframe HEAD for presence of dt-builder-site-inline
+  useEffect(() => {
+    if (!iframeDoc) return;
+    const head = iframeDoc.head;
+    if (!head) return;
+    const update = () => {
+      try { setHasSiteVars(Boolean(iframeDoc.getElementById("dt-builder-site-inline"))); } catch {}
+    };
+    update();
+    const obs = new MutationObserver(update);
+    try { obs.observe(head, { childList: true, subtree: true }); } catch {}
+    return () => { try { obs.disconnect(); } catch {} };
   }, [iframeDoc]);
 
   useEffect(() => {
@@ -41,11 +46,11 @@ export const HeadTags = () => {
   useEffect(() => {
     try {
       if (!iframeDoc) return;
-      if (!skipThemeVars) return;
+      if (!hasSiteVars) return;
       const existing = iframeDoc.getElementById("chai-theme");
       if (existing && existing.parentNode) existing.parentNode.removeChild(existing);
     } catch {}
-  }, [skipThemeVars, iframeDoc]);
+  }, [hasSiteVars, iframeDoc]);
 
   useEffect(() => {
     // @ts-ignore
@@ -95,59 +100,120 @@ export const HeadTags = () => {
     } catch {}
   }, [chaiTheme, chaiThemeOptions, iframeWin]);
 
-  return (
-    <>
-      {!skipThemeVars && <CssThemeVariables theme={chaiTheme as ChaiBuilderThemeValues} />}
-      <Fonts />
-      <SelectedBlocks />
-      <SelectedStylingBlocks />
-    </>
-  );
+  // Inject theme variables into iframe HEAD (never BODY) so cascade with site vars behaves predictably
+  useEffect(() => {
+    if (!iframeDoc) return;
+    const head = iframeDoc.head;
+    if (!head) return;
+    const STYLE_ID = "chai-theme";
+    try {
+      const existing = head.querySelector<HTMLStyleElement>(`#${STYLE_ID}`);
+      if (hasSiteVars) {
+        if (existing) existing.remove();
+        return;
+      }
+      const css = getChaiThemeCssVariables(chaiTheme as ChaiBuilderThemeValues);
+      let el = existing || iframeDoc.createElement("style");
+      el.id = STYLE_ID;
+      el.textContent = css;
+      if (!existing) head.appendChild(el);
+    } catch {}
+  }, [iframeDoc, chaiTheme, hasSiteVars]);
+
+  // Inject fonts (links + @font-face) into iframe HEAD
+  useEffect(() => {
+    if (!iframeDoc) return;
+    const head = iframeDoc.head;
+    if (!head) return;
+    const FONT_STYLE_ID = "chai-custom-fonts";
+    try {
+      // Links
+      const fontUrls = getThemeFontsUrls(usePickedFonts(chaiTheme));
+      // Remove previous font links first
+      head.querySelectorAll('link[data-chai-font="1"]').forEach((n) => n.parentNode?.removeChild(n));
+      fontUrls.forEach((url) => {
+        const link = iframeDoc.createElement("link");
+        link.rel = "stylesheet";
+        link.href = url;
+        link.setAttribute("data-chai-font", "1");
+        head.appendChild(link);
+      });
+      // Custom font-face
+      const customFonts = getThemeCustomFontFace(usePickedFonts(chaiTheme, true));
+      let styleEl = head.querySelector<HTMLStyleElement>(`#${FONT_STYLE_ID}`);
+      if (!styleEl) {
+        styleEl = iframeDoc.createElement("style");
+        styleEl.id = FONT_STYLE_ID;
+        head.appendChild(styleEl);
+      }
+      styleEl.textContent = customFonts;
+    } catch {}
+  }, [iframeDoc, chaiTheme]);
+
+  // Inject selection highlight styles into iframe HEAD
+  const selectedBlocksCss = useSelectedBlocksCss();
+  const selectedStylingCss = useSelectedStylingCss();
+  useEffect(() => {
+    if (!iframeDoc) return;
+    const head = iframeDoc.head;
+    if (!head) return;
+    try {
+      const selId = "selected-blocks";
+      let el = head.querySelector<HTMLStyleElement>(`#${selId}`);
+      if (!el) {
+        el = iframeDoc.createElement("style");
+        el.id = selId;
+        head.appendChild(el);
+      }
+      el.textContent = selectedBlocksCss;
+    } catch {}
+  }, [iframeDoc, selectedBlocksCss]);
+  useEffect(() => {
+    if (!iframeDoc) return;
+    const head = iframeDoc.head;
+    if (!head) return;
+    try {
+      const selId = "selected-styling-blocks";
+      let el = head.querySelector<HTMLStyleElement>(`#${selId}`);
+      if (!el) {
+        el = iframeDoc.createElement("style");
+        el.id = selId;
+        head.appendChild(el);
+      }
+      el.textContent = selectedStylingCss;
+    } catch {}
+  }, [iframeDoc, selectedStylingCss]);
+
+  return null;
 };
 
-const SelectedStylingBlocks = () => {
+function useSelectedStylingCss() {
   const [selectedStylingBlocks] = useSelectedStylingBlocks();
   const [selectedBlockIds] = useSelectedBlockIds();
-  const styles = useMemo(() => {
+  return useMemo(() => {
     return `${map(selectedStylingBlocks, ({ id }: any) => `[data-style-id="${id}"]`).join(",")}{
                 outline: 1px solid ${selectedBlockIds.length > 0 ? "#42a1fc" : "#de8f09"} !important; outline-offset: -1px;
             }`;
   }, [selectedStylingBlocks, selectedBlockIds]);
-  return <style id="selected-styling-blocks" dangerouslySetInnerHTML={{ __html: styles }} />;
-};
+}
 
-const SelectedBlocks = () => {
+function useSelectedBlocksCss() {
   const [selectedBlockIds] = useSelectedBlockIds();
-  const styles = useMemo(() => {
+  return useMemo(() => {
     return `${map(selectedBlockIds, (id) => `[data-block-id="${id}"]`).join(",")}{
                 outline: 1px solid #42a1fc !important; outline-offset: -1px;
             }`;
   }, [selectedBlockIds]);
-  return <style id="selected-blocks" dangerouslySetInnerHTML={{ __html: styles }} />;
-};
+}
 
-const Fonts = () => {
-  const [chaiTheme] = useTheme();
+function usePickedFonts(chaiTheme: any, onlySrc: boolean = false) {
   const registeredFonts = useRegisteredFonts();
-  const pickedFonts = useMemo(() => {
+  return useMemo(() => {
     const { heading, body } = {
       heading: get(chaiTheme, "fontFamily.heading"),
       body: get(chaiTheme, "fontFamily.body"),
     };
-    return registeredFonts.filter((font) => font.family === heading || font.family === body);
+    const list = registeredFonts.filter((font) => font.family === heading || font.family === body);
+    return onlySrc ? filter(list, (font) => has(font, "src")) : list;
   }, [chaiTheme?.fontFamily, registeredFonts]);
-
-  const fonts = useMemo(() => getThemeFontsUrls(filter(pickedFonts, (font) => has(font, "url"))), [pickedFonts]);
-  const customFonts = useMemo(
-    () => getThemeCustomFontFace(filter(pickedFonts, (font) => has(font, "src"))),
-    [pickedFonts],
-  );
-  return (
-    <>
-      {fonts.map((font, index) => (
-        <link key={`google-font-${index}`} rel="stylesheet" href={font} />
-      ))}
-      <style id="chai-custom-fonts" dangerouslySetInnerHTML={{ __html: customFonts }} />
-    </>
-  );
-};
+}
