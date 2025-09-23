@@ -120,7 +120,7 @@ export const CoreBlock = ({
               }, 200);
             }}
             draggable={dnd ? "true" : "false"}
-            className="cursor-pointer w-full builder-sdk-core-block-btn space-y-2 rounded-lg border border-border p-0 text-center bg-white hover:bg-slate-300/50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400 dark:border-gray-700 dark:text-white dark:hover:bg-slate-800/50 dark:disabled:bg-gray-900 dark:disabled:text-foreground"
+            className="cursor-pointer w-full builder-sdk-core-block-btn rounded-lg border border-border p-0 text-center bg-white hover:bg-slate-300/50 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-400 dark:border-gray-700 dark:text-white dark:hover:bg-slate-800/50 dark:disabled:bg-gray-900 dark:disabled:text-foreground"
           >
             {visual}
             <p className="truncate text-center w-full py-[20px] px-[10px] text-xs border-t">{displayLabel}</p>
