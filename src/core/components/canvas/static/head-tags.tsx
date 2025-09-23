@@ -107,7 +107,7 @@ export const HeadTags = () => {
     if (!head) return;
     const STYLE_ID = "chai-theme";
     try {
-      const existing = head.querySelector<HTMLStyleElement>(`#${STYLE_ID}`);
+      const existing = head.querySelector(`#${STYLE_ID}`) as HTMLStyleElement | null;
       if (hasSiteVars) {
         if (existing) existing.remove();
         return;
@@ -140,7 +140,7 @@ export const HeadTags = () => {
       });
       // Custom font-face
       const customFonts = getThemeCustomFontFace(usePickedFonts(chaiTheme, true));
-      let styleEl = head.querySelector<HTMLStyleElement>(`#${FONT_STYLE_ID}`);
+      let styleEl = head.querySelector(`#${FONT_STYLE_ID}`) as HTMLStyleElement | null;
       if (!styleEl) {
         styleEl = iframeDoc.createElement("style");
         styleEl.id = FONT_STYLE_ID;
@@ -159,7 +159,7 @@ export const HeadTags = () => {
     if (!head) return;
     try {
       const selId = "selected-blocks";
-      let el = head.querySelector<HTMLStyleElement>(`#${selId}`);
+      let el = head.querySelector(`#${selId}`) as HTMLStyleElement | null;
       if (!el) {
         el = iframeDoc.createElement("style");
         el.id = selId;
@@ -174,7 +174,7 @@ export const HeadTags = () => {
     if (!head) return;
     try {
       const selId = "selected-styling-blocks";
-      let el = head.querySelector<HTMLStyleElement>(`#${selId}`);
+      let el = head.querySelector(`#${selId}`) as HTMLStyleElement | null;
       if (!el) {
         el = iframeDoc.createElement("style");
         el.id = selId;
