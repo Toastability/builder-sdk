@@ -87,11 +87,21 @@ export default function BlockSettings() {
           set(uiSchema, "sort", { "ui:widget": "collectionSelect" });
         }
       }
+      // Hide default link/button controls for interactive-only controls inside FAQ With Sidebar
+      try {
+        if (type === 'Button' && get(registeredBlock, 'type') === 'Button') {
+          // When editing a child control of a wrapper, wrapper settings are also available below
+          if (registeredWrapperBlock && registeredWrapperBlock.type === 'FaqKitWithSidebar') {
+            set(uiSchema, 'link', { 'ui:widget': 'hidden' });
+            set(uiSchema, 'prefetchLink', { 'ui:widget': 'hidden' });
+          }
+        }
+      } catch {}
       return { schema, uiSchema };
     } catch (error) {
       return { schema: {}, uiSchema: {} };
     }
-  }, [selectedBlock]);
+  }, [selectedBlock, registeredWrapperBlock]);
 
   const { wrapperSchema, wrapperUiSchema } = useMemo(() => {
     if (!wrapperBlock || !wrapperBlock?._type) {

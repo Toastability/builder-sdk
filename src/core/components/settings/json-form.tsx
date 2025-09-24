@@ -61,6 +61,7 @@ export const JSONForm = memo(({ blockId, schema, uiSchema, formData, onChange }:
       key={selectedLang}
       widgets={{
         richtext: RTEField,
+        richtextJson: RTEJsonField,
         icon: IconPickerField,
         image: ImagePickerField,
         code: CodeEditor,
