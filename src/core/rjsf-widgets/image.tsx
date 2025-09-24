@@ -25,11 +25,14 @@ const ImagePickerField = ({ value, onChange, id, onBlur }: WidgetProps) => {
   const showImagePicker = true;
 
   // Derive the actual schema property name from the RJSF id (e.g. root_backgroundImage -> backgroundImage)
-  const idWithoutRoot = id.replace(/^root_/, "");
-  let propKey = (idWithoutRoot.split("_").pop() || idWithoutRoot || "").trim();
-  // Strip i18n suffix from prop key (e.g., image-en -> image)
+  // Normalize RJSF id to derive the actual schema prop name
+  // Handles ids like: root.image, root_0_image, root_image, root.image-en, root.0.image-en
+  const idNoRoot = id.replace(/^root[\._]/, "");
+  const pathParts = idNoRoot.split(/[\._]/).filter(Boolean);
+  let propKey = (pathParts[pathParts.length - 1] || idNoRoot || "").trim();
+  // Strip i18n suffix: image-en => image
   if (selectedLang && propKey.endsWith(`-${selectedLang}`)) {
-    propKey = propKey.slice(0, -1 * (selectedLang.length + 1));
+    propKey = propKey.slice(0, propKey.length - selectedLang.length - 1);
   }
   const propIdKey = selectedLang ? `_${propKey}Id-${selectedLang}` : `_${propKey}Id`;
 
