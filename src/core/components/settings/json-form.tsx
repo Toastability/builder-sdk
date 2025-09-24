@@ -6,6 +6,7 @@ import {
   LinkField,
   RowColField,
   RTEField,
+  RTEJsonField,
   SliderField,
   SourcesField,
 } from "@/core/rjsf-widgets";
