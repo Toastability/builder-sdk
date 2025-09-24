@@ -49,6 +49,10 @@ export { getBlocksFromHTML as convertHTMLToChaiBlocks, getBlocksFromHTML } from 
 // types
 export type { ChaiBlock, ChaiBuilderEditorProps };
 
+// interactive components
+export * from "@/core/features/interactive-blocks";
+export { InteractiveStateWidget } from "@/core/rjsf-widgets/InteractiveState";
+
 // registration apis
 export { registerChaiAddBlockTab } from "@/core/extensions/add-block-tabs";
 export {
