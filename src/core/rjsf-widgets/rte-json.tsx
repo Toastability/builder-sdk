@@ -10,7 +10,7 @@ import { Button } from '@/ui/shadcn/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/ui/shadcn/components/ui/dialog';
 
 // Minimal TipTap JSON field that stores JSON (not HTML) in formData
-export const RTEJsonField = ({ id, schema, uiSchema, formData, onChange }: FieldProps) => {
+export const RTEJsonField = ({ id, uiSchema, formData, onChange }: FieldProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState<any>(formData || { type: 'doc', content: [] });
   const rteRef = useRef<HTMLDivElement | null>(null);
