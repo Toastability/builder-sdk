@@ -1,4 +1,4 @@
-import { WidgetProps } from '@rjsf/utils/lib/index.js';
+import { FieldProps } from '@rjsf/utils/lib/index.js';
 import { EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
@@ -9,10 +9,10 @@ import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/ui/shadcn/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/ui/shadcn/components/ui/dialog';
 
-// Minimal TipTap JSON widget that stores JSON (not HTML) in formData
-export const RTEJsonField = ({ id, placeholder, value, onChange }: WidgetProps) => {
+// Minimal TipTap JSON field that stores JSON (not HTML) in formData
+export const RTEJsonField = ({ id, schema, uiSchema, formData, onChange }: FieldProps) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalContent, setModalContent] = useState<any>(value || { type: 'doc', content: [] });
+  const [modalContent, setModalContent] = useState<any>(formData || { type: 'doc', content: [] });
   const rteRef = useRef<HTMLDivElement | null>(null);
 
   const editor = useEditor({
@@ -22,11 +22,11 @@ export const RTEJsonField = ({ id, placeholder, value, onChange }: WidgetProps) 
       TextAlign.configure({ types: ['heading', 'paragraph'], alignments: ['left', 'center', 'right'], defaultAlignment: 'left' }),
       Underline,
       Placeholder.configure({
-        placeholder: placeholder || 'Enter content... (stored as JSON)',
+        placeholder: (uiSchema as any)?.['ui:placeholder'] || 'Enter content... (stored as JSON)',
         emptyEditorClass: 'cursor-text before:content-[attr(data-placeholder)] before:absolute before:opacity-50 before:pointer-events-none',
       }),
     ],
-    content: value && typeof value === 'object' ? value : undefined,
+    content: formData && typeof formData === 'object' ? formData : undefined,
     onUpdate: ({ editor }) => {
       const json = editor.getJSON();
       onChange(json);
@@ -43,11 +43,11 @@ export const RTEJsonField = ({ id, placeholder, value, onChange }: WidgetProps) 
   }, [editor]);
 
   useEffect(() => {
-    if (value && editor && typeof value === 'object') {
+    if (formData && editor && typeof formData === 'object') {
       // external changes
-      editor.commands.setContent(value);
+      editor.commands.setContent(formData);
     }
-  }, [value]);
+  }, [formData]);
 
   const handleModalClose = () => {
     setIsModalOpen(false);
@@ -80,4 +80,3 @@ export const RTEJsonField = ({ id, placeholder, value, onChange }: WidgetProps) 
     </>
   );
 };
-
