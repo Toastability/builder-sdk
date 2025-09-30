@@ -156,13 +156,17 @@ const getAttrs = (node: Node) => {
     if (includes(NAME_ATTRIBUTES, key)) return;
     if (replacers[key]) {
       // for img tag if the src is not absolute then replace with placeholder image
+      // allow mustache-style placeholders like {{primaryLogo}} to pass through unchanged
       if (node.tagName === "img" && key === "src" && !value.startsWith("http")) {
-        const width = find(node.attributes, { key: "width" }) as { value: string } | undefined;
-        const height = find(node.attributes, { key: "height" }) as { value: string } | undefined;
-        if (width && height) {
-          value = `https://via.placeholder.com/${width?.value}x${height?.value}`;
-        } else {
-          value = `https://via.placeholder.com/150x150`;
+        const isPlaceholderToken = /\{\{\s*[a-zA-Z0-9_]+\s*\}\}/.test(value);
+        if (!isPlaceholderToken) {
+          const width = find(node.attributes, { key: "width" }) as { value: string } | undefined;
+          const height = find(node.attributes, { key: "height" }) as { value: string } | undefined;
+          if (width && height) {
+            value = `https://via.placeholder.com/${width?.value}x${height?.value}`;
+          } else {
+            value = `https://via.placeholder.com/150x150`;
+          }
         }
       }
       set(attrs, replacers[key], getSanitizedValue(value));
