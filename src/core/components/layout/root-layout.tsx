@@ -39,45 +39,59 @@ import { useTranslation } from "react-i18next";
 
 const DEFAULT_PANEL_WIDTH = 280;
 
-const OutlineButton = ({ isActive, show }: { isActive: boolean; show: () => void; panelId: string }) => {
-  return (
-    <Button variant={isActive ? "default" : "link"} size="icon" onClick={show}>
-      <Layers size={20} />
-    </Button>
-  );
-};
+const OutlineButton = React.forwardRef<HTMLButtonElement, { isActive: boolean; show: () => void; panelId: string }>(
+  ({ isActive, show }, ref) => {
+    return (
+      <Button ref={ref} variant={isActive ? "default" : "link"} size="icon" onClick={show}>
+        <Layers size={20} />
+      </Button>
+    );
+  }
+);
+OutlineButton.displayName = "OutlineButton";
 
-const ComponentsButton = ({ isActive, show }: { isActive: boolean; show: () => void; panelId: string }) => {
-  const [pulseCount] = useComponentsButtonPulse();
-  return (
-    <Button
-      variant={isActive ? "default" : "link"}
-      size="icon"
-      onClick={show}
-      className={
-        pulseCount > 0 && !isActive
-          ? "relative after:absolute after:inset-0 after:animate-[ping_0.8s_ease-out] after:rounded-md after:bg-primary/40"
-          : undefined
-      }>
-      <Blocks className="h-5 w-5" />
-    </Button>
-  );
-};
+const ComponentsButton = React.forwardRef<HTMLButtonElement, { isActive: boolean; show: () => void; panelId: string }>(
+  ({ isActive, show }, ref) => {
+    const [pulseCount] = useComponentsButtonPulse();
+    return (
+      <Button
+        ref={ref}
+        variant={isActive ? "default" : "link"}
+        size="icon"
+        onClick={show}
+        className={
+          pulseCount > 0 && !isActive
+            ? "relative after:absolute after:inset-0 after:animate-[ping_0.8s_ease-out] after:rounded-md after:bg-primary/40"
+            : undefined
+        }>
+        <Blocks className="h-5 w-5" />
+      </Button>
+    );
+  }
+);
+ComponentsButton.displayName = "ComponentsButton";
 
-const AiButton = ({ isActive, show }: { isActive: boolean; show: () => void; panelId: string }) => {
-  return (
-    <Button variant={isActive ? "default" : "link"} size="icon" onClick={show}>
-      <LightningBoltIcon className="rtl:ml-2" />
-    </Button>
-  );
-};
-const AskAiButton = ({ isActive, show }: { isActive: boolean; show: () => void; panelId: string }) => {
-  return (
-    <Button variant={isActive ? "default" : "link"} size="icon" onClick={show}>
-      <SparklesIcon className="rtl:ml-2" />
-    </Button>
-  );
-};
+const AiButton = React.forwardRef<HTMLButtonElement, { isActive: boolean; show: () => void; panelId: string }>(
+  ({ isActive, show }, ref) => {
+    return (
+      <Button ref={ref} variant={isActive ? "default" : "link"} size="icon" onClick={show}>
+        <LightningBoltIcon className="rtl:ml-2" />
+      </Button>
+    );
+  }
+);
+AiButton.displayName = "AiButton";
+
+const AskAiButton = React.forwardRef<HTMLButtonElement, { isActive: boolean; show: () => void; panelId: string }>(
+  ({ isActive, show }, ref) => {
+    return (
+      <Button ref={ref} variant={isActive ? "default" : "link"} size="icon" onClick={show}>
+        <SparklesIcon className="rtl:ml-2" />
+      </Button>
+    );
+  }
+);
+AskAiButton.displayName = "AskAiButton";
 function useSidebarDefaultPanels() {
   const askAiCallBack = useBuilderProp("askAiCallBack", null);
   const aiChat = useFeature("aiChat");
