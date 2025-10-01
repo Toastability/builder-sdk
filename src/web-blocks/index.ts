@@ -48,6 +48,8 @@ import {
 } from "@/web-blocks/row-col";
 import { Component as RichTextBlock, Config as RichTextConfig, RichTextProps } from "@/web-blocks/rte";
 import { Component as SpanBlock, Config as SpanBlockConfig, SpanProps } from "@/web-blocks/span";
+import { Component as SocialLinkBlock, Config as SocialLinkConfig, SocialLinkBlockProps } from "@/web-blocks/social-link";
+import { Component as SocialIconBlock, Config as SocialIconConfig, SocialIconBlockProps } from "@/web-blocks/social-icon";
 import { Config as LayersConfig, Component as TextBlock, TextBlockProps } from "@/web-blocks/text";
 import { Component as VideoBlock, Config as VideoBlockConfig, VideoBlockProps } from "@/web-blocks/video";
 import {
@@ -83,6 +85,8 @@ const loadWebBlocks = () => {
   registerChaiBlock<CustomHTMLBlockProps>(CustomHTML, CustomHTMLConfig);
   registerChaiBlock<CustomScriptBlockProps>(CustomScript, CustomScriptConfig);
   registerChaiBlock<TextBlockProps>(TextBlock, LayersConfig);
+  registerChaiBlock<SocialLinkBlockProps>(SocialLinkBlock, SocialLinkConfig);
+  registerChaiBlock<SocialIconBlockProps>(SocialIconBlock, SocialIconConfig);
 
   // //forms
   registerChaiBlock<FormProps>(FormBlock, FormBlockConfig);
