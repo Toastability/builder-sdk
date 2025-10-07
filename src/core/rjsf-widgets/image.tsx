@@ -17,20 +17,20 @@ const stripCssUrl = (val?: string): string => {
   return match ? match[2] : val;
 };
 
-const ImagePickerField = ({ value, onChange, id, onBlur }: WidgetProps) => {
+const ImagePickerField = ({ value, onChange, id, onBlur, options }: WidgetProps) => {
   const { t } = useTranslation();
   const { selectedLang } = useLanguages();
   const selectedBlock = useSelectedBlock();
   const updateBlockProps = useUpdateMultipleBlocksProps();
   const showImagePicker = true;
+  const widgetOptions = (options as { mediaMode?: "image" | "video" | "audio" } | undefined) ?? undefined;
+  const inferredMode: "image" | "video" = selectedBlock?._type === "Video" ? "video" : "image";
+  const managerMode = (widgetOptions?.mediaMode as "image" | "video" | "audio" | undefined) ?? inferredMode;
+  const isVideoManager = managerMode === "video";
 
-  // Derive the actual schema property name from the RJSF id (e.g. root_backgroundImage -> backgroundImage)
-  // Normalize RJSF id to derive the actual schema prop name
-  // Handles ids like: root.image, root_0_image, root_image, root.image-en, root.0.image-en
   const idNoRoot = id.replace(/^root[\._]/, "");
   const pathParts = idNoRoot.split(/[\._]/).filter(Boolean);
   let propKey = (pathParts[pathParts.length - 1] || idNoRoot || "").trim();
-  // Strip i18n suffix: image-en => image
   if (selectedLang && propKey.endsWith(`-${selectedLang}`)) {
     propKey = propKey.slice(0, propKey.length - selectedLang.length - 1);
   }
@@ -51,40 +51,39 @@ const ImagePickerField = ({ value, onChange, id, onBlur }: WidgetProps) => {
       if (selectedBlock?._id) {
         const mrid = asset?.id && !isNaN(Number(asset.id)) ? Number(asset.id) : undefined;
         const props: Record<string, any> = {};
-        // For primary image fields, attach helpful dimensions/alt
         if (propKey === "image" || selectedBlock?._type === "Image") {
           if (width) props.width = width;
           if (height) props.height = height;
           if (asset.description) props.alt = asset.description;
         }
-        // Always set the actual prop to the raw URL so payload carries it explicitly
+        if (isVideoManager && propKey !== "poster") {
+          props.videoSource = "Custom";
+          props.url = asset.url;
+          if (asset.thumbnailUrl) props.poster = asset.thumbnailUrl;
+        }
         props[propKey] = asset.url;
-        // For background images, also reflect immediate inline style for canvas
         if (propKey === "backgroundImage") {
-          const prevStyle = (selectedBlock as any)?.style && typeof (selectedBlock as any).style === 'object'
+          const prevStyle = (selectedBlock as any)?.style && typeof (selectedBlock as any).style === "object"
             ? { ...(selectedBlock as any).style }
             : {};
           props.style = { ...prevStyle, backgroundImage: `url('${asset.url}')` };
         }
-        // handling asset id based on prop (e.g., _backgroundImageId, _imageId)
         if (mrid) {
-          // Always write base id key
           set(props, `_${propKey}Id`, mrid);
-          // Also write language-specific id if applicable
           if (selectedLang) set(props, propIdKey, mrid);
+          if (isVideoManager) {
+            props._videoId = mrid;
+            props.videoId = mrid;
+          }
         }
-        // Attach canonical media reference at block level when we have a valid record id
         if (mrid) {
-          props.mediaRecordId = mrid;
           props.mediaReference = {
             mediaRecordId: mrid,
             mediaToken: undefined,
             fallbackUrl: asset?.url || undefined,
           };
+          props.mediaRecordId = mrid;
         }
-        // handling asset id based on prop
-        // (already set above when mrid exists)
-        // Only update if props are not empty
         if (isEmpty(props)) return;
         updateBlockProps([{ _id: selectedBlock._id, ...props }]);
       }
@@ -95,10 +94,8 @@ const ImagePickerField = ({ value, onChange, id, onBlur }: WidgetProps) => {
     onChange(propKey === 'image' ? PLACEHOLDER_IMAGE : "");
     if (selectedBlock?._id) {
       const reset: Record<string, any> = { assetId: "" };
-      // Clear per-prop id as well (both base and language-specific)
       reset[`_${propKey}Id`] = "";
       if (selectedLang) reset[propIdKey] = "";
-      // Clear canonical media reference metadata
       reset.mediaReference = null;
       reset.mediaRecordId = undefined;
       reset.mediaToken = undefined;
@@ -110,25 +107,49 @@ const ImagePickerField = ({ value, onChange, id, onBlur }: WidgetProps) => {
         delete (prevStyle as any).backgroundImage;
         reset.style = prevStyle;
       }
+      if (isVideoManager) {
+        reset.url = "";
+        reset.poster = "";
+        reset.videoSource = "Custom";
+        reset._videoId = "";
+        reset.videoId = "";
+      }
       updateBlockProps([{ _id: selectedBlock._id, ...reset }]);
     }
-  }, [onChange, propIdKey, selectedBlock?._id, updateBlockProps]);
+  }, [onChange, propIdKey, selectedBlock?._id, updateBlockProps, isVideoManager, propKey, selectedLang]);
 
-  // Normalize any css url(...) values that may sneak into the saved value
   const normalizedValue = stripCssUrl(value as any);
+  const replaceLabel = isVideoManager ? t("Replace video") : t("Replace image");
+  const chooseLabel = isVideoManager ? t("Choose video") : t("Choose image");
+  const inputPlaceholder = isVideoManager ? t("Enter video URL") : t("Enter image URL");
+  const posterPreview = (selectedBlock as any)?.poster;
 
   return (
     <div className="mt-1.5 flex items-center gap-x-3">
       {normalizedValue ? (
         <div className="group relative">
-          <img
-            src={normalizedValue}
-            className={
-              `h-20 w-20 overflow-hidden rounded-md border border-border object-cover transition duration-200 ` +
-              (assetId && assetId !== "" ? "cursor-pointer group-hover:blur-sm" : "")
-            }
-            alt=""
-          />
+          {isVideoManager ? (
+            <video
+              src={normalizedValue}
+              poster={posterPreview || undefined}
+              className={
+                `h-20 w-20 overflow-hidden rounded-md border border-border object-cover transition duration-200 ` +
+                (assetId && assetId !== "" ? "cursor-pointer group-hover:blur-sm" : "")
+              }
+              muted
+              loop
+              playsInline
+            />
+          ) : (
+            <img
+              src={normalizedValue}
+              className={
+                `h-20 w-20 overflow-hidden rounded-md border border-border object-cover transition duration-200 ` +
+                (assetId && assetId !== "" ? "cursor-pointer group-hover:blur-sm" : "")
+              }
+              alt=""
+            />
+          )}
           {showRemoveIcons && (
             <button
               type="button"
@@ -138,7 +159,7 @@ const ImagePickerField = ({ value, onChange, id, onBlur }: WidgetProps) => {
             </button>
           )}
           {assetId && assetId !== "" && (
-            <MediaManagerModal onSelect={handleSelect} assetId={assetId}>
+            <MediaManagerModal onSelect={handleSelect} assetId={assetId} mode={managerMode}>
               <button
                 type="button"
                 className="absolute inset-0 z-10 flex cursor-pointer items-center justify-center bg-black/10 opacity-0 transition duration-200 group-hover:bg-black/30 group-hover:opacity-100">
@@ -148,16 +169,16 @@ const ImagePickerField = ({ value, onChange, id, onBlur }: WidgetProps) => {
           )}
         </div>
       ) : (
-        <MediaManagerModal onSelect={handleSelect} mode="image" assetId={assetId}>
+        <MediaManagerModal onSelect={handleSelect} mode={managerMode} assetId={assetId}>
           <div className="h-20 w-20 cursor-pointer rounded-md border border-border bg-[radial-gradient(#AAA,transparent_1px)] duration-300 [background-size:10px_10px]"></div>
         </MediaManagerModal>
       )}
       <div className="flex w-3/5 flex-col">
         {showImagePicker && (
           <>
-            <MediaManagerModal onSelect={handleSelect} assetId="">
+            <MediaManagerModal onSelect={handleSelect} assetId="" mode={managerMode}>
               <small className="h-6 cursor-pointer rounded-md bg-secondary px-2 py-1 text-center text-xs text-secondary-foreground hover:bg-secondary/80">
-                {normalizedValue || !isEmpty(normalizedValue) ? t("Replace image") : t("Choose image")}
+                {normalizedValue || !isEmpty(normalizedValue) ? replaceLabel : chooseLabel}
               </small>
             </MediaManagerModal>
             <small className="-pl-4 pt-2 text-center text-xs text-secondary-foreground">OR</small>
@@ -170,7 +191,7 @@ const ImagePickerField = ({ value, onChange, id, onBlur }: WidgetProps) => {
           spellCheck={"false"}
           type="url"
           className="text-xs"
-          placeholder={t("Enter image URL")}
+          placeholder={inputPlaceholder}
           value={normalizedValue || ""}
           onBlur={({ target: { value: url } }) => onBlur(id, stripCssUrl(url))}
           onChange={(e) => onChange(stripCssUrl(e.target.value))}
@@ -180,4 +201,6 @@ const ImagePickerField = ({ value, onChange, id, onBlur }: WidgetProps) => {
   );
 };
 
+
 export { ImagePickerField };
+
