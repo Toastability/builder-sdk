@@ -126,11 +126,13 @@ export const Node = memo(({ node, style, dragHandle }: NodeRendererProps<any>) =
 
   const setDropAttribute = (id: string, value: string) => {
     const innerDoc = iframe.contentDocument || iframe.contentWindow.document;
-    const dropTarget = innerDoc.querySelector(`[data-block-id=${id}]`) as HTMLElement;
+    const dropTarget = innerDoc.querySelector(`[data-block-id=${id}]`) as HTMLElement | null;
 
-    if (dropTarget) {
-      dropTarget.setAttribute("data-drop", value);
+    if (!dropTarget) {
+      return;
     }
+
+    dropTarget.setAttribute("data-drop", value);
 
     const rect = dropTarget.getBoundingClientRect();
     const iframeRect = iframe.getBoundingClientRect();
