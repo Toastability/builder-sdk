@@ -53,6 +53,26 @@ export const IframeInitialContent: string = `<!doctype html>
         outline: 1px solid #42a1fc !important; outline-offset: -1px;
       }
     </style>
+    <style id="slider-styles">
+      [data-slider-track]::-webkit-scrollbar,
+      .slider-container::-webkit-scrollbar {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+      }
+      [data-slider-track],
+      .slider-container {
+        -ms-overflow-style: none !important;
+        scrollbar-width: none !important;
+      }
+      .slider-nav-controls {
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+      [data-slider-root]:hover .slider-nav-controls {
+        opacity: 1;
+      }
+    </style>
 
   </head>
   <body class="font-body antialiased h-full">

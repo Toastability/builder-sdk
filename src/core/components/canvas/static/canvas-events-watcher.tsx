@@ -62,5 +62,258 @@ export const CanvasEventsWatcher = () => {
     setSelectedStylingBlocks([]);
   });
 
+  useEffect(() => {
+    if (!document) return;
+
+    const SLIDER_STATE = Symbol("chai-slider-state");
+
+    type SliderController = {
+      cleanup: () => void;
+    };
+
+    const isBlockSelected = (root: HTMLElement): boolean => {
+      const blockId = root.getAttribute("data-block-id");
+      if (!blockId) return false;
+      return ids.includes(blockId);
+    };
+
+    const initializeSlider = (root: HTMLElement): SliderController | null => {
+      const track =
+        root.querySelector<HTMLElement>("[data-slider-track]") ??
+        root.querySelector<HTMLElement>(".slider-container");
+      const slides = track
+        ? Array.from(
+            track.querySelectorAll<HTMLElement>(
+              "[data-slider-slide], .slider-slide"
+            )
+          )
+        : Array.from(
+            root.querySelectorAll<HTMLElement>(
+              "[data-slider-slide], .slider-slide"
+            )
+          );
+
+      if (!track || !slides.length) return null;
+
+      let currentIndex = Math.max(
+        0,
+        slides.findIndex((slide) => slide.classList.contains("is-active"))
+      );
+      if (currentIndex < 0) currentIndex = 0;
+
+      let lockScroll = false;
+      let lockTimer: number | undefined;
+      let syncFrame: number | undefined;
+      let autoplayTimer: number | undefined;
+
+      const dots = Array.from(
+        root.querySelectorAll<HTMLButtonElement>("[data-slider-dot]")
+      );
+      const prevButtons = Array.from(
+        root.querySelectorAll<HTMLButtonElement>("[data-slider-prev]")
+      );
+      const nextButtons = Array.from(
+        root.querySelectorAll<HTMLButtonElement>("[data-slider-next]")
+      );
+
+      const updateActive = (index: number, smooth = true) => {
+        const total = slides.length;
+        if (!total) return;
+        const target = ((index % total) + total) % total;
+        currentIndex = target;
+
+        slides.forEach((slide, idx) => {
+          slide.classList.toggle("is-active", idx === currentIndex);
+          slide.setAttribute("aria-hidden", String(idx !== currentIndex));
+        });
+        dots.forEach((dot, idx) =>
+          dot.classList.toggle("is-active", idx === currentIndex)
+        );
+
+        lockScroll = true;
+        const left =
+          slides[currentIndex].offsetLeft - (track.offsetLeft || 0);
+
+        track.scrollTo({
+          left,
+          behavior: smooth ? "smooth" : "auto",
+        });
+
+        if (lockTimer) window.clearTimeout(lockTimer);
+        lockTimer = window.setTimeout(
+          () => {
+            lockScroll = false;
+          },
+          smooth ? 450 : 50
+        ) as unknown as number;
+      };
+
+      updateActive(currentIndex, false);
+
+      const goPrevious = () => updateActive(currentIndex - 1);
+      const goNext = () => updateActive(currentIndex + 1);
+      const dotHandlers: Array<() => void> = [];
+
+      prevButtons.forEach((btn) => btn.addEventListener("click", goPrevious));
+      nextButtons.forEach((btn) => btn.addEventListener("click", goNext));
+      dots.forEach((btn, idx) => {
+        const handler = () => updateActive(idx);
+        dotHandlers.push(handler);
+        btn.addEventListener("click", handler);
+      });
+
+      const pauseInteractions = () => {
+        if (lockTimer) window.clearTimeout(lockTimer);
+        lockScroll = false;
+      };
+
+      const handleScroll = () => {
+        if (lockScroll) return;
+        if (syncFrame) window.cancelAnimationFrame(syncFrame);
+        syncFrame = window.requestAnimationFrame(() => {
+          const center = track.scrollLeft + track.clientWidth / 2;
+          let nearest = currentIndex;
+          let minDelta = Number.POSITIVE_INFINITY;
+          slides.forEach((slide, idx) => {
+            const slideCenter =
+              slide.offsetLeft + slide.offsetWidth / 2;
+            const delta = Math.abs(slideCenter - center);
+            if (delta < minDelta) {
+              minDelta = delta;
+              nearest = idx;
+            }
+          });
+          if (nearest !== currentIndex) {
+            currentIndex = nearest;
+            slides.forEach((slide, idx) =>
+              slide.classList.toggle("is-active", idx === currentIndex)
+            );
+            dots.forEach((dot, idx) =>
+              dot.classList.toggle("is-active", idx === currentIndex)
+            );
+          }
+        });
+      };
+
+      track.addEventListener("scroll", handleScroll, { passive: true });
+
+      const autoplayEnabled = root.dataset.autoplay !== "false";
+      const autoplayInterval = Number(
+        root.dataset.autoplayInterval || "6000"
+      );
+
+      let resumeTimer: number | undefined;
+      
+      const navControls = root.querySelector<HTMLElement>("[data-slider-controls]");
+
+      const updateControlsVisibility = () => {
+        const selected = isBlockSelected(root);
+        if (navControls) {
+          navControls.style.opacity = selected ? "1" : "0";
+          navControls.style.transition = "opacity 0.3s ease";
+        }
+        if (selected) {
+          stopAutoplay();
+        }
+      };
+
+      const startAutoplay = () => {
+        if (!autoplayEnabled || slides.length < 2) return;
+        if (isBlockSelected(root)) return;
+        if (autoplayTimer) window.clearInterval(autoplayTimer);
+        autoplayTimer = window.setInterval(() => {
+          if (document.hidden) return;
+          if (isBlockSelected(root)) {
+            stopAutoplay();
+            return;
+          }
+          updateActive(currentIndex + 1);
+        }, autoplayInterval) as unknown as number;
+      };
+
+      const stopAutoplay = () => {
+        if (autoplayTimer) window.clearInterval(autoplayTimer);
+        autoplayTimer = undefined;
+      };
+
+      const haltAndScheduleResume = () => {
+        stopAutoplay();
+        pauseInteractions();
+        if (resumeTimer) window.clearTimeout(resumeTimer);
+        resumeTimer = window.setTimeout(() => {
+          startAutoplay();
+        }, Math.max(autoplayInterval, 6000)) as unknown as number;
+      };
+
+      root.addEventListener("pointerdown", haltAndScheduleResume);
+      root.addEventListener("focusin", haltAndScheduleResume);
+      root.addEventListener("keydown", haltAndScheduleResume);
+
+      updateControlsVisibility();
+      startAutoplay();
+
+      const cleanup = () => {
+        prevButtons.forEach((btn) =>
+          btn.removeEventListener("click", goPrevious)
+        );
+        nextButtons.forEach((btn) =>
+          btn.removeEventListener("click", goNext)
+        );
+        dots.forEach((btn, idx) =>
+          btn.removeEventListener("click", dotHandlers[idx])
+        );
+        track.removeEventListener("scroll", handleScroll);
+        root.removeEventListener("pointerdown", haltAndScheduleResume);
+        root.removeEventListener("focusin", haltAndScheduleResume);
+        root.removeEventListener("keydown", haltAndScheduleResume);
+        if (syncFrame) window.cancelAnimationFrame(syncFrame);
+        stopAutoplay();
+        if (resumeTimer) window.clearTimeout(resumeTimer);
+      };
+
+      return { cleanup };
+    };
+
+    const activeControllers = new Map<HTMLElement, SliderController>();
+
+    const ensureSlider = (root: HTMLElement) => {
+      const existing = (root as any)[SLIDER_STATE] as
+        | SliderController
+        | undefined;
+      if (existing) existing.cleanup();
+      const controller = initializeSlider(root);
+      if (controller) {
+        (root as any)[SLIDER_STATE] = controller;
+        activeControllers.set(root, controller);
+      }
+    };
+
+    document
+      .querySelectorAll<HTMLElement>("[data-slider-root]")
+      .forEach(ensureSlider);
+
+    const observer = new MutationObserver(() => {
+      const currentRoots = Array.from(
+        document.querySelectorAll<HTMLElement>("[data-slider-root]")
+      );
+      currentRoots.forEach(ensureSlider);
+      activeControllers.forEach((controller, root) => {
+        if (!currentRoots.includes(root)) {
+          controller.cleanup();
+          activeControllers.delete(root);
+          delete (root as any)[SLIDER_STATE];
+        }
+      });
+    });
+
+    observer.observe(document.body, { subtree: true, childList: true });
+
+    return () => {
+      observer.disconnect();
+      activeControllers.forEach((controller) => controller.cleanup());
+      activeControllers.clear();
+    };
+  }, [document, ids]);
+
   return null;
 };
