@@ -75,37 +75,28 @@ export const CanvasEventsWatcher = () => {
       const blockId = root.getAttribute("data-block-id");
       if (!blockId) return false;
       if (ids.includes(blockId)) return true;
-      
+
       const allDescendants = root.querySelectorAll("[data-block-id]");
       for (const descendant of Array.from(allDescendants)) {
         const descId = descendant.getAttribute("data-block-id");
         if (descId && ids.includes(descId)) return true;
       }
-      
+
       return false;
     };
 
     const initializeSlider = (root: HTMLElement): SliderController | null => {
       const track =
-        root.querySelector<HTMLElement>("[data-slider-track]") ??
-        root.querySelector<HTMLElement>(".slider-container");
+        root.querySelector<HTMLElement>("[data-slider-track]") ?? root.querySelector<HTMLElement>(".slider-container");
       const slides = track
-        ? Array.from(
-            track.querySelectorAll<HTMLElement>(
-              "[data-slider-slide], .slider-slide"
-            )
-          )
-        : Array.from(
-            root.querySelectorAll<HTMLElement>(
-              "[data-slider-slide], .slider-slide"
-            )
-          );
+        ? Array.from(track.querySelectorAll<HTMLElement>("[data-slider-slide], .slider-slide"))
+        : Array.from(root.querySelectorAll<HTMLElement>("[data-slider-slide], .slider-slide"));
 
       if (!track || !slides.length) return null;
 
       let currentIndex = Math.max(
         0,
-        slides.findIndex((slide) => slide.classList.contains("is-active"))
+        slides.findIndex((slide) => slide.classList.contains("is-active")),
       );
       if (currentIndex < 0) currentIndex = 0;
 
@@ -114,43 +105,33 @@ export const CanvasEventsWatcher = () => {
       let syncFrame: number | undefined;
       let autoplayTimer: number | undefined;
 
-      const dots = Array.from(
-        root.querySelectorAll<HTMLElement>("[data-slider-dot]")
-      );
-      const prevButtons = Array.from(
-        root.querySelectorAll<HTMLButtonElement>("[data-slider-prev]")
-      );
-      const nextButtons = Array.from(
-        root.querySelectorAll<HTMLButtonElement>("[data-slider-next]")
-      );
+      const dots = Array.from(root.querySelectorAll<HTMLElement>("[data-slider-dot]"));
+      const prevButtons = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-slider-prev]"));
+      const nextButtons = Array.from(root.querySelectorAll<HTMLButtonElement>("[data-slider-next]"));
 
-      const updateActive = (index: number, immediate = false) => {
+      const updateActive = (index: number) => {
         const total = slides.length;
         if (!total) return;
         const target = ((index % total) + total) % total;
-        
+
         if (currentIndex === target) return;
-        
-        const previousIndex = currentIndex;
+
         currentIndex = target;
 
         slides.forEach((slide, idx) => {
           slide.classList.remove("is-active");
           slide.setAttribute("aria-hidden", "true");
-          
+
           if (idx === currentIndex) {
             slide.classList.add("is-active");
             slide.setAttribute("aria-hidden", "false");
           }
         });
-        
-        dots.forEach((dot, idx) =>
-          dot.classList.toggle("is-active", idx === currentIndex)
-        );
+
+        dots.forEach((dot, idx) => dot.classList.toggle("is-active", idx === currentIndex));
 
         lockScroll = true;
-        const left =
-          slides[currentIndex].offsetLeft - (track.offsetLeft || 0);
+        const left = slides[currentIndex].offsetLeft - (track.offsetLeft || 0);
 
         track.scrollTo({
           left,
@@ -158,12 +139,9 @@ export const CanvasEventsWatcher = () => {
         });
 
         if (lockTimer) window.clearTimeout(lockTimer);
-        lockTimer = window.setTimeout(
-          () => {
-            lockScroll = false;
-          },
-          100
-        ) as unknown as number;
+        lockTimer = window.setTimeout(() => {
+          lockScroll = false;
+        }, 100) as unknown as number;
       };
 
       slides[0]?.classList.add("is-active");
@@ -195,8 +173,7 @@ export const CanvasEventsWatcher = () => {
           let nearest = currentIndex;
           let minDelta = Number.POSITIVE_INFINITY;
           slides.forEach((slide, idx) => {
-            const slideCenter =
-              slide.offsetLeft + slide.offsetWidth / 2;
+            const slideCenter = slide.offsetLeft + slide.offsetWidth / 2;
             const delta = Math.abs(slideCenter - center);
             if (delta < minDelta) {
               minDelta = delta;
@@ -205,12 +182,8 @@ export const CanvasEventsWatcher = () => {
           });
           if (nearest !== currentIndex) {
             currentIndex = nearest;
-            slides.forEach((slide, idx) =>
-              slide.classList.toggle("is-active", idx === currentIndex)
-            );
-            dots.forEach((dot, idx) =>
-              dot.classList.toggle("is-active", idx === currentIndex)
-            );
+            slides.forEach((slide, idx) => slide.classList.toggle("is-active", idx === currentIndex));
+            dots.forEach((dot, idx) => dot.classList.toggle("is-active", idx === currentIndex));
           }
         });
       };
@@ -218,12 +191,10 @@ export const CanvasEventsWatcher = () => {
       track.addEventListener("scroll", handleScroll, { passive: true });
 
       const autoplayEnabled = root.dataset.autoplay !== "false";
-      const autoplayInterval = Number(
-        root.dataset.autoplayInterval || "6000"
-      );
+      const autoplayInterval = Number(root.dataset.autoplayInterval || "6000");
 
       let resumeTimer: number | undefined;
-      
+
       const navControls = root.querySelector<HTMLElement>("[data-slider-controls]");
 
       const updateControlsVisibility = () => {
@@ -263,9 +234,12 @@ export const CanvasEventsWatcher = () => {
         stopAutoplay();
         pauseInteractions();
         if (resumeTimer) window.clearTimeout(resumeTimer);
-        resumeTimer = window.setTimeout(() => {
-          startAutoplay();
-        }, Math.max(autoplayInterval, 6000)) as unknown as number;
+        resumeTimer = window.setTimeout(
+          () => {
+            startAutoplay();
+          },
+          Math.max(autoplayInterval, 6000),
+        ) as unknown as number;
       };
 
       root.addEventListener("pointerdown", haltAndScheduleResume);
@@ -276,15 +250,9 @@ export const CanvasEventsWatcher = () => {
       startAutoplay();
 
       const cleanup = () => {
-        prevButtons.forEach((btn) =>
-          btn.removeEventListener("click", goPrevious)
-        );
-        nextButtons.forEach((btn) =>
-          btn.removeEventListener("click", goNext)
-        );
-        dots.forEach((btn, idx) =>
-          btn.removeEventListener("click", dotHandlers[idx])
-        );
+        prevButtons.forEach((btn) => btn.removeEventListener("click", goPrevious));
+        nextButtons.forEach((btn) => btn.removeEventListener("click", goNext));
+        dots.forEach((btn, idx) => btn.removeEventListener("click", dotHandlers[idx]));
         track.removeEventListener("scroll", handleScroll);
         root.removeEventListener("pointerdown", haltAndScheduleResume);
         root.removeEventListener("focusin", haltAndScheduleResume);
@@ -300,9 +268,7 @@ export const CanvasEventsWatcher = () => {
     const activeControllers = new Map<HTMLElement, SliderController>();
 
     const ensureSlider = (root: HTMLElement) => {
-      const existing = (root as any)[SLIDER_STATE] as
-        | SliderController
-        | undefined;
+      const existing = (root as any)[SLIDER_STATE] as SliderController | undefined;
       if (existing) existing.cleanup();
       const controller = initializeSlider(root);
       if (controller) {
@@ -311,14 +277,10 @@ export const CanvasEventsWatcher = () => {
       }
     };
 
-    Array.from(document.querySelectorAll("[data-slider-root]")).forEach(
-      (root) => ensureSlider(root as HTMLElement)
-    );
+    Array.from(document.querySelectorAll("[data-slider-root]")).forEach((root) => ensureSlider(root as HTMLElement));
 
     const observer = new MutationObserver(() => {
-      const currentRoots = Array.from(
-        document.querySelectorAll("[data-slider-root]")
-      ) as HTMLElement[];
+      const currentRoots = Array.from(document.querySelectorAll("[data-slider-root]")) as HTMLElement[];
       currentRoots.forEach(ensureSlider);
       activeControllers.forEach((controller, root) => {
         if (!currentRoots.includes(root)) {
