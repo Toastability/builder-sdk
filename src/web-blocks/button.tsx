@@ -19,21 +19,34 @@ const Component = (props: ChaiBlockComponentProps<ButtonProps>) => {
   const { blockProps, iconSize, icon, content, styles, children, iconPos, link, inBuilder } = props;
   const _icon = icon;
 
-  // Don't render content span if content is empty, whitespace-only, or just the default "Button" placeholder
-  const hasRealContent = content && content.trim() && content.trim() !== "Button";
+  const trimmedContent = typeof content === "string" ? content.trim() : "";
+  const ariaLabelFromProps = typeof blockProps?.["aria-label"] === "string" ? blockProps["aria-label"].trim() : "";
+  const hasProvidedChildren = Boolean(children);
+
+  const isPlaceholderContent =
+    !hasProvidedChildren &&
+    (!trimmedContent || trimmedContent === "Button" || (!!ariaLabelFromProps && trimmedContent === ariaLabelFromProps));
+
+  const hasRealContent = hasProvidedChildren || (!isPlaceholderContent && Boolean(trimmedContent));
 
   const child = children || (
     <>
-      {hasRealContent && <span data-ai-key="content">{content}</span>}
+      {hasRealContent && trimmedContent && <span data-ai-key="content">{content}</span>}
       {_icon && (
         <div
           style={{ width: iconSize + "px" }}
-          className={iconPos + " " + (hasRealContent ? (iconPos === "order-first" ? "mr-2" : "ml-2") : "") || ""}
+          className={
+            iconPos +
+              " " +
+              (hasRealContent && trimmedContent ? (iconPos === "order-first" ? "mr-2" : "ml-2") : "") || ""
+          }
           dangerouslySetInnerHTML={{ __html: _icon }}
         />
       )}
     </>
   );
+
+  const effectiveAriaLabel = ariaLabelFromProps || (hasRealContent && trimmedContent ? trimmedContent : undefined);
 
   const button = createElement(
     "button",
@@ -41,22 +54,23 @@ const Component = (props: ChaiBlockComponentProps<ButtonProps>) => {
       ...blockProps,
       ...styles,
       type: "button",
-      // Use blockProps aria-label if available (for accessibility-only buttons), otherwise use content
-      "aria-label": blockProps?.["aria-label"] || (hasRealContent ? content : undefined),
+      "aria-label": effectiveAriaLabel,
     },
     child,
   );
 
-  if (!isEmpty(get(link, "href"))) {
+  const linkHref = get(link, "href");
+  const linkTarget = get(link, "target", "_self");
+
+  if (!isEmpty(linkHref)) {
     if (inBuilder) {
       return <span>{button}</span>;
-    } else {
-      return (
-        <a aria-label={content} href={get(link, "href") || "/"} target={get(link, "target", "_self")}>
-          {button}
-        </a>
-      );
     }
+    return (
+      <a aria-label={effectiveAriaLabel} href={linkHref || "/"} target={linkTarget}>
+        {button}
+      </a>
+    );
   }
 
   return button;
