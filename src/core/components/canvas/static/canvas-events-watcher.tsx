@@ -115,7 +115,7 @@ export const CanvasEventsWatcher = () => {
       let autoplayTimer: number | undefined;
 
       const dots = Array.from(
-        root.querySelectorAll<HTMLButtonElement>("[data-slider-dot]")
+        root.querySelectorAll<HTMLElement>("[data-slider-dot]")
       );
       const prevButtons = Array.from(
         root.querySelectorAll<HTMLButtonElement>("[data-slider-prev]")
@@ -124,7 +124,7 @@ export const CanvasEventsWatcher = () => {
         root.querySelectorAll<HTMLButtonElement>("[data-slider-next]")
       );
 
-      const updateActive = (index: number) => {
+      const updateActive = (index: number, immediate = false) => {
         const total = slides.length;
         if (!total) return;
         const target = ((index % total) + total) % total;
@@ -135,26 +135,12 @@ export const CanvasEventsWatcher = () => {
         currentIndex = target;
 
         slides.forEach((slide, idx) => {
-          if (idx === previousIndex) {
-            slide.style.opacity = "1";
-            slide.style.transition = "opacity 0.5s ease-in-out";
-            setTimeout(() => {
-              slide.style.opacity = "0";
-              slide.classList.remove("is-active");
-              slide.setAttribute("aria-hidden", "true");
-            }, 50);
-          } else if (idx === currentIndex) {
+          slide.classList.remove("is-active");
+          slide.setAttribute("aria-hidden", "true");
+          
+          if (idx === currentIndex) {
             slide.classList.add("is-active");
             slide.setAttribute("aria-hidden", "false");
-            slide.style.opacity = "0";
-            slide.style.transition = "opacity 0.5s ease-in-out";
-            setTimeout(() => {
-              slide.style.opacity = "1";
-            }, 50);
-          } else {
-            slide.classList.remove("is-active");
-            slide.setAttribute("aria-hidden", "true");
-            slide.style.opacity = "0";
           }
         });
         
@@ -176,11 +162,13 @@ export const CanvasEventsWatcher = () => {
           () => {
             lockScroll = false;
           },
-          550
+          100
         ) as unknown as number;
       };
 
-      updateActive(currentIndex);
+      slides[0]?.classList.add("is-active");
+      slides[0]?.setAttribute("aria-hidden", "false");
+      dots[0]?.classList.add("is-active");
 
       const goPrevious = () => updateActive(currentIndex - 1);
       const goNext = () => updateActive(currentIndex + 1);

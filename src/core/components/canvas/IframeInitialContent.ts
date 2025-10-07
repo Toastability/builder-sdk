@@ -71,8 +71,13 @@ export const IframeInitialContent: string = `<!doctype html>
         inset: 0 !important;
         opacity: 0;
         transition: opacity 0.5s ease-in-out;
+        pointer-events: none;
       }
       .slider-slide.is-active {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .slider-slide:first-child {
         opacity: 1;
       }
       .slider-nav-controls {
