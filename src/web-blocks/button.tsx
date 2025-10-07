@@ -19,13 +19,16 @@ const Component = (props: ChaiBlockComponentProps<ButtonProps>) => {
   const { blockProps, iconSize, icon, content, styles, children, iconPos, link, inBuilder } = props;
   const _icon = icon;
 
+  // Don't render content span if content is empty, whitespace-only, or just the default "Button" placeholder
+  const hasRealContent = content && content.trim() && content.trim() !== "Button";
+
   const child = children || (
     <>
-      {content && <span data-ai-key="content">{content}</span>}
+      {hasRealContent && <span data-ai-key="content">{content}</span>}
       {_icon && (
         <div
           style={{ width: iconSize + "px" }}
-          className={iconPos + " " + (content ? (iconPos === "order-first" ? "mr-2" : "ml-2") : "") || ""}
+          className={iconPos + " " + (hasRealContent ? (iconPos === "order-first" ? "mr-2" : "ml-2") : "") || ""}
           dangerouslySetInnerHTML={{ __html: _icon }}
         />
       )}
@@ -38,7 +41,8 @@ const Component = (props: ChaiBlockComponentProps<ButtonProps>) => {
       ...blockProps,
       ...styles,
       type: "button",
-      "aria-label": content,
+      // Use blockProps aria-label if available (for accessibility-only buttons), otherwise use content
+      "aria-label": blockProps?.["aria-label"] || (hasRealContent ? content : undefined),
     },
     child,
   );
