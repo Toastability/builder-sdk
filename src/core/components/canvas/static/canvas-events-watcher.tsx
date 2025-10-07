@@ -288,14 +288,14 @@ export const CanvasEventsWatcher = () => {
       }
     };
 
-    document
-      .querySelectorAll<HTMLElement>("[data-slider-root]")
-      .forEach(ensureSlider);
+    Array.from(document.querySelectorAll("[data-slider-root]")).forEach(
+      (root) => ensureSlider(root as HTMLElement)
+    );
 
     const observer = new MutationObserver(() => {
       const currentRoots = Array.from(
-        document.querySelectorAll<HTMLElement>("[data-slider-root]")
-      );
+        document.querySelectorAll("[data-slider-root]")
+      ) as HTMLElement[];
       currentRoots.forEach(ensureSlider);
       activeControllers.forEach((controller, root) => {
         if (!currentRoots.includes(root)) {
