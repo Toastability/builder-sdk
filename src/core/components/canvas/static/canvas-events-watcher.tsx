@@ -191,7 +191,7 @@ export const CanvasEventsWatcher = () => {
       track.addEventListener("scroll", handleScroll, { passive: true });
 
       const autoplayEnabled = root.dataset.autoplay !== "false";
-      const autoplayInterval = Number(root.dataset.autoplayInterval || "6000");
+      const autoplayInterval = Number(root.dataset.autoplayInterval || "8000");
 
       let resumeTimer: number | undefined;
 
