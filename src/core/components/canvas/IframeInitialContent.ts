@@ -64,13 +64,19 @@ export const IframeInitialContent: string = `<!doctype html>
       .slider-container {
         -ms-overflow-style: none !important;
         scrollbar-width: none !important;
+        overflow: hidden !important;
+      }
+      .slider-slide {
+        position: absolute !important;
+        inset: 0 !important;
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+      }
+      .slider-slide.is-active {
+        opacity: 1;
       }
       .slider-nav-controls {
-        opacity: 0;
-        transition: opacity 0.3s ease;
-      }
-      [data-slider-root]:hover .slider-nav-controls {
-        opacity: 1;
+        opacity: 1 !important;
       }
     </style>
 

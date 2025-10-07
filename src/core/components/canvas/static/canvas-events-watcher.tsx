@@ -74,7 +74,15 @@ export const CanvasEventsWatcher = () => {
     const isBlockSelected = (root: HTMLElement): boolean => {
       const blockId = root.getAttribute("data-block-id");
       if (!blockId) return false;
-      return ids.includes(blockId);
+      if (ids.includes(blockId)) return true;
+      
+      const allDescendants = root.querySelectorAll("[data-block-id]");
+      for (const descendant of Array.from(allDescendants)) {
+        const descId = descendant.getAttribute("data-block-id");
+        if (descId && ids.includes(descId)) return true;
+      }
+      
+      return false;
     };
 
     const initializeSlider = (root: HTMLElement): SliderController | null => {
@@ -116,16 +124,40 @@ export const CanvasEventsWatcher = () => {
         root.querySelectorAll<HTMLButtonElement>("[data-slider-next]")
       );
 
-      const updateActive = (index: number, smooth = true) => {
+      const updateActive = (index: number) => {
         const total = slides.length;
         if (!total) return;
         const target = ((index % total) + total) % total;
+        
+        if (currentIndex === target) return;
+        
+        const previousIndex = currentIndex;
         currentIndex = target;
 
         slides.forEach((slide, idx) => {
-          slide.classList.toggle("is-active", idx === currentIndex);
-          slide.setAttribute("aria-hidden", String(idx !== currentIndex));
+          if (idx === previousIndex) {
+            slide.style.opacity = "1";
+            slide.style.transition = "opacity 0.5s ease-in-out";
+            setTimeout(() => {
+              slide.style.opacity = "0";
+              slide.classList.remove("is-active");
+              slide.setAttribute("aria-hidden", "true");
+            }, 50);
+          } else if (idx === currentIndex) {
+            slide.classList.add("is-active");
+            slide.setAttribute("aria-hidden", "false");
+            slide.style.opacity = "0";
+            slide.style.transition = "opacity 0.5s ease-in-out";
+            setTimeout(() => {
+              slide.style.opacity = "1";
+            }, 50);
+          } else {
+            slide.classList.remove("is-active");
+            slide.setAttribute("aria-hidden", "true");
+            slide.style.opacity = "0";
+          }
         });
+        
         dots.forEach((dot, idx) =>
           dot.classList.toggle("is-active", idx === currentIndex)
         );
@@ -136,7 +168,7 @@ export const CanvasEventsWatcher = () => {
 
         track.scrollTo({
           left,
-          behavior: smooth ? "smooth" : "auto",
+          behavior: "auto",
         });
 
         if (lockTimer) window.clearTimeout(lockTimer);
@@ -144,11 +176,11 @@ export const CanvasEventsWatcher = () => {
           () => {
             lockScroll = false;
           },
-          smooth ? 450 : 50
+          550
         ) as unknown as number;
       };
 
-      updateActive(currentIndex, false);
+      updateActive(currentIndex);
 
       const goPrevious = () => updateActive(currentIndex - 1);
       const goNext = () => updateActive(currentIndex + 1);
@@ -209,11 +241,14 @@ export const CanvasEventsWatcher = () => {
       const updateControlsVisibility = () => {
         const selected = isBlockSelected(root);
         if (navControls) {
-          navControls.style.opacity = selected ? "1" : "0";
-          navControls.style.transition = "opacity 0.3s ease";
+          navControls.style.opacity = "1";
         }
         if (selected) {
           stopAutoplay();
+        } else {
+          if (!autoplayTimer && autoplayEnabled) {
+            startAutoplay();
+          }
         }
       };
 
