@@ -64,21 +64,13 @@ export const IframeInitialContent: string = `<!doctype html>
       .slider-container {
         -ms-overflow-style: none !important;
         scrollbar-width: none !important;
-        overflow: hidden !important;
+        display: flex !important;
+        flex-direction: row !important;
       }
       .slider-slide {
-        position: absolute !important;
-        inset: 0 !important;
-        opacity: 0;
-        transition: opacity 0.5s ease-in-out;
-        pointer-events: none;
-      }
-      .slider-slide.is-active {
-        opacity: 1;
-        pointer-events: auto;
-      }
-      .slider-slide:first-child {
-        opacity: 1;
+        flex-shrink: 0 !important;
+        min-width: 100% !important;
+        max-width: 100% !important;
       }
       .slider-nav-controls {
         opacity: 1 !important;
