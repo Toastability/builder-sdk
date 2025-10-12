@@ -34,10 +34,11 @@ const IconPickerField = ({ value, onChange, id }: WidgetProps) => {
 
   const currentIconSelection = useMemo(() => {
     if (!svgInput) return null;
+    const preferredSize = blockWidth ?? blockHeight ?? 20;
     return {
       svg: svgInput,
-      width: blockWidth,
-      height: blockHeight,
+      width: preferredSize,
+      height: preferredSize,
     } as Partial<IconLibraryResult>;
   }, [svgInput, blockHeight, blockWidth]);
 
@@ -56,22 +57,18 @@ const IconPickerField = ({ value, onChange, id }: WidgetProps) => {
   };
 
   const handleIconSelect = (icon: IconLibraryResult) => {
-    const sizeFromIcon = typeof icon.width === "number" && icon.width > 0 ? icon.width : undefined;
-    const desiredSize = sizeFromIcon ?? blockWidth ?? blockHeight;
-
-    handleSvgChange(icon.svg);
+    const cleanedSvg = removeSizeAttributes(icon.svg);
+    handleSvgChange(cleanedSvg);
 
     if (isIconBlock && selectedBlock?._id) {
-      const cleanedSvg = removeSizeAttributes(icon.svg);
       const updates: { _id: string } & Partial<ChaiBlock> = { _id: selectedBlock._id, icon: cleanedSvg };
 
-      if (typeof desiredSize === "number" && !Number.isNaN(desiredSize)) {
-        updates.width = desiredSize;
-        updates.height = desiredSize;
-      } else {
-        if (typeof blockWidth === "number") updates.width = blockWidth;
-        if (typeof blockHeight === "number") updates.height = blockHeight;
-      }
+      // Preserve existing dimensions, or use icon library size, or fallback to default
+      const preferredWidth = blockWidth ?? icon.width ?? 20;
+      const preferredHeight = blockHeight ?? icon.height ?? 20;
+      
+      updates.width = preferredWidth;
+      updates.height = preferredHeight;
 
       updateBlockProps([updates]);
     }

@@ -87,7 +87,7 @@ const DefaultIconLibrary = ({ close, onSelect, currentIcon, baseUrl }: IconLibra
     currentIcon?.prefix && currentIcon?.name ? { prefix: currentIcon.prefix, name: currentIcon.name } : null,
   );
   const [previewSvg, setPreviewSvg] = useState<string>(currentIcon?.svg ?? "");
-  const [previewSize, setPreviewSize] = useState<number>(currentIcon?.width ?? 64);
+  const [previewSize, setPreviewSize] = useState<number>(currentIcon?.width ?? currentIcon?.height ?? 20);
   const [useCurrentColor, setUseCurrentColor] = useState<boolean>(true);
   const [customColor, setCustomColor] = useState<string>("#1f2937");
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
