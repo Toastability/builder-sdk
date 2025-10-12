@@ -23,7 +23,7 @@ const PLACEHOLDER_LABEL = "SVG";
 const IconPickerField = ({ value, onChange, id }: WidgetProps) => {
   const { t } = useTranslation();
   const selectedBlock = useSelectedBlock();
-  const isIconBlock = selectedBlock?._type === "Icon";
+  const isIconBlock = selectedBlock?._type === "Icon" || selectedBlock?._type === "SocialIcon";
   const updateBlockProps = useUpdateMultipleBlocksProps();
   const [svgInput, setSvgInput] = useState<string>(value ? String(value) : "");
 
