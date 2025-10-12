@@ -68,6 +68,11 @@ export { registerChaiSaveToLibrary } from "@/core/extensions/save-to-library";
 export { registerChaiSidebarPanel } from "@/core/extensions/sidebar-panels";
 export { registerChaiTopBar } from "@/core/extensions/top-bar";
 export {
+  registerBlockPreconfiguration,
+  resetBlockPreconfiguration,
+} from "@/core/extensions/block-preconfiguration";
+export { useBlockPreconfigurationHandler } from "@/core/extensions/block-preconfiguration";
+export {
   IfChaiFeatureFlag,
   registerChaiFeatureFlag,
   registerChaiFeatureFlags,
