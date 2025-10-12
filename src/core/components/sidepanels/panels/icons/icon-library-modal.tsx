@@ -42,8 +42,8 @@ const IconLibraryModal = ({ children, onSelect, currentIcon, className, baseUrl 
       <SheetContent
         side="right"
         className={cn(
-          "flex h-full w-full max-w-6xl flex-col overflow-hidden border-l border-border bg-background p-0",
-          className
+          "flex h-full w-full max-w-none flex-col overflow-hidden border-l border-border bg-background p-0 sm:max-w-none md:w-[min(90vw,1100px)] lg:w-[960px] xl:w-[1100px]",
+          className,
         )}>
         <SheetHeader className="sr-only">
           <SheetTitle>Icon library</SheetTitle>
