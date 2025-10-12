@@ -42,7 +42,7 @@ const IconLibraryModal = ({ children, onSelect, currentIcon, className, baseUrl 
       <SheetContent
         side="right"
         className={cn(
-          "flex h-full w-full max-w-none flex-col overflow-hidden border-l border-border bg-background p-0 sm:max-w-none md:w-[min(90vw,1100px)] lg:w-[960px] xl:w-[1100px]",
+          "flex h-full w-full max-w-none flex-col overflow-hidden border-l border-border bg-background p-0 sm:max-w-none md:w-[min(90vw,1100px)] lg:w-[960px] xl:w-[1100px] [&>button.absolute]:hidden",
           className,
         )}>
         <SheetHeader className="sr-only">

@@ -5,17 +5,11 @@ import { Button } from "@/ui/shadcn/components/ui/button";
 import { Input } from "@/ui/shadcn/components/ui/input";
 import { Label } from "@/ui/shadcn/components/ui/label";
 import { ScrollArea } from "@/ui/shadcn/components/ui/scroll-area";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/ui/shadcn/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/ui/shadcn/components/ui/select";
 import { Slider } from "@/ui/shadcn/components/ui/slider";
 import { Switch } from "@/ui/shadcn/components/ui/switch";
-import { Loader2, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { ChevronLeft, ChevronRight, Loader2, X } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 type IconCollection = {
@@ -61,7 +55,7 @@ export type IconLibraryProps = {
   baseUrl?: string;
 };
 
-const DEFAULT_LIMIT = 100;
+const PAGE_SIZE = 48;
 const DEFAULT_BASE_URL = (import.meta.env.VITE_ICON_LIBRARY_URL as string | undefined) ?? "https://icons.opensite.ai";
 const ALL_COLLECTIONS_VALUE = "__all__";
 
@@ -85,6 +79,9 @@ const DefaultIconLibrary = ({ close, onSelect, currentIcon, baseUrl }: IconLibra
   const [icons, setIcons] = useState<IconListItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingPreview, setLoadingPreview] = useState(false);
+  const [page, setPage] = useState(0);
+  const [totalResults, setTotalResults] = useState(0);
+  const [activeCollectionInfo, setActiveCollectionInfo] = useState<IconCollection | null>(null);
   const [selectedIcon, setSelectedIcon] = useState<IconListItem | null>(
     currentIcon?.prefix && currentIcon?.name ? { prefix: currentIcon.prefix, name: currentIcon.name } : null,
   );
@@ -93,12 +90,20 @@ const DefaultIconLibrary = ({ close, onSelect, currentIcon, baseUrl }: IconLibra
   const [useCurrentColor, setUseCurrentColor] = useState<boolean>(true);
   const [customColor, setCustomColor] = useState<string>("#1f2937");
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
-  const [resultsTotal, setResultsTotal] = useState<number | null>(null);
+  const selectedIconRef = useRef<IconListItem | null>(selectedIcon);
 
   useEffect(() => {
     const timeout = setTimeout(() => setDebouncedQuery(searchQuery.trim()), 350);
     return () => clearTimeout(timeout);
   }, [searchQuery]);
+
+  useEffect(() => {
+    setPage(0);
+  }, [selectedCollection, debouncedQuery]);
+
+  useEffect(() => {
+    selectedIconRef.current = selectedIcon;
+  }, [selectedIcon]);
 
   useEffect(() => {
     let mounted = true;
@@ -110,9 +115,6 @@ const DefaultIconLibrary = ({ close, onSelect, currentIcon, baseUrl }: IconLibra
         if (!mounted) return;
         const fetchedCollections = (data?.collections ?? []) as IconCollection[];
         setCollections(fetchedCollections);
-        if (!selectedCollection && fetchedCollections.length > 0) {
-          setSelectedCollection(fetchedCollections[0]?.prefix ?? null);
-        }
       } catch (error) {
         if (!mounted) return;
         setStatusMessage(t("Unable to load icon collections. Please try again later."));
@@ -122,59 +124,110 @@ const DefaultIconLibrary = ({ close, onSelect, currentIcon, baseUrl }: IconLibra
     return () => {
       mounted = false;
     };
-  }, [apiBaseUrl, selectedCollection, t]);
+  }, [apiBaseUrl, t]);
 
   useEffect(() => {
     const controller = new AbortController();
     let mounted = true;
-    if (!debouncedQuery && !selectedCollection) return;
+
     const fetchIcons = async () => {
       try {
         setIsLoading(true);
         setStatusMessage(null);
+
+        const offset = page * PAGE_SIZE;
         let items: IconListItem[] = [];
-        if (debouncedQuery) {
-          const params = new URLSearchParams({ q: debouncedQuery, limit: String(DEFAULT_LIMIT) });
-          if (selectedCollection) params.set("prefix", selectedCollection);
+        let total = 0;
+        let collectionInfo: IconCollection | null = null;
+
+        if (!selectedCollection) {
+          const params = new URLSearchParams({ limit: String(PAGE_SIZE), offset: String(offset) });
+          if (debouncedQuery) params.set("q", debouncedQuery);
+
           const response = await fetch(`${apiBaseUrl}/api/search?${params.toString()}`, { signal: controller.signal });
           if (!response.ok) throw new Error("SEARCH_ERROR");
+
           const data = await response.json();
           if (!mounted) return;
+
           items = ((data?.results as IconListItem[]) ?? []).map((icon) => ({
             prefix: icon.prefix,
             name: icon.name,
             collection: icon.collection,
           }));
-          setResultsTotal(typeof data?.total === "number" ? data.total : items.length);
-        } else if (selectedCollection) {
-          const params = new URLSearchParams({ icons: "true", limit: String(DEFAULT_LIMIT) });
+
+          total = typeof data?.total === "number" ? data.total : items.length;
+          if (total === 0 && items.length > 0) {
+            total = offset + items.length;
+          }
+
+          if (total > 0 && offset >= total) {
+            const lastPage = Math.max(0, Math.ceil(total / PAGE_SIZE) - 1);
+            if (lastPage !== page) {
+              setPage(lastPage);
+              return;
+            }
+          }
+        } else {
+          const params = new URLSearchParams({ icons: "true", limit: String(PAGE_SIZE), offset: String(offset) });
           const response = await fetch(`${apiBaseUrl}/api/collection/${selectedCollection}?${params.toString()}`, {
             signal: controller.signal,
           });
           if (!response.ok) throw new Error("COLLECTION_ERROR");
+
           const data = await response.json();
           if (!mounted) return;
+
           const collectionName = data?.name;
           items = ((data?.icons as string[]) ?? []).map((name: string) => ({
             prefix: data?.prefix ?? selectedCollection,
             name,
             collection: collectionName,
           }));
-          setResultsTotal(typeof data?.iconsCount === "number" ? data.iconsCount : items.length);
-        }
-        if (!mounted) return;
-        setIcons(items);
-        if (items.length === 0) {
-          if (selectedIcon !== null) setSelectedIcon(null);
-          setPreviewSvg("");
-        } else {
-          const currentSelectionKey = selectedIcon ? `${selectedIcon.prefix}:${selectedIcon.name}` : null;
-          const hasCurrentSelection = currentSelectionKey
-            ? items.some((item) => `${item.prefix}:${item.name}` === currentSelectionKey)
-            : false;
-          if (!hasCurrentSelection) {
-            setSelectedIcon(items[0]);
+
+          total = typeof data?.iconsCount === "number" ? data.iconsCount : items.length;
+          if (total === 0 && items.length > 0) {
+            total = offset + items.length;
           }
+
+          const reference = collections.find((collection) => collection.prefix === selectedCollection);
+          collectionInfo = {
+            prefix: data?.prefix ?? selectedCollection,
+            name: collectionName ?? reference?.name ?? selectedCollection,
+            total,
+            category: reference?.category,
+            palette: reference?.palette,
+          };
+
+          if (total > 0 && offset >= total) {
+            const lastPage = Math.max(0, Math.ceil(total / PAGE_SIZE) - 1);
+            if (lastPage !== page) {
+              setPage(lastPage);
+              return;
+            }
+          }
+        }
+
+        if (!mounted) return;
+
+        setIcons(items);
+        setTotalResults(total);
+        setActiveCollectionInfo(collectionInfo);
+
+        if (items.length === 0) {
+          setSelectedIcon(null);
+          setPreviewSvg("");
+          return;
+        }
+
+        const currentSelectionKey = selectedIconRef.current
+          ? `${selectedIconRef.current.prefix}:${selectedIconRef.current.name}`
+          : null;
+        const hasCurrentSelection = currentSelectionKey
+          ? items.some((item) => `${item.prefix}:${item.name}` === currentSelectionKey)
+          : false;
+        if (!hasCurrentSelection) {
+          setSelectedIcon(items[0]);
         }
       } catch (error) {
         if (!mounted) return;
@@ -186,12 +239,14 @@ const DefaultIconLibrary = ({ close, onSelect, currentIcon, baseUrl }: IconLibra
         }
       }
     };
+
     fetchIcons();
+
     return () => {
       mounted = false;
       controller.abort();
     };
-  }, [apiBaseUrl, debouncedQuery, selectedCollection, t]);
+  }, [apiBaseUrl, collections, debouncedQuery, page, selectedCollection, t]);
 
   useEffect(() => {
     if (!selectedIcon) return;
@@ -246,30 +301,74 @@ const DefaultIconLibrary = ({ close, onSelect, currentIcon, baseUrl }: IconLibra
   const handleSelectCollection = (value: string) => {
     if (!value || value === ALL_COLLECTIONS_VALUE) {
       setSelectedCollection(null);
+      setPage(0);
       return;
     }
     setSelectedCollection(value);
+    setPage(0);
   };
 
-  const selectedCollectionDetails = useMemo(
-    () => collections.find((collection) => collection.prefix === selectedCollection) ?? null,
-    [collections, selectedCollection],
-  );
+  const selectedCollectionDetails = useMemo(() => {
+    if (!selectedCollection) return null;
+    return collections.find((collection) => collection.prefix === selectedCollection) ?? activeCollectionInfo;
+  }, [activeCollectionInfo, collections, selectedCollection]);
+
+  const offset = page * PAGE_SIZE;
+  const showingStart = icons.length ? offset + 1 : 0;
+  const showingEnd = icons.length ? offset + icons.length : 0;
+  const hasPrevPage = page > 0;
+  const hasNextPage = totalResults > 0 ? showingEnd < totalResults : icons.length === PAGE_SIZE;
+  const totalCountDisplay = totalResults > 0 ? totalResults : icons.length;
+  const rangeLabel =
+    icons.length === 0
+      ? t("No icons to display")
+      : totalResults > 0
+        ? `Showing ${showingStart.toLocaleString()}–${showingEnd.toLocaleString()} of ${totalResults.toLocaleString()} icons`
+        : `Showing ${icons.length.toLocaleString()} icons`;
 
   return (
     <div className="flex h-full w-full flex-col bg-background">
-      <div className="flex flex-col gap-3 border-b border-border px-6 py-5 md:flex-row md:items-center">
-        <div className="flex items-center gap-3">
-          <div className="rounded-md bg-primary/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-primary">
-            {t("Icon library")}
-          </div>
-          {resultsTotal !== null ? (
-            <Badge variant="secondary" className="text-xs">
-              {resultsTotal.toLocaleString()} {t("icons")}
+      <div className="flex flex-col gap-4 border-b border-border px-6 py-5">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-3">
+            <Badge variant="secondary" className="rounded-md bg-primary/10 text-primary">
+              {t("Icon library")}
             </Badge>
-          ) : null}
+            {totalCountDisplay ? (
+              <span className="text-xs text-muted-foreground">
+                {totalCountDisplay.toLocaleString()} {t("icons")}
+              </span>
+            ) : null}
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="hidden text-xs text-muted-foreground md:block">{rangeLabel}</span>
+            <div className="flex items-center gap-1">
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setPage((prev) => Math.max(0, prev - 1))}
+                disabled={!hasPrevPage}>
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setPage((prev) => prev + 1)}
+                disabled={!hasNextPage}>
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+            <Button type="button" variant="ghost" size="icon" onClick={close} aria-label={t("Close")}>
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
-        <div className="flex w-full flex-col gap-3 md:flex-1 md:flex-row md:items-center">
+        <span className="text-xs text-muted-foreground md:hidden">{rangeLabel}</span>
+        <div className="flex w-full flex-col gap-3 md:flex-row md:items-center">
           <Input
             placeholder={t("Search icons")}
             value={searchQuery}
@@ -296,9 +395,6 @@ const DefaultIconLibrary = ({ close, onSelect, currentIcon, baseUrl }: IconLibra
             </SelectContent>
           </Select>
         </div>
-        <Button variant="ghost" size="icon" onClick={close} className="self-start md:self-auto" aria-label={t("Close")}>
-          <X className="h-4 w-4" />
-        </Button>
       </div>
 
       <div className="flex flex-1 flex-col md:flex-row">
@@ -314,7 +410,7 @@ const DefaultIconLibrary = ({ close, onSelect, currentIcon, baseUrl }: IconLibra
               <p>{t("Try a different search term or choose another collection.")}</p>
             </div>
           ) : (
-            <ScrollArea className="h-full w-full">
+            <ScrollArea className="h-full w-full" style={{ maxHeight: "calc(100dvh - 260px)" }}>
               <div className="grid grid-cols-2 gap-3 p-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                 {icons.map((icon) => {
                   const isSelected = selectedIcon?.prefix === icon.prefix && selectedIcon?.name === icon.name;
