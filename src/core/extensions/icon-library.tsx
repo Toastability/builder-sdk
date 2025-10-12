@@ -18,7 +18,7 @@ import { Loader2, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
- type IconCollection = {
+type IconCollection = {
   prefix: string;
   name: string;
   category?: string;
@@ -26,7 +26,7 @@ import { useTranslation } from "react-i18next";
   palette?: boolean;
 };
 
- type IconListItem = {
+type IconListItem = {
   prefix: string;
   name: string;
   collection?: string;
@@ -63,6 +63,7 @@ export type IconLibraryProps = {
 
 const DEFAULT_LIMIT = 100;
 const DEFAULT_BASE_URL = (import.meta.env.VITE_ICON_LIBRARY_URL as string | undefined) ?? "https://icons.opensite.ai";
+const ALL_COLLECTIONS_VALUE = "__all__";
 
 const normalizeColor = (value: string) => {
   if (!value) return "#1f2937";
@@ -163,8 +164,17 @@ const DefaultIconLibrary = ({ close, onSelect, currentIcon, baseUrl }: IconLibra
         }
         if (!mounted) return;
         setIcons(items);
-        if (items.length > 0 && !selectedIcon) {
-          setSelectedIcon(items[0]);
+        if (items.length === 0) {
+          if (selectedIcon !== null) setSelectedIcon(null);
+          setPreviewSvg("");
+        } else {
+          const currentSelectionKey = selectedIcon ? `${selectedIcon.prefix}:${selectedIcon.name}` : null;
+          const hasCurrentSelection = currentSelectionKey
+            ? items.some((item) => `${item.prefix}:${item.name}` === currentSelectionKey)
+            : false;
+          if (!hasCurrentSelection) {
+            setSelectedIcon(items[0]);
+          }
         }
       } catch (error) {
         if (!mounted) return;
@@ -181,7 +191,7 @@ const DefaultIconLibrary = ({ close, onSelect, currentIcon, baseUrl }: IconLibra
       mounted = false;
       controller.abort();
     };
-  }, [apiBaseUrl, debouncedQuery, selectedCollection, selectedIcon, t]);
+  }, [apiBaseUrl, debouncedQuery, selectedCollection, t]);
 
   useEffect(() => {
     if (!selectedIcon) return;
@@ -191,6 +201,7 @@ const DefaultIconLibrary = ({ close, onSelect, currentIcon, baseUrl }: IconLibra
     const fetchIconPreview = async () => {
       try {
         setLoadingPreview(true);
+        setStatusMessage(null);
         const params = new URLSearchParams({ format: "svg", width: String(previewSize), height: String(previewSize) });
         if (!useCurrentColor && customColor) {
           params.set("color", customColor);
@@ -233,7 +244,11 @@ const DefaultIconLibrary = ({ close, onSelect, currentIcon, baseUrl }: IconLibra
   };
 
   const handleSelectCollection = (value: string) => {
-    setSelectedCollection(value || null);
+    if (!value || value === ALL_COLLECTIONS_VALUE) {
+      setSelectedCollection(null);
+      return;
+    }
+    setSelectedCollection(value);
   };
 
   const selectedCollectionDetails = useMemo(
@@ -262,16 +277,12 @@ const DefaultIconLibrary = ({ close, onSelect, currentIcon, baseUrl }: IconLibra
             className="w-full md:max-w-sm"
             autoFocus
           />
-          <Select value={selectedCollection ?? ""} onValueChange={handleSelectCollection}>
+          <Select value={selectedCollection ?? ALL_COLLECTIONS_VALUE} onValueChange={handleSelectCollection}>
             <SelectTrigger className="w-full md:max-w-xs">
-              <SelectValue
-                placeholder={
-                  collections.length > 0 ? t("All collections") : t("Loading collections…")
-                }
-              />
+              <SelectValue placeholder={collections.length > 0 ? t("Select collection") : t("Loading collections…")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">{t("All collections")}</SelectItem>
+              <SelectItem value={ALL_COLLECTIONS_VALUE}>{t("All collections")}</SelectItem>
               {collections.map((collection) => (
                 <SelectItem key={collection.prefix} value={collection.prefix}>
                   <div className="flex flex-col">
@@ -303,7 +314,7 @@ const DefaultIconLibrary = ({ close, onSelect, currentIcon, baseUrl }: IconLibra
               <p>{t("Try a different search term or choose another collection.")}</p>
             </div>
           ) : (
-            <ScrollArea className="h_full w-full">
+            <ScrollArea className="h-full w-full">
               <div className="grid grid-cols-2 gap-3 p-6 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                 {icons.map((icon) => {
                   const isSelected = selectedIcon?.prefix === icon.prefix && selectedIcon?.name === icon.name;
@@ -339,7 +350,7 @@ const DefaultIconLibrary = ({ close, onSelect, currentIcon, baseUrl }: IconLibra
           )}
         </div>
 
-        <div className="flex w-full shrink-0 flex-col gap-6 border-border bg-muted/30 p-6 md:w-[320px] md:border_l">
+        <div className="flex w-full shrink-0 flex-col gap-6 border-border bg-muted/30 p-6 md:w-[320px] md:border-l">
           <div>
             <h3 className="text-sm font-semibold">{t("Preview")}</h3>
             <div className="mt-3 flex h-40 items-center justify-center rounded-md border border-dashed border-border bg-background">
@@ -373,7 +384,7 @@ const DefaultIconLibrary = ({ close, onSelect, currentIcon, baseUrl }: IconLibra
             </div>
 
             <div className="space-y-2">
-              <div className="flex items-center justify_between">
+              <div className="flex items-center justify-between">
                 <Label htmlFor="use-theme-color" className="text-xs font-medium text-muted-foreground">
                   {t("Use theme color")}
                 </Label>

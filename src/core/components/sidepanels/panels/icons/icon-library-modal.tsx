@@ -1,5 +1,4 @@
 import { IconLibraryProps, IconLibraryResult, useIconLibraryComponent } from "@/core/extensions/icon-library";
-import { cn } from "@/core/functions/common-functions";
 import {
   Sheet,
   SheetContent,
@@ -8,8 +7,8 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/ui/shadcn/components/ui/sheet";
-import type { ReactNode } from "react";
-import { useState } from "react";
+import { cn } from "@/core/functions/common-functions";
+import { useState, type ReactNode } from "react";
 
 type IconLibraryModalProps = {
   children: ReactNode;
@@ -19,8 +18,8 @@ type IconLibraryModalProps = {
    */
   currentIcon?: Partial<IconLibraryResult> | null;
   /**
-   * Optionally override the panel width.
-   */
+    * Optionally override the panel width.
+    */
   className?: string;
   /**
    * Optional API base URL override passed to the registered library.
@@ -44,19 +43,14 @@ const IconLibraryModal = ({ children, onSelect, currentIcon, className, baseUrl 
         side="right"
         className={cn(
           "flex h-full w-full max-w-6xl flex-col overflow-hidden border-l border-border bg-background p-0",
-          className,
+          className
         )}>
         <SheetHeader className="sr-only">
           <SheetTitle>Icon library</SheetTitle>
           <SheetDescription>Browse and select an icon.</SheetDescription>
         </SheetHeader>
         {IconLibraryComponent ? (
-          <IconLibraryComponent
-            close={() => setOpen(false)}
-            onSelect={handleSelect}
-            currentIcon={currentIcon}
-            baseUrl={baseUrl}
-          />
+          <IconLibraryComponent close={() => setOpen(false)} onSelect={handleSelect} currentIcon={currentIcon} baseUrl={baseUrl} />
         ) : null}
       </SheetContent>
     </Sheet>
