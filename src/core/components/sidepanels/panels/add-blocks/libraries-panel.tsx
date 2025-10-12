@@ -130,6 +130,11 @@ const BlockCard = ({
             error: error instanceof Error ? error.message : String(error),
           });
         }
+      } else {
+        emitBuilderDebug("preconfig.handler:missing", {
+          blockId: block?.id,
+          blockName: block?.name,
+        });
       }
 
       if (has(block, "component")) {
