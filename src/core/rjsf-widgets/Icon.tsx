@@ -27,10 +27,19 @@ const IconPickerField = ({ value, onChange, id }: WidgetProps) => {
   const updateBlockProps = useUpdateMultipleBlocksProps();
   const [svgInput, setSvgInput] = useState<string>(value ? String(value) : "");
 
+  const rawBlockWidth = (selectedBlock as any)?.width;
+  const rawBlockHeight = (selectedBlock as any)?.height;
+  const blockWidth = typeof rawBlockWidth === "number" && rawBlockWidth > 0 ? rawBlockWidth : undefined;
+  const blockHeight = typeof rawBlockHeight === "number" && rawBlockHeight > 0 ? rawBlockHeight : undefined;
+
   const currentIconSelection = useMemo(() => {
     if (!svgInput) return null;
-    return { svg: svgInput } as Partial<IconLibraryResult>;
-  }, [svgInput]);
+    return {
+      svg: svgInput,
+      width: blockWidth,
+      height: blockHeight,
+    } as Partial<IconLibraryResult>;
+  }, [svgInput, blockHeight, blockWidth]);
 
   useEffect(() => {
     setSvgInput(value ? String(value) : "");
@@ -40,27 +49,31 @@ const IconPickerField = ({ value, onChange, id }: WidgetProps) => {
     const cleanedSvg = removeSizeAttributes(newSvg);
     setSvgInput(cleanedSvg);
     onChange(cleanedSvg);
+    if (isIconBlock && selectedBlock?._id) {
+      const updates: { _id: string } & Partial<ChaiBlock> = { _id: selectedBlock._id, icon: cleanedSvg };
+      updateBlockProps([updates]);
+    }
   };
 
   const handleIconSelect = (icon: IconLibraryResult) => {
+    const sizeFromIcon = typeof icon.width === "number" && icon.width > 0 ? icon.width : undefined;
+    const desiredSize = sizeFromIcon ?? blockWidth ?? blockHeight;
+
     handleSvgChange(icon.svg);
 
     if (isIconBlock && selectedBlock?._id) {
-      const updates: { _id: string } & Partial<ChaiBlock> = { _id: selectedBlock._id };
-      let hasNumericUpdate = false;
+      const cleanedSvg = removeSizeAttributes(icon.svg);
+      const updates: { _id: string } & Partial<ChaiBlock> = { _id: selectedBlock._id, icon: cleanedSvg };
 
-      if (typeof icon.width === "number" && !Number.isNaN(icon.width)) {
-        updates.width = icon.width;
-        hasNumericUpdate = true;
-      }
-      if (typeof icon.height === "number" && !Number.isNaN(icon.height)) {
-        updates.height = icon.height;
-        hasNumericUpdate = true;
+      if (typeof desiredSize === "number" && !Number.isNaN(desiredSize)) {
+        updates.width = desiredSize;
+        updates.height = desiredSize;
+      } else {
+        if (typeof blockWidth === "number") updates.width = blockWidth;
+        if (typeof blockHeight === "number") updates.height = blockHeight;
       }
 
-      if (hasNumericUpdate) {
-        updateBlockProps([updates]);
-      }
+      updateBlockProps([updates]);
     }
   };
 

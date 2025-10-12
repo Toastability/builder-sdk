@@ -73,7 +73,7 @@ const DefaultIconLibrary = ({ close, onSelect, currentIcon, baseUrl }: IconLibra
   const apiBaseUrl = (baseUrl || DEFAULT_BASE_URL).replace(/\/$/, "");
 
   const [collections, setCollections] = useState<IconCollection[]>([]);
-  const [selectedCollection, setSelectedCollection] = useState<string | null>(currentIcon?.prefix ?? null);
+  const [selectedCollection, setSelectedCollection] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [debouncedQuery, setDebouncedQuery] = useState<string>("");
   const [icons, setIcons] = useState<IconListItem[]>([]);
@@ -82,6 +82,7 @@ const DefaultIconLibrary = ({ close, onSelect, currentIcon, baseUrl }: IconLibra
   const [page, setPage] = useState(0);
   const [totalResults, setTotalResults] = useState(0);
   const [activeCollectionInfo, setActiveCollectionInfo] = useState<IconCollection | null>(null);
+  const [hasMore, setHasMore] = useState(false);
   const [selectedIcon, setSelectedIcon] = useState<IconListItem | null>(
     currentIcon?.prefix && currentIcon?.name ? { prefix: currentIcon.prefix, name: currentIcon.name } : null,
   );
@@ -100,6 +101,10 @@ const DefaultIconLibrary = ({ close, onSelect, currentIcon, baseUrl }: IconLibra
   useEffect(() => {
     setPage(0);
   }, [selectedCollection, debouncedQuery]);
+
+  useEffect(() => {
+    selectedIconRef.current = selectedIcon;
+  }, [selectedIcon]);
 
   useEffect(() => {
     selectedIconRef.current = selectedIcon;
@@ -134,6 +139,7 @@ const DefaultIconLibrary = ({ close, onSelect, currentIcon, baseUrl }: IconLibra
       try {
         setIsLoading(true);
         setStatusMessage(null);
+        setHasMore(false);
 
         const offset = page * PAGE_SIZE;
         let items: IconListItem[] = [];
@@ -158,8 +164,13 @@ const DefaultIconLibrary = ({ close, onSelect, currentIcon, baseUrl }: IconLibra
 
           total = typeof data?.total === "number" ? data.total : items.length;
           if (total === 0 && items.length > 0) {
-            total = offset + items.length;
+            total = data?.hasMore ? offset + items.length + PAGE_SIZE : offset + items.length;
           }
+
+          setActiveCollectionInfo(null);
+
+          const hasMoreFromApi = Boolean(data?.hasMore) || offset + items.length < total;
+          setHasMore(hasMoreFromApi);
 
           if (total > 0 && offset >= total) {
             const lastPage = Math.max(0, Math.ceil(total / PAGE_SIZE) - 1);
@@ -169,42 +180,77 @@ const DefaultIconLibrary = ({ close, onSelect, currentIcon, baseUrl }: IconLibra
             }
           }
         } else {
-          const params = new URLSearchParams({ icons: "true", limit: String(PAGE_SIZE), offset: String(offset) });
-          const response = await fetch(`${apiBaseUrl}/api/collection/${selectedCollection}?${params.toString()}`, {
-            signal: controller.signal,
-          });
-          if (!response.ok) throw new Error("COLLECTION_ERROR");
+          if (debouncedQuery) {
+            const params = new URLSearchParams({ prefix: selectedCollection, limit: String(PAGE_SIZE), offset: String(offset) });
+            params.set("q", debouncedQuery);
+            const response = await fetch(`${apiBaseUrl}/api/search?${params.toString()}`, { signal: controller.signal });
+            if (!response.ok) throw new Error("SEARCH_ERROR");
 
-          const data = await response.json();
-          if (!mounted) return;
+            const data = await response.json();
+            if (!mounted) return;
 
-          const collectionName = data?.name;
-          items = ((data?.icons as string[]) ?? []).map((name: string) => ({
-            prefix: data?.prefix ?? selectedCollection,
-            name,
-            collection: collectionName,
-          }));
-
-          total = typeof data?.iconsCount === "number" ? data.iconsCount : items.length;
-          if (total === 0 && items.length > 0) {
-            total = offset + items.length;
-          }
-
-          const reference = collections.find((collection) => collection.prefix === selectedCollection);
-          collectionInfo = {
-            prefix: data?.prefix ?? selectedCollection,
-            name: collectionName ?? reference?.name ?? selectedCollection,
-            total,
-            category: reference?.category,
-            palette: reference?.palette,
-          };
-
-          if (total > 0 && offset >= total) {
-            const lastPage = Math.max(0, Math.ceil(total / PAGE_SIZE) - 1);
-            if (lastPage !== page) {
-              setPage(lastPage);
-              return;
+            items = ((data?.results as IconListItem[]) ?? []).map((icon) => ({
+              prefix: icon.prefix,
+              name: icon.name,
+              collection: icon.collection,
+            }));
+            total = typeof data?.total === "number" ? data.total : items.length;
+            if (total === 0 && items.length > 0) {
+              total = data?.hasMore ? offset + items.length + PAGE_SIZE : offset + items.length;
             }
+            const reference = collections.find((collection) => collection.prefix === selectedCollection);
+            const collectionName = items[0]?.collection ?? reference?.name ?? selectedCollection;
+            collectionInfo = {
+              prefix: selectedCollection,
+              name: collectionName,
+              total,
+              category: reference?.category,
+              palette: reference?.palette,
+            } as IconCollection;
+
+            const hasMoreFromApi = Boolean(data?.hasMore) || offset + items.length < total;
+            setHasMore(hasMoreFromApi);
+          } else {
+            const params = new URLSearchParams({ icons: "true", limit: String(PAGE_SIZE), offset: String(offset) });
+            const response = await fetch(`${apiBaseUrl}/api/collection/${selectedCollection}?${params.toString()}`, {
+              signal: controller.signal,
+            });
+            if (!response.ok) throw new Error("COLLECTION_ERROR");
+
+            const data = await response.json();
+            if (!mounted) return;
+
+            const collectionName = data?.name;
+            items = ((data?.icons as string[]) ?? []).map((name: string) => ({
+              prefix: data?.prefix ?? selectedCollection,
+              name,
+              collection: collectionName,
+            }));
+
+            total = typeof data?.iconsCount === "number" ? data.iconsCount : items.length;
+            if (total === 0 && items.length > 0) {
+              total = data?.hasMore ? offset + items.length + PAGE_SIZE : offset + items.length;
+            }
+
+            const reference = collections.find((collection) => collection.prefix === selectedCollection);
+            collectionInfo = {
+              prefix: data?.prefix ?? selectedCollection,
+              name: collectionName ?? reference?.name ?? selectedCollection,
+              total,
+              category: reference?.category,
+              palette: reference?.palette,
+            };
+
+            if (total > 0 && offset >= total) {
+              const lastPage = Math.max(0, Math.ceil(total / PAGE_SIZE) - 1);
+              if (lastPage !== page) {
+                setPage(lastPage);
+                return;
+              }
+            }
+
+            const hasMoreFromApi = Boolean(data?.hasMore) || offset + items.length < total;
+            setHasMore(hasMoreFromApi);
           }
         }
 
@@ -317,14 +363,24 @@ const DefaultIconLibrary = ({ close, onSelect, currentIcon, baseUrl }: IconLibra
   const showingStart = icons.length ? offset + 1 : 0;
   const showingEnd = icons.length ? offset + icons.length : 0;
   const hasPrevPage = page > 0;
-  const hasNextPage = totalResults > 0 ? showingEnd < totalResults : icons.length === PAGE_SIZE;
-  const totalCountDisplay = totalResults > 0 ? totalResults : icons.length;
-  const rangeLabel =
-    icons.length === 0
-      ? t("No icons to display")
-      : totalResults > 0
-        ? `Showing ${showingStart.toLocaleString()}–${showingEnd.toLocaleString()} of ${totalResults.toLocaleString()} icons`
-        : `Showing ${icons.length.toLocaleString()} icons`;
+  const formatNumber = (value: number) => value.toLocaleString();
+  const totalCountLabel =
+    totalResults > 0
+      ? `${formatNumber(totalResults)} ${t("icons")}`
+      : hasMore
+        ? `${formatNumber(showingEnd)}+ ${t("icons")}`
+        : `${formatNumber(showingEnd)} ${t("icons")}`;
+  const rangeLabel = (() => {
+    if (icons.length === 0) return t("No icons to display");
+    if (totalResults > 0) {
+      return `Showing ${formatNumber(showingStart)}–${formatNumber(showingEnd)} of ${formatNumber(totalResults)} ${t("icons")}`;
+    }
+    if (hasMore) {
+      return `Showing ${formatNumber(showingStart)}–${formatNumber(showingEnd)}+ ${t("icons")}`;
+    }
+    return `Showing ${formatNumber(icons.length)} ${t("icons")}`;
+  })();
+  const hasNextPage = hasMore;
 
   return (
     <div className="flex h-full w-full flex-col bg-background">
@@ -334,11 +390,7 @@ const DefaultIconLibrary = ({ close, onSelect, currentIcon, baseUrl }: IconLibra
             <Badge variant="secondary" className="rounded-md bg-primary/10 text-primary">
               {t("Icon library")}
             </Badge>
-            {totalCountDisplay ? (
-              <span className="text-xs text-muted-foreground">
-                {totalCountDisplay.toLocaleString()} {t("icons")}
-              </span>
-            ) : null}
+            <span className="text-xs text-muted-foreground">{totalCountLabel}</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="hidden text-xs text-muted-foreground md:block">{rangeLabel}</span>
@@ -385,8 +437,8 @@ const DefaultIconLibrary = ({ close, onSelect, currentIcon, baseUrl }: IconLibra
               {collections.map((collection) => (
                 <SelectItem key={collection.prefix} value={collection.prefix}>
                   <div className="flex flex-col">
-                    <span className="text-sm font-medium">{collection.name}</span>
-                    <span className="text-[11px] text-muted-foreground">
+                    <span className="max-w-[220px] truncate text-sm font-medium">{collection.name}</span>
+                    <span className="max-w-[220px] truncate text-[11px] text-muted-foreground">
                       {collection.total ? `${collection.total.toLocaleString()} icons` : collection.prefix}
                     </span>
                   </div>
@@ -433,8 +485,8 @@ const DefaultIconLibrary = ({ close, onSelect, currentIcon, baseUrl }: IconLibra
                         className="h-12 w-12 shrink-0"
                       />
                       <div className="flex w-full flex-col items-center gap-1 text-xs">
-                        <span className="truncate font-medium text-foreground">{icon.name}</span>
-                        <span className="truncate text-[10px] uppercase tracking-wide text-muted-foreground">
+                        <span className="w-full truncate text-sm font-medium text-foreground">{icon.name}</span>
+                        <span className="w-full truncate text-[10px] uppercase tracking-wide text-muted-foreground">
                           {icon.collection ?? icon.prefix}
                         </span>
                       </div>
