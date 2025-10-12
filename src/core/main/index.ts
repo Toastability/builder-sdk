@@ -62,6 +62,7 @@ export {
   registerBlockSettingWidget,
 } from "@/core/extensions/blocks-settings";
 export { registerChaiLibrary } from "@/core/extensions/libraries";
+export { registerChaiIconLibrary } from "@/core/extensions/icon-library";
 export { registerChaiMediaManager } from "@/core/extensions/media-manager";
 export { registerChaiSaveToLibrary } from "@/core/extensions/save-to-library";
 export { registerChaiSidebarPanel } from "@/core/extensions/sidebar-panels";
@@ -77,9 +78,11 @@ export {
 export type { ChaiLibrary, ChaiLibraryBlock } from "@/types/chaibuilder-editor-props";
 
 // hooks
+export { useIconLibraryComponent } from "@/core/extensions/icon-library";
 export { useMediaManagerComponent } from "@/core/extensions/media-manager";
 export type { ChaiSidebarPanel } from "@/core/extensions/sidebar-panels";
 export * from "@/core/hooks";
+export type { IconLibraryResult } from "@/core/extensions/icon-library";
 
 // constants
 export { PERMISSIONS } from "@/core/constants/PERMISSIONS";
