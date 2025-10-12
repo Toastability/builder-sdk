@@ -9,7 +9,7 @@ import { ChaiFeatureFlagsWidget } from "@/core/flags/flags-widget";
 import { setDebugLogs } from "@/core/functions/logging";
 import { useBlocksStore } from "@/core/history/use-blocks-store-undoable-actions";
 import { defaultThemeValues } from "@/core/hooks/default-theme-options";
-import { useBuilderProp, useBuilderReset, useSavePage } from "@/core/hooks/index";
+import { useBuilderProp, useBuilderReset, useDarkMode, useSavePage } from "@/core/hooks/index";
 import { useBroadcastChannel, useUnmountBroadcastChannel } from "@/core/hooks/use-broadcast-channel";
 import { useExpandTree } from "@/core/hooks/use-expand-tree";
 import { useKeyEventWatcher } from "@/core/hooks/use-key-event-watcher";
@@ -51,6 +51,7 @@ const ChaiWatchers = (props: ChaiBuilderEditorProps) => {
   useUnmountBroadcastChannel();
   const { postMessage } = useBroadcastChannel();
   const [, setIsPageLoaded] = useAtom(isPageLoadedAtom);
+  const [darkMode, setDarkMode] = useDarkMode();
 
   useEffect(() => {
     builderStore.set(
@@ -59,6 +60,12 @@ const ChaiWatchers = (props: ChaiBuilderEditorProps) => {
       omit(props, ["blocks", "translations", "pageExternalData"]),
     );
   }, [props]);
+
+  useEffect(() => {
+    if (typeof props.darkMode !== "boolean") return;
+    if (props.darkMode === darkMode) return;
+    setDarkMode(props.darkMode);
+  }, [props.darkMode, darkMode, setDarkMode]);
 
   useEffect(() => {
     builderStore.set(chaiPageExternalDataAtom, props.pageExternalData || {});
