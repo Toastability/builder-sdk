@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+import { emitBuilderDebug } from "@/core/utils/debug";
 import type { ChaiBlock } from "@/types/chai-block";
 import type { ChaiLibrary, ChaiLibraryBlock } from "@/types/chaibuilder-editor-props";
 
@@ -34,6 +35,9 @@ export const registerBlockPreconfiguration = (
   nextHandler: BlockPreconfigurationHandler | null,
 ) => {
   handler = nextHandler;
+  emitBuilderDebug("register-block-preconfig", {
+    hasHandler: Boolean(nextHandler),
+  });
   subscribers.forEach((callback) => {
     try {
       callback();

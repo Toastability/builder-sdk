@@ -26,6 +26,7 @@ import { Loader, RefreshCw, Search, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useBlockPreconfigurationHandler } from "@/core/extensions/block-preconfiguration";
+import { emitBuilderDebug } from "@/core/utils/debug";
 
 const BlockCard = ({
   block,
@@ -59,6 +60,10 @@ const BlockCard = ({
       e.stopPropagation();
       const contextHandlers = {
         loadTemplate: async () => {
+          emitBuilderDebug("preconfig.load-template:start", {
+            blockId: block?.id,
+            blockName: block?.name,
+          });
           let uiBlocks: string | ChaiBlock[] = await getUILibraryBlock({ library, block });
           let html: string | null = null;
           if (typeof uiBlocks === "string") {
@@ -66,23 +71,44 @@ const BlockCard = ({
             uiBlocks = getBlocksFromHTML(uiBlocks);
           }
           const blocksArray = Array.isArray(uiBlocks) ? uiBlocks : [];
+          emitBuilderDebug("preconfig.load-template:done", {
+            blockId: block?.id,
+            hasHtml: Boolean(html),
+            blockCount: blocksArray.length,
+          });
           return { html, blocks: blocksArray };
         },
         insertConfiguredBlock: async (blocksToInsert: ChaiBlock[]) => {
+          emitBuilderDebug("preconfig.insert-configured-block:start", {
+            blockId: block?.id,
+            providedCount: Array.isArray(blocksToInsert) ? blocksToInsert.length : 0,
+          });
           if (!Array.isArray(blocksToInsert) || !blocksToInsert.length) {
             return undefined;
           }
           const inserted = addPredefinedBlock(syncBlocksWithDefaults(blocksToInsert), parentId, position);
           pubsub.publish(CHAI_BUILDER_EVENTS.CLOSE_ADD_BLOCK);
+          emitBuilderDebug("preconfig.insert-configured-block:done", {
+            blockId: block?.id,
+            inserted: Boolean(inserted),
+          });
           return inserted as ChaiBlock | undefined;
         },
         closeLibraryPanel: () => {
           pubsub.publish(CHAI_BUILDER_EVENTS.CLOSE_ADD_BLOCK);
+          emitBuilderDebug("preconfig.close-library-panel", {
+            blockId: block?.id,
+          });
         },
       };
 
       if (preconfigHandler) {
         try {
+          emitBuilderDebug("preconfig.handler:invoke", {
+            blockId: block?.id,
+            blockName: block?.name,
+            hasHandler: true,
+          });
           const handled = await preconfigHandler({
             block,
             library,
@@ -90,11 +116,19 @@ const BlockCard = ({
             position,
             ...contextHandlers,
           });
+          emitBuilderDebug("preconfig.handler:result", {
+            blockId: block?.id,
+            handled,
+          });
           if (handled) {
             return;
           }
         } catch (error) {
           console.error("[Builder] Block pre-configuration handler failed", error);
+          emitBuilderDebug("preconfig.handler:error", {
+            blockId: block?.id,
+            error: error instanceof Error ? error.message : String(error),
+          });
         }
       }
 
