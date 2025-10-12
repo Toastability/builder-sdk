@@ -25,8 +25,16 @@ export const HeadTags = () => {
   // (no-op observer now; we no longer remove SDK theme if site vars exist)
 
   useEffect(() => {
-    if (darkMode) iframeDoc?.documentElement.classList.add("dark");
-    else iframeDoc?.documentElement.classList.remove("dark");
+    if (!iframeDoc?.documentElement) return;
+    
+    // Always ensure light mode unless explicitly dark mode is enabled
+    iframeDoc.documentElement.classList.remove("dark");
+    iframeDoc.documentElement.classList.add("light");
+    
+    if (darkMode) {
+      iframeDoc.documentElement.classList.remove("light");
+      iframeDoc.documentElement.classList.add("dark");
+    }
   }, [darkMode, iframeDoc]);
 
   // Keep SDK theme variables present; site vars injected later (by host) should override via cascade order.
