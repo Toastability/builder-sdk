@@ -72,6 +72,10 @@ export {
   resetBlockPreconfiguration,
 } from "@/core/extensions/block-preconfiguration";
 export { useBlockPreconfigurationHandler } from "@/core/extensions/block-preconfiguration";
+export type {
+  BlockPreconfigurationContext,
+  BlockPreconfigurationHandler,
+} from "@/core/extensions/block-preconfiguration";
 export {
   IfChaiFeatureFlag,
   registerChaiFeatureFlag,
