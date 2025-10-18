@@ -153,6 +153,9 @@ const getAttrs = (node: Node) => {
   const attributes: Array<{ key: string; value: string }> = node.attributes as any;
 
   forEach(attributes, ({ key, value }) => {
+    if (startsWith(key, "data-media-")) {
+      return;
+    }
     if (includes(NAME_ATTRIBUTES, key)) return;
     if (replacers[key]) {
       // for img tag if the src is not absolute then replace with placeholder image
@@ -183,6 +186,52 @@ const getAttrs = (node: Node) => {
   });
 
   delete attrs.class;
+
+  if (node.tagName === "img" || node.tagName === "video") {
+    const findAttr = (attrKey: string) =>
+      (attributes as Array<{ key: string; value: string }>).find((attr) => attr.key === attrKey)?.value;
+
+    const dataMediaIdRaw = findAttr("data-media-id");
+    const dataMediaToken = findAttr("data-media-token");
+    const dataMediaFallback = findAttr("data-media-fallback");
+
+    const mediaReference: Record<string, unknown> = {};
+
+    const looksLikeTemplate = (val?: string | null) => Boolean(val && val.includes("{{"));
+
+    if (dataMediaIdRaw && dataMediaIdRaw.trim().length && !looksLikeTemplate(dataMediaIdRaw)) {
+      const parsed = Number(dataMediaIdRaw);
+      const mediaRecordId = Number.isFinite(parsed) ? parsed : dataMediaIdRaw;
+      attrs.mediaRecordId = mediaRecordId;
+      mediaReference.mediaRecordId = Number.isFinite(parsed) ? parsed : mediaRecordId;
+    }
+
+    if (dataMediaToken && dataMediaToken.trim().length && !looksLikeTemplate(dataMediaToken)) {
+      mediaReference.mediaToken = dataMediaToken;
+    }
+
+    const fallbackCandidate =
+      dataMediaFallback && dataMediaFallback.trim().length && !looksLikeTemplate(dataMediaFallback)
+        ? dataMediaFallback
+        : undefined;
+    const rawExistingSrc =
+      typeof attrs.image === "string"
+        ? attrs.image
+        : typeof attrs.src === "string"
+        ? attrs.src
+        : undefined;
+    const existingSrc = rawExistingSrc && !looksLikeTemplate(rawExistingSrc) ? rawExistingSrc : undefined;
+    if (fallbackCandidate) {
+      mediaReference.fallbackUrl = fallbackCandidate;
+    } else if (existingSrc && existingSrc.trim().length) {
+      mediaReference.fallbackUrl = existingSrc;
+    }
+
+    if (Object.keys(mediaReference).length > 0) {
+      attrs.mediaReference = mediaReference;
+    }
+  }
+
   return attrs;
 };
 
