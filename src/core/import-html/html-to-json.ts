@@ -298,6 +298,7 @@ const getBlockProps = (node: Node): Record<string, any> => {
     case "canvas":
       return { _type: "Canvas" };
     case "video":
+      return { _type: "Video" };
     case "iframe":
       return { _type: "CustomHTML" };
     case "svg":
