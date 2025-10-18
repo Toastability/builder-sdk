@@ -145,10 +145,10 @@ const getHeightAndWidthFromClass = (classString: string): { width: string; heigh
  * @returns Mapping Attributes as per blocks need from @ATTRIBUTE_MAP and rest passing as it is
  * @param node
  */
-const getAttrs = (node: Node) => {
+const getAttrs = (node: Node): Record<string, any> => {
   if (node.tagName === "svg") return {};
 
-  const attrs: Record<string, string> = {};
+  const attrs: Record<string, any> = {};
   const replacers = ATTRIBUTE_MAP[node.tagName] || {};
   const attributes: Array<{ key: string; value: string }> = node.attributes as any;
 
