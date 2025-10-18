@@ -98,8 +98,17 @@ export const HeadTags = () => {
       const css = getChaiThemeCssVariables(chaiTheme as ChaiBuilderThemeValues);
       let el = existing || iframeDoc.createElement("style");
       el.id = STYLE_ID;
+      // Ensure builder defaults load before host/site Tailwind overrides
+      if (!existing) {
+        if (head.firstChild) {
+          head.insertBefore(el, head.firstChild);
+        } else {
+          head.appendChild(el);
+        }
+      } else if (head.firstChild && existing !== head.firstChild) {
+        head.insertBefore(existing, head.firstChild);
+      }
       el.textContent = css;
-      if (!existing) head.appendChild(el);
     } catch {}
   }, [iframeDoc, chaiTheme]);
 
