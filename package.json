@@ -5,7 +5,7 @@
   "author": "Suraj Air",
   "license": "BSD-3-Clause",
   "homepage": "https://chaibuilder.com",
-  "version": "3.4.0",
+  "version": "3.4.1",
   "type": "module",
   "repository": {
     "type": "git",
@@ -74,16 +74,20 @@
   },
   "peerDependencies": {
     "@chaibuilder/runtime": "2.2.0",
+    "@page-speed/forms": ">=0.2.0",
     "@rjsf/core": "5.24.12",
     "@rjsf/utils": "5.24.12",
     "@rjsf/validator-ajv8": "5.24.12",
+    "@types/react": "*",
+    "@types/react-dom": "*",
     "jotai": "^2.12.1",
     "react": "^18.0 || ^19.0",
-    "react-dom": "^18.0 || ^19.0",
-    "@types/react": "*",
-    "@types/react-dom": "*"
+    "react-dom": "^18.0 || ^19.0"
   },
   "peerDependenciesMeta": {
+    "@page-speed/forms": {
+      "optional": true
+    },
     "@types/react": {
       "optional": true
     },
@@ -95,6 +99,7 @@
     "@floating-ui/dom": "1.7.3",
     "@floating-ui/react-dom": "2.1.5",
     "@mhsdesign/jit-browser-tailwindcss": "0.4.2",
+    "@page-speed/forms": "^0.2.2",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.14",
     "@radix-ui/react-avatar": "^1.1.10",

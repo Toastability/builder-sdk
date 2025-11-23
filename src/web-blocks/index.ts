@@ -113,4 +113,11 @@ const loadWebBlocks = () => {
   registerChaiBlock<RepeaterEmptyStateProps>(RepeaterEmptyState, RepeaterEmptyStateConfig);
 };
 
+/*
+ * Export Page Speed Forms integration
+ * This provides a separate loader for @page-speed/forms blocks
+ * @see ./page-speed-forms.tsx for implementation details
+ */
+export { loadPageSpeedFormBlocks } from "./page-speed-forms";
+
 export { loadWebBlocks };
