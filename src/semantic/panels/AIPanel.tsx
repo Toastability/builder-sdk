@@ -331,7 +331,8 @@ export function AIPanel({
                       ? "Describe what changes you'd like to make to the content brief..."
                       : "Describe your page topic to generate a content brief..."
                   }
-                  rows={1}
+                  rows={2}
+                  style={{ minHeight: '60px' }}
                   className="max-h-52 w-full resize-none rounded-none border-none !bg-transparent p-4 !text-base leading-[1.2] shadow-none focus-visible:outline-0 focus-visible:ring-0 placeholder:text-muted-foreground"
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) {
