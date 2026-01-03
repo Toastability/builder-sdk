@@ -40,6 +40,7 @@ export function SemanticBuilderEditor({
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [slug, setSlug] = useState(page.slug || '');
+  const [title, setTitle] = useState(page.title || '');
   const [seoTitle, setSeoTitle] = useState(page.seo_title || '');
   const [seoDescription, setSeoDescription] = useState(page.seo_description || '');
 
@@ -66,7 +67,7 @@ export function SemanticBuilderEditor({
       const success = await onSave({
         blocks: page.blocks,
         slug,
-        title: page.title,
+        title,
         seo_title: seoTitle,
         seo_description: seoDescription,
       });
@@ -80,12 +81,17 @@ export function SemanticBuilderEditor({
     } finally {
       setIsSaving(false);
     }
-  }, [page.blocks, page.title, slug, seoTitle, seoDescription, onSave, preview]);
+  }, [page.blocks, slug, title, seoTitle, seoDescription, onSave, preview]);
 
   // Handle slug change
   const handleSlugChange = useCallback((newSlug: string) => {
     setSlug(newSlug);
     // TODO: Trigger save with new slug
+  }, []);
+
+  // Handle title change
+  const handleTitleChange = useCallback((newTitle: string) => {
+    setTitle(newTitle);
   }, []);
 
   // Handle SEO field changes
@@ -219,8 +225,9 @@ export function SemanticBuilderEditor({
       <AppHeader
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        title={page.title}
+        title={title}
         subtitle={slug || undefined}
+        onTitleChange={handleTitleChange}
         actions={
           <>
             <ActionButton

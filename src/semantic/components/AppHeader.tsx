@@ -26,6 +26,9 @@ interface AppHeaderProps {
 
   /** CSS classes for container */
   className?: string;
+
+  /** Optional callback when title changes (makes title editable) */
+  onTitleChange?: (newTitle: string) => void;
 }
 
 interface TabItem {
@@ -46,7 +49,32 @@ export function AppHeader({
   subtitle,
   actions,
   className = '',
+  onTitleChange,
 }: AppHeaderProps) {
+  const [isEditingTitle, setIsEditingTitle] = React.useState(false);
+  const [editedTitle, setEditedTitle] = React.useState(title || '');
+
+  React.useEffect(() => {
+    setEditedTitle(title || '');
+  }, [title]);
+
+  const handleTitleSubmit = () => {
+    if (onTitleChange && editedTitle.trim()) {
+      onTitleChange(editedTitle.trim());
+    }
+    setIsEditingTitle(false);
+  };
+
+  const handleTitleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleTitleSubmit();
+    } else if (e.key === 'Escape') {
+      setEditedTitle(title || '');
+      setIsEditingTitle(false);
+    }
+  };
+
   return (
     <header
       className={`
@@ -61,7 +89,32 @@ export function AppHeader({
         {/* Title */}
         {title && (
           <div className="flex flex-col">
-            <h1 className="text-lg font-semibold text-foreground">{title}</h1>
+            {isEditingTitle && onTitleChange ? (
+              <input
+                type="text"
+                value={editedTitle}
+                onChange={(e) => setEditedTitle(e.target.value)}
+                onBlur={handleTitleSubmit}
+                onKeyDown={handleTitleKeyDown}
+                autoFocus
+                className="
+                  text-lg font-semibold text-foreground
+                  bg-muted border border-border rounded px-2 py-1
+                  outline-none focus:ring-2 focus:ring-primary
+                "
+              />
+            ) : (
+              <h1
+                className={`
+                  text-lg font-semibold text-foreground
+                  ${onTitleChange ? 'cursor-pointer hover:text-primary transition-colors' : ''}
+                `}
+                onClick={() => onTitleChange && setIsEditingTitle(true)}
+                title={onTitleChange ? 'Click to edit page name' : undefined}
+              >
+                {title}
+              </h1>
+            )}
             {subtitle && (
               <p className="text-xs text-muted-foreground">{subtitle}</p>
             )}
