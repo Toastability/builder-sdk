@@ -28,6 +28,7 @@ import {
 export function SemanticBuilderEditor({
   page,
   websiteId,
+  activeSite,
   contentBrief,
   onSave,
   onStyleChange: _onStyleChange,
@@ -109,6 +110,7 @@ export function SemanticBuilderEditor({
     const panelProps = {
       pageId: page.id,
       websiteId,
+      activeSite,
       blocks: page.blocks,
       onBlocksChange: (newBlocks: any[]) => {
         // TODO: Update blocks and trigger save

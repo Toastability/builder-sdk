@@ -33,6 +33,12 @@ export interface SemanticBuilderEditorProps {
   /** Website ID for context */
   websiteId: string | number;
 
+  /** Active site information */
+  activeSite?: {
+    label: string;
+    value: string | number;
+  };
+
   /** Optional content brief data for SEO panel */
   contentBrief?: any;
 
@@ -79,6 +85,10 @@ export interface SideNavItem {
 export interface BasePanelProps {
   pageId: string | number;
   websiteId: string | number;
+  activeSite?: {
+    label: string;
+    value: string | number;
+  };
   blocks: ChaiBlock[];
   onBlocksChange?: (blocks: ChaiBlock[]) => void;
   seoTitle?: string;

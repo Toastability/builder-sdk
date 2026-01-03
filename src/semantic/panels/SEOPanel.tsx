@@ -15,6 +15,7 @@ interface SEOPanelProps extends BasePanelProps {}
 export function SEOPanel({
   pageId: _pageId,
   websiteId: _websiteId,
+  activeSite,
   blocks: _blocks,
   onBlocksChange: _onBlocksChange,
   seoTitle,
@@ -154,8 +155,7 @@ export function SEOPanel({
             <CollapsibleSection title="Search Preview">
               <div className="p-3 bg-muted rounded-md space-y-2">
                 <div className="text-xs text-muted-foreground font-mono">
-                  {/* TODO: Get actual website domain from websiteId */}
-                  yoursite.com{slug ? ` › ${slug}` : ''}
+                  {activeSite?.label || 'yoursite.com'}{slug ? ` › ${slug}` : ''}
                 </div>
                 <div className="text-sm text-primary font-medium">
                   {seoData.title || 'Page Title'}
