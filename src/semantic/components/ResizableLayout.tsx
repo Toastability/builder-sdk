@@ -5,7 +5,7 @@
  * Provides a split-panel interface with drag-to-resize functionality
  */
 
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from "react";
 
 export interface ResizableLayoutProps {
   /** Left panel content */
@@ -27,7 +27,7 @@ export interface ResizableLayoutProps {
   singlePanelMode?: boolean;
 
   /** Active panel in single panel mode */
-  activePanel?: 'left' | 'right';
+  activePanel?: "left" | "right";
 
   /** Callback when resize occurs */
   onResize?: (leftWidth: number) => void;
@@ -43,9 +43,9 @@ export function ResizableLayout({
   minLeftWidth = 20,
   maxLeftWidth = 60,
   singlePanelMode = false,
-  activePanel = 'left',
+  activePanel = "left",
   onResize,
-  className = '',
+  className = "",
 }: ResizableLayoutProps) {
   const [leftWidth, setLeftWidth] = useState(defaultLeftWidth);
   const [isDragging, setIsDragging] = useState(false);
@@ -67,15 +67,12 @@ export function ResizableLayout({
       const newLeftWidth = (mouseX / containerRect.width) * 100;
 
       // Clamp width between min and max
-      const clampedWidth = Math.min(
-        Math.max(newLeftWidth, minLeftWidth),
-        maxLeftWidth
-      );
+      const clampedWidth = Math.min(Math.max(newLeftWidth, minLeftWidth), maxLeftWidth);
 
       setLeftWidth(clampedWidth);
       onResize?.(clampedWidth);
     },
-    [isDragging, minLeftWidth, maxLeftWidth, onResize]
+    [isDragging, minLeftWidth, maxLeftWidth, onResize],
   );
 
   // Handle mouse up to end drag
@@ -86,17 +83,17 @@ export function ResizableLayout({
   // Add/remove global mouse event listeners
   useEffect(() => {
     if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-      document.body.style.cursor = 'col-resize';
-      document.body.style.userSelect = 'none';
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
+      document.body.style.cursor = "col-resize";
+      document.body.style.userSelect = "none";
     }
 
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
     };
   }, [isDragging, handleMouseMove, handleMouseUp]);
 
@@ -104,42 +101,24 @@ export function ResizableLayout({
   if (singlePanelMode) {
     return (
       <div className={`h-full ${className}`} ref={containerRef}>
-        {activePanel === 'left' ? leftPanel : rightPanel}
+        {activePanel === "left" ? leftPanel : rightPanel}
       </div>
     );
   }
 
   // Desktop: Always render both panels to prevent remounting
   return (
-    <div
-      ref={containerRef}
-      className={`flex h-full gap-0 ${className}`}
-      data-resizable-layout
-    >
+    <div ref={containerRef} className={`flex h-full gap-0 ${className}`} data-resizable-layout>
       {/* Left Panel */}
-      <div
-        className="flex-shrink-0 overflow-hidden"
-        style={{ width: `${leftWidth}%` }}
-        data-panel="left"
-      >
+      <div className="flex-shrink-0 overflow-hidden" style={{ width: `${leftWidth}%` }} data-panel="left">
         {leftPanel}
       </div>
 
       {/* Divider */}
-      <div
-        className={`
-          w-1 cursor-col-resize bg-border hover:bg-primary transition-colors
-          ${isDragging ? 'bg-primary' : ''}
-        `}
-        onMouseDown={handleMouseDown}
-        data-divider
-      />
+      <div className={`cursor-col-resize border bg-border transition-colors`} data-divider />
 
       {/* Right Panel */}
-      <div
-        className="flex-1 overflow-hidden"
-        data-panel="right"
-      >
+      <div className="flex-1 overflow-hidden" data-panel="right">
         {rightPanel}
       </div>
     </div>
@@ -149,10 +128,7 @@ export function ResizableLayout({
 /**
  * Hook to persist resizable layout width
  */
-export function usePersistedWidth(
-  key: string,
-  defaultWidth: number
-): [number, (width: number) => void] {
+export function usePersistedWidth(key: string, defaultWidth: number): [number, (width: number) => void] {
   const [width, setWidthState] = useState<number>(() => {
     try {
       const stored = localStorage.getItem(`resizable-width-${key}`);
@@ -171,7 +147,7 @@ export function usePersistedWidth(
         // Ignore localStorage errors
       }
     },
-    [key]
+    [key],
   );
 
   return [width, setWidth];
