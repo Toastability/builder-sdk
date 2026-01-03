@@ -109,7 +109,7 @@ export function ResizableLayout({
       </div>
 
       {/* Divider */}
-      <div className={`cursor-col-resize border bg-border transition-colors`} data-divider />
+      <div className="border bg-border" data-divider />
 
       {/* Right Panel */}
       <div className="flex-1 overflow-hidden" data-panel="right">
