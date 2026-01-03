@@ -2,7 +2,152 @@
  * ChatPanel Component
  *
  * Conversational AI interface for building pages
+ *
  * TODO: Implement AI chat with Octane integration
+ *
+ * TODO: Database Model for Chat History
+ * =====================================
+ *
+ * When implementing full chat functionality, create a new database model in toastability-service:
+ *
+ * Model Name: ContentAiMessage
+ * Table Name: content_ai_messages
+ *
+ * Purpose:
+ * - Store conversation history for each page_category
+ * - Enable historical logging of user and AI interactions
+ * - Support feedback collection for AI response refinement
+ * - Provide data for improving AI responses over time
+ *
+ * Schema Definition:
+ * ------------------
+ *
+ * Core Fields:
+ * - id: bigint (primary key, auto-increment)
+ * - page_category_id: bigint (foreign key to page_categories.id, required, indexed)
+ * - role: string (enum: 'user' | 'assistant', required)
+ *   - 'user': Messages from the user
+ *   - 'assistant': Messages from the AI bot
+ * - content: text (required, the actual message content)
+ * - timestamp: datetime (required, when the message was created)
+ *
+ * Feedback Fields (for AI bot messages only):
+ * - feedback_type: string (enum: 'like' | 'dislike' | null)
+ *   - Allows users to rate AI responses
+ *   - NULL for user messages or unrated AI messages
+ * - feedback_comment: text (optional)
+ *   - Allows users to add comments explaining their feedback
+ *   - Useful for understanding why responses were liked/disliked
+ * - feedback_timestamp: datetime (optional)
+ *   - When the feedback was provided
+ *
+ * Context Fields:
+ * - generation_type: string (enum: 'chat' | 'component' | 'content' | 'style' | null)
+ *   - Tracks what type of generation request this was
+ *   - Helps analyze which features are most used
+ * - prompt_tokens: integer (optional)
+ *   - Number of tokens in the prompt (for cost tracking)
+ * - completion_tokens: integer (optional)
+ *   - Number of tokens in the response (for cost tracking)
+ * - model_used: string (optional)
+ *   - Which AI model was used (e.g., 'gpt-4.1', 'claude-sonnet-4')
+ *
+ * Audit Fields:
+ * - created_at: datetime (auto-set on creation)
+ * - updated_at: datetime (auto-updated on modification)
+ *
+ * Relationships:
+ * --------------
+ * - belongs_to :page_category
+ * - PageCategory model should have: has_many :content_ai_messages, dependent: :destroy
+ *
+ * Indexes:
+ * --------
+ * - page_category_id (for fast lookups of chat history)
+ * - [page_category_id, timestamp] (composite index for chronological queries)
+ * - feedback_type (for analytics on feedback patterns)
+ * - created_at (for time-based queries)
+ *
+ * Validations:
+ * ------------
+ * - page_category_id: presence: true
+ * - role: presence: true, inclusion: { in: ['user', 'assistant'] }
+ * - content: presence: true
+ * - timestamp: presence: true
+ * - feedback_type: inclusion: { in: ['like', 'dislike', nil] }
+ * - feedback_comment: length: { maximum: 1000 }
+ *
+ * Scopes:
+ * -------
+ * - by_page_category(page_category_id): where(page_category_id: page_category_id)
+ * - chronological: order(timestamp: :asc)
+ * - reverse_chronological: order(timestamp: :desc)
+ * - user_messages: where(role: 'user')
+ * - assistant_messages: where(role: 'assistant')
+ * - with_feedback: where.not(feedback_type: nil)
+ * - liked: where(feedback_type: 'like')
+ * - disliked: where(feedback_type: 'dislike')
+ * - recent(limit = 50): reverse_chronological.limit(limit)
+ *
+ * Instance Methods:
+ * -----------------
+ * - user_message?: returns true if role == 'user'
+ * - assistant_message?: returns true if role == 'assistant'
+ * - has_feedback?: returns true if feedback_type is present
+ * - liked?: returns true if feedback_type == 'like'
+ * - disliked?: returns true if feedback_type == 'dislike'
+ *
+ * API Integration:
+ * ----------------
+ * When implementing the chat panel:
+ * 1. On message send: Create a ContentAiMessage record with role='user'
+ * 2. On AI response: Create a ContentAiMessage record with role='assistant'
+ * 3. On feedback: Update the assistant message record with feedback_type and optional comment
+ * 4. On panel open: Load recent chat history for the page_category
+ *
+ * UI Integration:
+ * ---------------
+ * - Display chat history chronologically
+ * - Show like/dislike buttons only for assistant messages
+ * - Allow users to add comments when providing feedback
+ * - Highlight messages with feedback for user awareness
+ * - Optionally show token counts and model info in message metadata
+ *
+ * Migration Example:
+ * ------------------
+ * rails generate migration CreateContentAiMessages
+ *
+ * class CreateContentAiMessages < ActiveRecord::Migration[6.1]
+ *   def change
+ *     create_table :content_ai_messages do |t|
+ *       t.references :page_category, null: false, foreign_key: true, index: true
+ *       t.string :role, null: false
+ *       t.text :content, null: false
+ *       t.datetime :timestamp, null: false
+ *
+ *       # Feedback fields
+ *       t.string :feedback_type
+ *       t.text :feedback_comment
+ *       t.datetime :feedback_timestamp
+ *
+ *       # Context fields
+ *       t.string :generation_type
+ *       t.integer :prompt_tokens
+ *       t.integer :completion_tokens
+ *       t.string :model_used
+ *
+ *       t.timestamps
+ *     end
+ *
+ *     add_index :content_ai_messages, [:page_category_id, :timestamp]
+ *     add_index :content_ai_messages, :feedback_type
+ *     add_index :content_ai_messages, :created_at
+ *   end
+ * end
+ *
+ * Note: This is for the CHAT panel only, not the AI Content Brief panel (AIPanel).
+ * The AIPanel is focused on displaying SEO content briefs and simple Q&A,
+ * while ChatPanel is for conversational AI with persistent history and feedback.
  */
 
 import { useState } from 'react';
