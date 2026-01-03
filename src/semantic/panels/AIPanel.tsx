@@ -4,13 +4,21 @@
  * AI-powered content brief display with chat interface
  */
 
-import { useState, useRef, useLayoutEffect } from 'react';
+import { useState, useRef } from 'react';
 import {
   motion,
   MotionConfig,
-  useMotionValue,
 } from 'framer-motion';
-import { Sparkles, Send } from 'lucide-react';
+import {
+  Sparkles,
+  Send,
+  FileText,
+  List,
+  Target,
+  TrendingUp,
+  Search,
+  Info
+} from 'lucide-react';
 import { BasePanel, CollapsibleSection } from '../components/BasePanel';
 import { BasePanelProps } from '../types/semantic-builder';
 import { cn } from '../../lib/utils';
@@ -30,12 +38,117 @@ const BUTTON_BASE_STYLES =
 const BUTTON_ACTIVE_STYLES =
   'bg-primary/15 hover:bg-primary/19 border-primary/10 text-primary';
 
-// Message type
-interface ChatMessage {
-  id: number;
-  message: string;
-  isFromUser: boolean;
-}
+// Helper Components for Visualizations
+
+const SearchIntentBadge = ({ intent }: { intent: string }) => {
+  const getIntentStyles = (intentType: string) => {
+    const intentLower = intentType.toLowerCase();
+    if (intentLower.includes('informational')) {
+      return { bg: 'bg-blue-500/10', text: 'text-blue-600', border: 'border-blue-500/20', icon: <Info className="w-3 h-3" /> };
+    }
+    if (intentLower.includes('transactional') || intentLower.includes('commercial')) {
+      return { bg: 'bg-green-500/10', text: 'text-green-600', border: 'border-green-500/20', icon: <TrendingUp className="w-3 h-3" /> };
+    }
+    if (intentLower.includes('navigational')) {
+      return { bg: 'bg-purple-500/10', text: 'text-purple-600', border: 'border-purple-500/20', icon: <Target className="w-3 h-3" /> };
+    }
+    return { bg: 'bg-gray-500/10', text: 'text-gray-600', border: 'border-gray-500/20', icon: <Search className="w-3 h-3" /> };
+  };
+
+  const styles = getIntentStyles(intent);
+
+  return (
+    <div className={cn('inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border', styles.bg, styles.text, styles.border)}>
+      {styles.icon}
+      <span className="text-sm font-medium capitalize">{intent}</span>
+    </div>
+  );
+};
+
+const WordCountGauge = ({ targetCount }: { targetCount: number }) => {
+  // Calculate visual segments based on target count
+  const segments = [
+    { label: 'Minimum', value: Math.round(targetCount * 0.7), color: 'bg-yellow-500' },
+    { label: 'Target', value: targetCount, color: 'bg-green-500' },
+    { label: 'Ideal', value: Math.round(targetCount * 1.2), color: 'bg-blue-500' },
+  ];
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <FileText className="w-4 h-4 text-primary" />
+          <span className="text-2xl font-bold text-foreground">{targetCount.toLocaleString()}</span>
+          <span className="text-sm text-muted-foreground">words</span>
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        {segments.map((segment, index) => (
+          <div key={index} className="flex items-center gap-3">
+            <div className="w-20 text-xs text-muted-foreground">{segment.label}</div>
+            <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
+              <div
+                className={cn('h-full rounded-full transition-all duration-300', segment.color)}
+                style={{ width: `${Math.min((segment.value / (targetCount * 1.2)) * 100, 100)}%` }}
+              />
+            </div>
+            <div className="w-16 text-xs text-right font-mono text-muted-foreground">
+              {segment.value.toLocaleString()}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const ContentOutlineTree = ({ outline }: { outline: Array<{ section: string; subsections?: string[] }> }) => {
+  return (
+    <div className="space-y-3">
+      {outline.map((section, index) => (
+        <div key={index} className="space-y-2">
+          <div className="flex items-start gap-2 p-2 rounded-md bg-muted/50">
+            <List className="w-4 h-4 mt-0.5 text-primary flex-shrink-0" />
+            <div className="flex-1 space-y-2">
+              <h4 className="text-sm font-semibold text-foreground leading-tight">
+                {index + 1}. {section.section}
+              </h4>
+              {section.subsections && section.subsections.length > 0 && (
+                <ul className="space-y-1.5">
+                  {section.subsections.map((subsection: string, subIndex: number) => (
+                    <li key={subIndex} className="flex items-start gap-2 pl-6">
+                      <span className="text-xs text-muted-foreground mt-0.5">•</span>
+                      <span className="text-xs text-muted-foreground leading-relaxed">
+                        {subsection}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <div className="flex-shrink-0 px-2 py-0.5 rounded bg-primary/10 text-primary text-xs font-medium">
+              {section.subsections?.length || 0}
+            </div>
+          </div>
+        </div>
+      ))}
+
+      <div className="mt-4 p-3 bg-muted/30 rounded-md border border-border">
+        <div className="flex items-center justify-between text-xs">
+          <span className="text-muted-foreground">Total Sections</span>
+          <span className="font-semibold text-foreground">{outline.length}</span>
+        </div>
+        <div className="flex items-center justify-between text-xs mt-1">
+          <span className="text-muted-foreground">Total Subsections</span>
+          <span className="font-semibold text-foreground">
+            {outline.reduce((sum, section) => sum + (section.subsections?.length || 0), 0)}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export function AIPanel({
   pageId,
@@ -47,16 +160,11 @@ export function AIPanel({
 }: AIPanelProps) {
   const [userInput, setUserInput] = useState('');
   const [isSending, setIsSending] = useState(false);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
-  const [messageIndex, setMessageIndex] = useState(0);
 
-  const messageEndRef = useRef<HTMLDivElement>(null);
-  const messageElementsRef = useRef<HTMLDivElement[]>([]);
   const inputContainerRef = useRef<HTMLDivElement>(null);
-  const scrollMarginTop = useMotionValue(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Handle message submission
+  // Handle message submission - generates content brief
   const handleMessageSubmit = async () => {
     if (userInput.trim() === '' || isSending) {
       return;
@@ -65,76 +173,30 @@ export function AIPanel({
     const userMessage = userInput.trim();
     setIsSending(true);
     setUserInput('');
-    setMessageIndex((currentIndex) =>
-      currentIndex === 0 ? currentIndex + 1 : currentIndex + 2
-    );
-
-    // Add user message immediately
-    const newUserMessage: ChatMessage = {
-      id: chatMessages.length + 1,
-      message: userMessage,
-      isFromUser: true,
-    };
-    setChatMessages((prev) => [...prev, newUserMessage]);
 
     try {
       if (onChatMessage) {
-        const response = await onChatMessage(userMessage, {
+        // TODO: This should trigger content brief generation, not return a chat response
+        // The callback needs to be updated to generate a full content brief
+        // and update the page's content_brief data
+        await onChatMessage(userMessage, {
           contentBrief,
           pageId,
           websiteId,
         });
 
-        // Add AI response
-        const aiMessage: ChatMessage = {
-          id: chatMessages.length + 2,
-          message: response,
-          isFromUser: false,
-        };
-        setChatMessages((prev) => [...prev, aiMessage]);
+        // TODO: After successful generation, refresh the content brief display
+        console.log('Content brief generation requested:', userMessage);
       } else {
-        // Fallback
-        const aiMessage: ChatMessage = {
-          id: chatMessages.length + 2,
-          message: 'AI chat is not configured. Please contact support.',
-          isFromUser: false,
-        };
-        setChatMessages((prev) => [...prev, aiMessage]);
+        console.warn('Content brief generation not configured');
       }
     } catch (error) {
-      console.error('Chat error:', error);
-      const errorMessage: ChatMessage = {
-        id: chatMessages.length + 2,
-        message: `Error: ${error instanceof Error ? error.message : 'Unknown error occurred'}`,
-        isFromUser: false,
-      };
-      setChatMessages((prev) => [...prev, errorMessage]);
+      console.error('Content brief generation error:', error);
+      // TODO: Show error toast/notification to user
     } finally {
       setIsSending(false);
     }
   };
-
-  // Auto-scroll to latest message when new messages are added
-  useLayoutEffect(() => {
-    const currentMessageCount = chatMessages.length;
-    const calculatedScrollMargin =
-      currentMessageCount > 1
-        ? window.innerHeight -
-          (messageElementsRef.current[currentMessageCount - 2]?.clientHeight ||
-            0) -
-          (inputContainerRef.current?.clientHeight || 0)
-        : 0;
-
-    scrollMarginTop.set(calculatedScrollMargin);
-
-    // Smooth scroll to the latest message
-    requestAnimationFrame(() => {
-      messageEndRef.current?.scrollIntoView({
-        block: 'start',
-        behavior: 'smooth',
-      });
-    });
-  }, [chatMessages, messageIndex, scrollMarginTop]);
 
   // Auto-resize textarea
   const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -190,41 +252,22 @@ export function AIPanel({
 
                 {/* Search Intent */}
                 {contentBrief.search_intent && (
-                  <CollapsibleSection title="Search Intent">
-                    <p className="text-sm text-foreground">{contentBrief.search_intent}</p>
+                  <CollapsibleSection title="Search Intent" defaultCollapsed={false}>
+                    <SearchIntentBadge intent={contentBrief.search_intent} />
                   </CollapsibleSection>
                 )}
 
                 {/* Content Outline */}
                 {contentBrief.content_outline?.length > 0 && (
-                  <CollapsibleSection title="Content Outline">
-                    <div className="space-y-3">
-                      {contentBrief.content_outline.map((section: any, index: number) => (
-                        <div key={index} className="space-y-2">
-                          <h4 className="text-sm font-medium text-foreground">
-                            {section.section}
-                          </h4>
-                          {section.subsections?.length > 0 && (
-                            <ul className="list-disc list-inside space-y-1 pl-3">
-                              {section.subsections.map((subsection: string, subIndex: number) => (
-                                <li key={subIndex} className="text-xs text-muted-foreground">
-                                  {subsection}
-                                </li>
-                              ))}
-                            </ul>
-                          )}
-                        </div>
-                      ))}
-                    </div>
+                  <CollapsibleSection title="Content Outline" defaultCollapsed={false}>
+                    <ContentOutlineTree outline={contentBrief.content_outline} />
                   </CollapsibleSection>
                 )}
 
                 {/* Recommended Word Count */}
                 {contentBrief.recommended_word_count && (
-                  <CollapsibleSection title="Recommended Word Count">
-                    <p className="text-sm text-foreground font-mono">
-                      {contentBrief.recommended_word_count}
-                    </p>
+                  <CollapsibleSection title="Recommended Word Count" defaultCollapsed={false}>
+                    <WordCountGauge targetCount={contentBrief.recommended_word_count} />
                   </CollapsibleSection>
                 )}
 
@@ -257,49 +300,8 @@ export function AIPanel({
               </div>
             )}
 
-            {/* Chat Messages */}
-            {chatMessages.length > 0 && (
-              <div className="space-y-2 pt-4 border-t border-border">
-                <div className="flex items-center gap-2 pb-2">
-                  <Sparkles className="w-4 h-4 text-primary" />
-                  <h4 className="text-sm font-medium text-foreground">Chat History</h4>
-                </div>
-                {chatMessages.map((message, messageId) => (
-                  <motion.div
-                    initial={{
-                      opacity: 0,
-                      y: 10,
-                    }}
-                    animate={{
-                      opacity: 1,
-                      y: 0,
-                    }}
-                    transition={{ delay: (1 * messageId) % 2 }}
-                    ref={(element) => {
-                      if (element) {
-                        messageElementsRef.current[messageId] = element;
-                      }
-                    }}
-                    key={messageId}
-                    className={cn(
-                      'my-2 w-fit max-w-[85%] break-words rounded-2xl px-4 py-2',
-                      message.isFromUser
-                        ? 'self-end ml-auto bg-primary/10 text-foreground'
-                        : 'self-start mr-auto bg-muted text-foreground'
-                    )}
-                  >
-                    <p className="text-sm whitespace-pre-wrap">{message.message}</p>
-                  </motion.div>
-                ))}
-                <motion.div
-                  ref={messageEndRef}
-                  style={{ marginTop: scrollMarginTop }}
-                />
-              </div>
-            )}
-
             {/* No content brief message */}
-            {!contentBrief && chatMessages.length === 0 && (
+            {!contentBrief && (
               <div className="flex flex-col items-center justify-center h-full py-8">
                 <Sparkles className="w-12 h-12 text-muted-foreground mb-4" />
                 <h3 className="text-lg font-medium text-foreground mb-2">
@@ -326,8 +328,8 @@ export function AIPanel({
                   autoFocus
                   placeholder={
                     contentBrief
-                      ? "Ask AI about the content brief..."
-                      : "Ask AI to generate a content brief..."
+                      ? "Describe what changes you'd like to make to the content brief..."
+                      : "Describe your page topic to generate a content brief..."
                   }
                   rows={1}
                   className="max-h-52 w-full resize-none rounded-none border-none !bg-transparent p-4 !text-base leading-[1.2] shadow-none focus-visible:outline-0 focus-visible:ring-0 placeholder:text-muted-foreground"

@@ -116,6 +116,7 @@ export function SemanticBuilderEditor({
       },
       seoTitle,
       seoDescription,
+      slug,
       contentBrief,
       onSeoChange: handleSeoChange,
       onChatMessage,

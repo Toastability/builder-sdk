@@ -19,52 +19,22 @@ export function SEOPanel({
   onBlocksChange: _onBlocksChange,
   seoTitle,
   seoDescription,
-  contentBrief,
+  slug,
+  contentBrief: _contentBrief,
   onSeoChange,
 }: SEOPanelProps) {
-  // Extract keywords from content brief if available
-  const initialKeywords = contentBrief?.secondary_keywords?.join(', ') || '';
-
   const [seoData, setSeoData] = useState({
     title: seoTitle || '',
     description: seoDescription || '',
-    keywords: initialKeywords,
-    ogTitle: seoTitle || '',
-    ogDescription: seoDescription || '',
   });
-
-  // Debug logging
-  useEffect(() => {
-    console.log('[SEOPanel] Props received:', {
-      seoTitle,
-      seoDescription,
-      contentBrief: contentBrief ? 'present' : 'null/undefined',
-      hasSecondaryKeywords: !!contentBrief?.secondary_keywords,
-    });
-  }, [seoTitle, seoDescription, contentBrief]);
 
   // Update state when props change (e.g., when page data loads)
   useEffect(() => {
-    console.log('[SEOPanel] useEffect triggered, updating state with:', {
-      seoTitle,
-      seoDescription,
-      hasContentBrief: !!contentBrief,
+    setSeoData({
+      title: seoTitle || '',
+      description: seoDescription || '',
     });
-
-    // Always update if we have any data, even if just empty strings
-    setSeoData((prev) => {
-      const newData = {
-        ...prev,
-        title: seoTitle || prev.title,
-        description: seoDescription || prev.description,
-        keywords: contentBrief?.secondary_keywords?.join(', ') || prev.keywords,
-        ogTitle: seoTitle || prev.ogTitle,
-        ogDescription: seoDescription || prev.ogDescription,
-      };
-      console.log('[SEOPanel] Setting seoData to:', newData);
-      return newData;
-    });
-  }, [seoTitle, seoDescription, contentBrief]);
+  }, [seoTitle, seoDescription]);
 
   const handleChange = (field: string, value: string) => {
     setSeoData((prev) => ({ ...prev, [field]: value }));
@@ -148,71 +118,6 @@ export function SEOPanel({
                     Optimal: 150-160 characters
                   </p>
                 </div>
-
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-1 block">
-                    Keywords
-                  </label>
-                  <input
-                    type="text"
-                    value={seoData.keywords}
-                    onChange={(e) => handleChange('keywords', e.target.value)}
-                    placeholder="keyword1, keyword2, keyword3..."
-                    className="
-                      w-full px-3 py-2 rounded-md
-                      bg-muted text-foreground text-sm
-                      border border-border
-                      outline-none
-                      focus:ring-2 focus:ring-primary
-                    "
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Comma-separated list of keywords
-                  </p>
-                </div>
-              </div>
-            </CollapsibleSection>
-
-            {/* Open Graph */}
-            <CollapsibleSection title="Open Graph (Social Sharing)">
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-1 block">
-                    OG Title
-                  </label>
-                  <input
-                    type="text"
-                    value={seoData.ogTitle}
-                    onChange={(e) => handleChange('ogTitle', e.target.value)}
-                    placeholder="Title for social media..."
-                    className="
-                      w-full px-3 py-2 rounded-md
-                      bg-muted text-foreground text-sm
-                      border border-border
-                      outline-none
-                      focus:ring-2 focus:ring-primary
-                    "
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-1 block">
-                    OG Description
-                  </label>
-                  <textarea
-                    value={seoData.ogDescription}
-                    onChange={(e) => handleChange('ogDescription', e.target.value)}
-                    placeholder="Description for social media..."
-                    rows={2}
-                    className="
-                      w-full px-3 py-2 rounded-md
-                      bg-muted text-foreground text-sm
-                      border border-border
-                      resize-none outline-none
-                      focus:ring-2 focus:ring-primary
-                    "
-                  />
-                </div>
               </div>
             </CollapsibleSection>
 
@@ -248,7 +153,8 @@ export function SEOPanel({
             <CollapsibleSection title="Search Preview">
               <div className="p-3 bg-muted rounded-md space-y-2">
                 <div className="text-xs text-muted-foreground font-mono">
-                  www.example.com › page-slug
+                  {/* TODO: Get actual website domain from websiteId */}
+                  yoursite.com{slug ? ` › ${slug}` : ''}
                 </div>
                 <div className="text-sm text-primary font-medium">
                   {seoData.title || 'Page Title'}
@@ -258,34 +164,6 @@ export function SEOPanel({
                 </div>
               </div>
             </CollapsibleSection>
-          </div>
-        </div>
-
-        {/* Footer Actions */}
-        <div className="flex-shrink-0 p-4 border-t border-border">
-          <div className="flex items-center gap-2">
-            <button
-              className="
-                flex-1 px-4 py-2 rounded-md
-                bg-primary text-primary-foreground
-                hover:bg-primary/90
-                transition-colors
-                text-sm font-medium
-              "
-            >
-              Save SEO Settings
-            </button>
-            <button
-              className="
-                px-4 py-2 rounded-md
-                text-muted-foreground
-                hover:bg-accent hover:text-foreground
-                transition-colors
-                text-sm
-              "
-            >
-              Reset
-            </button>
           </div>
         </div>
       </div>

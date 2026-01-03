@@ -83,6 +83,7 @@ export interface BasePanelProps {
   onBlocksChange?: (blocks: ChaiBlock[]) => void;
   seoTitle?: string;
   seoDescription?: string;
+  slug?: string;
   contentBrief?: any;
   onSeoChange?: (field: 'title' | 'description', value: string) => void;
   onChatMessage?: (message: string, context: {
