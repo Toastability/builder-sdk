@@ -30,10 +30,6 @@ export function SEOPanel({
     keywords: initialKeywords,
     ogTitle: seoTitle || '',
     ogDescription: seoDescription || '',
-    ogImage: '',
-    twitterCard: 'summary_large_image',
-    canonical: '',
-    robots: 'index, follow',
   });
 
   // Debug logging
@@ -169,47 +165,6 @@ export function SEOPanel({
                     Comma-separated list of keywords
                   </p>
                 </div>
-
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-1 block">
-                    Canonical URL
-                  </label>
-                  <input
-                    type="url"
-                    value={seoData.canonical}
-                    onChange={(e) => handleChange('canonical', e.target.value)}
-                    placeholder="https://example.com/page"
-                    className="
-                      w-full px-3 py-2 rounded-md
-                      bg-muted text-foreground text-sm font-mono
-                      border border-border
-                      outline-none
-                      focus:ring-2 focus:ring-primary
-                    "
-                  />
-                </div>
-
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-1 block">
-                    Robots
-                  </label>
-                  <select
-                    value={seoData.robots}
-                    onChange={(e) => handleChange('robots', e.target.value)}
-                    className="
-                      w-full px-3 py-2 rounded-md
-                      bg-muted text-foreground text-sm
-                      border border-border
-                      outline-none
-                      focus:ring-2 focus:ring-primary
-                    "
-                  >
-                    <option value="index, follow">Index, Follow</option>
-                    <option value="noindex, follow">No Index, Follow</option>
-                    <option value="index, nofollow">Index, No Follow</option>
-                    <option value="noindex, nofollow">No Index, No Follow</option>
-                  </select>
-                </div>
               </div>
             </CollapsibleSection>
 
@@ -253,60 +208,6 @@ export function SEOPanel({
                     "
                   />
                 </div>
-
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-1 block">
-                    OG Image
-                  </label>
-                  <input
-                    type="url"
-                    value={seoData.ogImage}
-                    onChange={(e) => handleChange('ogImage', e.target.value)}
-                    placeholder="https://example.com/image.jpg"
-                    className="
-                      w-full px-3 py-2 rounded-md
-                      bg-muted text-foreground text-sm font-mono
-                      border border-border
-                      outline-none
-                      focus:ring-2 focus:ring-primary
-                    "
-                  />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Recommended: 1200x630px
-                  </p>
-                </div>
-              </div>
-            </CollapsibleSection>
-
-            {/* Twitter Card */}
-            <CollapsibleSection title="Twitter Card">
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-foreground mb-1 block">
-                    Card Type
-                  </label>
-                  <select
-                    value={seoData.twitterCard}
-                    onChange={(e) => handleChange('twitterCard', e.target.value)}
-                    className="
-                      w-full px-3 py-2 rounded-md
-                      bg-muted text-foreground text-sm
-                      border border-border
-                      outline-none
-                      focus:ring-2 focus:ring-primary
-                    "
-                  >
-                    <option value="summary">Summary</option>
-                    <option value="summary_large_image">Summary Large Image</option>
-                    <option value="app">App</option>
-                    <option value="player">Player</option>
-                  </select>
-                </div>
-
-                <p className="text-xs text-muted-foreground px-3 py-2 bg-muted rounded-md">
-                  Twitter uses Open Graph tags by default. Customize only if you need
-                  different content for Twitter.
-                </p>
               </div>
             </CollapsibleSection>
 

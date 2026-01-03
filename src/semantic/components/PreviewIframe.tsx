@@ -113,7 +113,6 @@ export function PreviewIframe({
 
         {/* URL/Slug Input */}
         <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-md bg-muted">
-          <span className="text-sm text-muted-foreground font-mono">/</span>
           {isEditingSlug ? (
             <input
               ref={inputRef}
@@ -126,7 +125,7 @@ export function PreviewIframe({
                 flex-1 bg-transparent text-sm font-mono
                 text-foreground outline-none
               "
-              placeholder="page-slug"
+              placeholder="/page-slug"
             />
           ) : (
             <button
@@ -137,7 +136,7 @@ export function PreviewIframe({
                 transition-colors
               "
             >
-              {slug || 'untitled'}
+              {slug || '/untitled'}
             </button>
           )}
         </div>

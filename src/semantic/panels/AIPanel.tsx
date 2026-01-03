@@ -19,6 +19,7 @@ export function AIPanel({
   websiteId: _websiteId,
   blocks: _blocks,
   onBlocksChange: _onBlocksChange,
+  contentBrief,
 }: AIPanelProps) {
   const [generationType, setGenerationType] = useState<GenerationType | null>(null);
   const [prompt, setPrompt] = useState('');
@@ -59,16 +60,170 @@ export function AIPanel({
   if (!generationType) {
     return (
       <BasePanel
-        title="AI Generation"
-        subtitle="Generate components, content, and styles with AI"
+        title="AI Content Brief"
+        subtitle="AI-generated SEO content brief and generation tools"
       >
         <div className="flex flex-col h-full">
-          <div className="flex-1 p-6 space-y-4">
-            <EmptyState
-              icon={<Sparkles className="w-12 h-12" />}
-              title="Choose what to generate"
-              description="Select the type of content you want to create with AI assistance"
-            />
+          <div className="flex-1 overflow-y-auto p-4 space-y-4">
+            {/* Content Brief Display */}
+            {contentBrief && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 pb-2 border-b border-border">
+                  <Sparkles className="w-5 h-5 text-primary" />
+                  <h3 className="text-sm font-semibold text-foreground">
+                    Generated Content Brief
+                  </h3>
+                </div>
+
+                {/* Primary Keyword */}
+                {contentBrief.primary_keyword && (
+                  <CollapsibleSection title="Primary Keyword" defaultCollapsed={false}>
+                    <p className="text-sm text-foreground font-mono bg-muted px-3 py-2 rounded-md">
+                      {contentBrief.primary_keyword}
+                    </p>
+                  </CollapsibleSection>
+                )}
+
+                {/* Secondary Keywords */}
+                {contentBrief.secondary_keywords?.length > 0 && (
+                  <CollapsibleSection title="Secondary Keywords">
+                    <div className="flex flex-wrap gap-2">
+                      {contentBrief.secondary_keywords.map((keyword: string, index: number) => (
+                        <span
+                          key={index}
+                          className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-md"
+                        >
+                          {keyword}
+                        </span>
+                      ))}
+                    </div>
+                  </CollapsibleSection>
+                )}
+
+                {/* Search Intent */}
+                {contentBrief.search_intent && (
+                  <CollapsibleSection title="Search Intent">
+                    <p className="text-sm text-foreground">{contentBrief.search_intent}</p>
+                  </CollapsibleSection>
+                )}
+
+                {/* Content Outline */}
+                {contentBrief.content_outline?.length > 0 && (
+                  <CollapsibleSection title="Content Outline">
+                    <div className="space-y-3">
+                      {contentBrief.content_outline.map((section: any, index: number) => (
+                        <div key={index} className="space-y-2">
+                          <h4 className="text-sm font-medium text-foreground">
+                            {section.section}
+                          </h4>
+                          {section.subsections?.length > 0 && (
+                            <ul className="list-disc list-inside space-y-1 pl-3">
+                              {section.subsections.map((subsection: string, subIndex: number) => (
+                                <li key={subIndex} className="text-xs text-muted-foreground">
+                                  {subsection}
+                                </li>
+                              ))}
+                            </ul>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </CollapsibleSection>
+                )}
+
+                {/* Recommended Word Count */}
+                {contentBrief.recommended_word_count && (
+                  <CollapsibleSection title="Recommended Word Count">
+                    <p className="text-sm text-foreground font-mono">
+                      {contentBrief.recommended_word_count}
+                    </p>
+                  </CollapsibleSection>
+                )}
+
+                {/* Meta Description Guidance */}
+                {contentBrief.meta_description_guidance && (
+                  <CollapsibleSection title="Meta Description Guidance">
+                    <p className="text-sm text-foreground">
+                      {contentBrief.meta_description_guidance}
+                    </p>
+                  </CollapsibleSection>
+                )}
+
+                {/* Internal Linking Strategy */}
+                {contentBrief.internal_linking_strategy && (
+                  <CollapsibleSection title="Internal Linking Strategy">
+                    <p className="text-sm text-foreground">
+                      {contentBrief.internal_linking_strategy}
+                    </p>
+                  </CollapsibleSection>
+                )}
+
+                {/* Featured Snippet Optimization */}
+                {contentBrief.featured_snippet_optimization && (
+                  <CollapsibleSection title="Featured Snippet Optimization">
+                    <p className="text-sm text-foreground">
+                      {contentBrief.featured_snippet_optimization}
+                    </p>
+                  </CollapsibleSection>
+                )}
+
+                {/* Additional Fields */}
+                {contentBrief.serp_analysis && Object.keys(contentBrief.serp_analysis).length > 0 && (
+                  <CollapsibleSection title="SERP Analysis">
+                    <div className="space-y-2">
+                      {Object.entries(contentBrief.serp_analysis).map(([key, value]: [string, any]) => (
+                        <div key={key} className="text-xs">
+                          <span className="font-medium text-foreground">{key}: </span>
+                          <span className="text-muted-foreground">
+                            {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </CollapsibleSection>
+                )}
+
+                {contentBrief.keyword_metrics && Object.keys(contentBrief.keyword_metrics).length > 0 && (
+                  <CollapsibleSection title="Keyword Metrics">
+                    <div className="space-y-2">
+                      {Object.entries(contentBrief.keyword_metrics).map(([key, value]: [string, any]) => (
+                        <div key={key} className="text-xs">
+                          <span className="font-medium text-foreground">{key}: </span>
+                          <span className="text-muted-foreground">
+                            {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </CollapsibleSection>
+                )}
+
+                {contentBrief.aeo_optimization && Object.keys(contentBrief.aeo_optimization).length > 0 && (
+                  <CollapsibleSection title="AEO Optimization">
+                    <div className="space-y-2">
+                      {Object.entries(contentBrief.aeo_optimization).map(([key, value]: [string, any]) => (
+                        <div key={key} className="text-xs">
+                          <span className="font-medium text-foreground">{key}: </span>
+                          <span className="text-muted-foreground">
+                            {typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </CollapsibleSection>
+                )}
+
+                <div className="pt-4 border-t border-border" />
+              </div>
+            )}
+
+            {/* AI Generation Tools */}
+            <div className="space-y-4">
+              <EmptyState
+                icon={<Sparkles className="w-12 h-12" />}
+                title="Choose what to generate"
+                description="Select the type of content you want to create with AI assistance"
+              />
 
             {/* Generation Type Selection */}
             <div className="grid grid-cols-1 gap-3 max-w-md mx-auto">
@@ -138,6 +293,7 @@ export function AIPanel({
                 </div>
               </button>
             </div>
+            </div>
           </div>
         </div>
       </BasePanel>
@@ -146,7 +302,7 @@ export function AIPanel({
 
   return (
     <BasePanel
-      title="AI Generation"
+      title="AI Content Brief"
       subtitle={`Generate ${generationType}`}
       actions={
         <button
