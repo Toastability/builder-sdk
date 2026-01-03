@@ -49,6 +49,13 @@ export interface SemanticBuilderEditorProps {
   /** Callback when style changes */
   onStyleChange?: (styleConfig: any) => void;
 
+  /** Callback when AI chat message is sent */
+  onChatMessage?: (message: string, context: {
+    contentBrief?: any;
+    pageId: string | number;
+    websiteId: string | number;
+  }) => Promise<string>;
+
   /** Optional initial active panel */
   initialPanel?: PanelType;
 
@@ -78,6 +85,11 @@ export interface BasePanelProps {
   seoDescription?: string;
   contentBrief?: any;
   onSeoChange?: (field: 'title' | 'description', value: string) => void;
+  onChatMessage?: (message: string, context: {
+    contentBrief?: any;
+    pageId: string | number;
+    websiteId: string | number;
+  }) => Promise<string>;
 }
 
 /**

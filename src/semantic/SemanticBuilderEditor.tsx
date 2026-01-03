@@ -31,6 +31,7 @@ export function SemanticBuilderEditor({
   contentBrief,
   onSave,
   onStyleChange: _onStyleChange,
+  onChatMessage,
   initialPanel = 'chat',
   initialTab = 'preview',
 }: SemanticBuilderEditorProps) {
@@ -117,6 +118,7 @@ export function SemanticBuilderEditor({
       seoDescription,
       contentBrief,
       onSeoChange: handleSeoChange,
+      onChatMessage,
     };
 
     // Debug logging
