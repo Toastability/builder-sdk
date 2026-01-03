@@ -66,12 +66,7 @@ const SearchIntentBadge = ({ intent }: { intent: string }) => {
 
   return (
     <div
-      className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5",
-        styles.bg,
-        styles.text,
-        styles.border,
-      )}>
+      className={cn("inline-flex items-center gap-1.5 rounded-md border p-2", styles.bg, styles.text, styles.border)}>
       {styles.icon}
       <span className="text-sm font-medium capitalize">{intent}</span>
     </div>
@@ -226,7 +221,7 @@ export function AIPanel({
           <div className="flex-1 space-y-4 overflow-y-auto p-4">
             {/* Skeleton Loading State */}
             {isSending && (
-              <div className="space-y-4 animate-pulse">
+              <div className="animate-pulse space-y-4">
                 <div className="flex items-center gap-2 border-b border-border pb-2">
                   <div className="h-5 w-5 rounded bg-muted" />
                   <div className="h-4 w-48 rounded bg-muted" />
@@ -260,9 +255,9 @@ export function AIPanel({
                   <div className="space-y-2">
                     {[...Array(4)].map((_, i) => (
                       <div key={i} className="flex items-start gap-2">
-                        <div className="h-4 w-4 rounded bg-muted flex-shrink-0 mt-0.5" />
+                        <div className="mt-0.5 h-4 w-4 flex-shrink-0 rounded bg-muted" />
                         <div className="flex-1">
-                          <div className="h-4 w-full rounded bg-muted mb-2" />
+                          <div className="mb-2 h-4 w-full rounded bg-muted" />
                           <div className="ml-6 space-y-1.5">
                             {[...Array(2)].map((_, j) => (
                               <div key={j} className="h-3 w-3/4 rounded bg-muted" />
