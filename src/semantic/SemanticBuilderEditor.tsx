@@ -204,7 +204,7 @@ export function SemanticBuilderEditor({
         activeTab={activeTab}
         onTabChange={setActiveTab}
         title={page.title}
-        subtitle={slug ? `/${slug}` : undefined}
+        subtitle={slug || undefined}
         actions={
           <>
             <ActionButton
