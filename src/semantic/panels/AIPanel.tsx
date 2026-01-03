@@ -22,6 +22,15 @@ export function AIPanel({
   const [chatMessage, setChatMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
 
+  // Debug logging
+  console.log('[AIPanel] Render - contentBrief:', {
+    isPresent: !!contentBrief,
+    isNull: contentBrief === null,
+    isUndefined: contentBrief === undefined,
+    contentBrief: contentBrief,
+    keys: contentBrief ? Object.keys(contentBrief) : [],
+  });
+
   const handleSendMessage = async () => {
     if (!chatMessage.trim() || isSending) return;
 

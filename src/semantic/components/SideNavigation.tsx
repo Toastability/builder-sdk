@@ -45,7 +45,7 @@ const NAV_ITEMS: NavItem[] = [
     type: 'ai',
     icon: Sparkles,
     label: 'AI',
-    tooltip: 'AI Generation Tools',
+    tooltip: 'AI Content Brief',
   },
   {
     type: 'style',
