@@ -23,6 +23,7 @@ export default defineConfig({
         tailwind: resolve(__dirname, "src/tailwind/index.ts"),
         runtime: resolve(__dirname, "src/runtime.ts"),
         styles: resolve(__dirname, "src/styles.ts"),
+        semantic: resolve(__dirname, "src/semantic/index.ts"),
       },
       formats: ["es", "cjs"],
     },

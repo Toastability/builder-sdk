@@ -5,7 +5,7 @@
   "author": "Suraj Air",
   "license": "BSD-3-Clause",
   "homepage": "https://chaibuilder.com",
-  "version": "3.4.3",
+  "version": "3.4.4",
   "type": "module",
   "repository": {
     "type": "git",
@@ -66,6 +66,11 @@
       "types": "./dist/runtime.d.ts",
       "import": "./dist/runtime.js",
       "require": "./dist/runtime.cjs"
+    },
+    "./semantic": {
+      "types": "./dist/semantic.d.ts",
+      "import": "./dist/semantic.js",
+      "require": "./dist/semantic.cjs"
     },
     "./styles": {
       "import": "./dist/sdk.css",
