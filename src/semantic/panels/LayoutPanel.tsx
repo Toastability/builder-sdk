@@ -184,6 +184,7 @@ export function LayoutPanel({
       <BasePanel
         title="Page Layout"
         subtitle="View and manage page structure"
+        showHeader={false}
       >
         <EmptyState
           icon={<Layout className="w-12 h-12" />}
@@ -198,6 +199,7 @@ export function LayoutPanel({
     <BasePanel
       title="Page Layout"
       subtitle="View and manage page structure"
+      showHeader={false}
     >
       <div className="flex flex-col h-full">
         {/* Tree View */}

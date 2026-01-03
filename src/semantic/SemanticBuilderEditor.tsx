@@ -6,7 +6,7 @@
  */
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
-import { Save, Settings } from 'lucide-react';
+import { Save } from 'lucide-react';
 import { ResizableLayout, usePersistedWidth } from './components/ResizableLayout';
 import { SideNavigation } from './components/SideNavigation';
 import { AppHeader, ActionButton } from './components/AppHeader';
@@ -132,28 +132,43 @@ export function SemanticBuilderEditor({
       contentBrief_present: !!contentBrief,
     });
 
+    let panelContent;
     switch (activePanel) {
       case 'chat':
         return <ChatPanel {...panelProps} />;
 
       case 'ai':
-        return <AIPanel {...panelProps} />;
+        panelContent = <AIPanel {...panelProps} />;
+        break;
 
       case 'style':
-        return <StylePanel {...panelProps} />;
+        panelContent = <StylePanel {...panelProps} />;
+        break;
 
       case 'seo':
-        return <SEOPanel {...panelProps} />;
+        panelContent = <SEOPanel {...panelProps} />;
+        break;
 
       case 'data':
-        return <DataPanel {...panelProps} />;
+        panelContent = <DataPanel {...panelProps} />;
+        break;
 
       case 'layout':
-        return <LayoutPanel {...panelProps} />;
+        panelContent = <LayoutPanel {...panelProps} />;
+        break;
 
       default:
         return null;
     }
+
+    // Wrap all panels except chat in a max-height card container
+    return (
+      <div className="h-full p-4">
+        <div className="h-full max-h-full rounded-lg border border-border bg-card shadow-sm overflow-hidden">
+          {panelContent}
+        </div>
+      </div>
+    );
   };
 
   // Render active tab content
@@ -188,16 +203,20 @@ export function SemanticBuilderEditor({
 
       case 'preview':
         return (
-          <PreviewIframe
-            url={preview.url}
-            slug={slug}
-            onSlugChange={handleSlugChange}
-            isFullscreen={preview.isFullscreen}
-            onFullscreenToggle={preview.toggleFullscreen}
-            refreshKey={preview.refreshKey}
-            onRefresh={preview.refresh}
-            isLoading={preview.isLoading}
-          />
+          <div className="h-full p-4">
+            <div className="h-full max-h-full rounded-lg border border-border bg-card shadow-sm overflow-hidden">
+              <PreviewIframe
+                url={preview.url}
+                slug={slug}
+                onSlugChange={handleSlugChange}
+                isFullscreen={preview.isFullscreen}
+                onFullscreenToggle={preview.toggleFullscreen}
+                refreshKey={preview.refreshKey}
+                onRefresh={preview.refresh}
+                isLoading={preview.isLoading}
+              />
+            </div>
+          </div>
         );
 
       default:
@@ -232,24 +251,15 @@ export function SemanticBuilderEditor({
         subtitle={slug || undefined}
         onTitleChange={handleTitleChange}
         actions={
-          <>
-            <ActionButton
-              onClick={handleSave}
-              variant="primary"
-              disabled={isSaving}
-              loading={isSaving}
-              icon={<Save className="w-4 h-4" />}
-            >
-              {isSaving ? 'Saving...' : 'Save'}
-            </ActionButton>
-            <ActionButton
-              onClick={() => console.log('Settings')}
-              variant="ghost"
-              icon={<Settings className="w-4 h-4" />}
-            >
-              Settings
-            </ActionButton>
-          </>
+          <ActionButton
+            onClick={handleSave}
+            variant="primary"
+            disabled={isSaving}
+            loading={isSaving}
+            icon={<Save className="w-4 h-4" />}
+          >
+            {isSaving ? 'Saving...' : 'Save'}
+          </ActionButton>
         }
       />
 

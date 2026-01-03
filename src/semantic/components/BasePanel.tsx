@@ -23,6 +23,9 @@ interface BasePanelProps {
 
   /** CSS classes for container */
   className?: string;
+
+  /** Whether to show the panel header (default: true) */
+  showHeader?: boolean;
 }
 
 export function BasePanel({
@@ -31,6 +34,7 @@ export function BasePanel({
   children,
   actions,
   className = '',
+  showHeader = true,
 }: BasePanelProps) {
   return (
     <div
@@ -39,26 +43,28 @@ export function BasePanel({
       aria-label={title}
     >
       {/* Panel Header */}
-      <div className="flex-shrink-0 px-4 py-3 border-b border-border">
-        <div className="flex items-start justify-between">
-          <div className="flex-1 min-w-0">
-            <h2 className="text-base font-semibold text-foreground truncate">
-              {title}
-            </h2>
-            {subtitle && (
-              <p className="text-sm text-muted-foreground mt-0.5">
-                {subtitle}
-              </p>
+      {showHeader && (
+        <div className="flex-shrink-0 px-4 py-3 border-b border-border">
+          <div className="flex items-start justify-between">
+            <div className="flex-1 min-w-0">
+              <h2 className="text-base font-semibold text-foreground truncate">
+                {title}
+              </h2>
+              {subtitle && (
+                <p className="text-sm text-muted-foreground mt-0.5">
+                  {subtitle}
+                </p>
+              )}
+            </div>
+
+            {actions && (
+              <div className="flex items-center gap-2 ml-4">
+                {actions}
+              </div>
             )}
           </div>
-
-          {actions && (
-            <div className="flex items-center gap-2 ml-4">
-              {actions}
-            </div>
-          )}
         </div>
-      </div>
+      )}
 
       {/* Panel Content - scrollable */}
       <div className="flex-1 overflow-y-auto overflow-x-hidden">

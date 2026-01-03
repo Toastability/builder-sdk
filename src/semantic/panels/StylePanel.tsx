@@ -38,7 +38,7 @@ export function StylePanel({
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded border border-border bg-background" />
               <span className="text-xs text-muted-foreground font-mono">
-                222.2 47.4% 11.2%
+                0 0% 100%
               </span>
             </div>
           </div>
@@ -47,7 +47,7 @@ export function StylePanel({
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded border border-border bg-foreground" />
               <span className="text-xs text-muted-foreground font-mono">
-                210 40% 98%
+                222.2 47.4% 11.2%
               </span>
             </div>
           </div>
@@ -77,6 +77,29 @@ export function StylePanel({
         </div>
       </CollapsibleSection>
 
+      <CollapsibleSection title="Secondary Colors">
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <label className="text-sm text-foreground">Secondary</label>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded border border-border bg-secondary" />
+              <span className="text-xs text-muted-foreground font-mono">
+                210 40% 96.1%
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center justify-between">
+            <label className="text-sm text-foreground">Secondary Foreground</label>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded border border-border bg-secondary-foreground" />
+              <span className="text-xs text-muted-foreground font-mono">
+                222.2 47.4% 11.2%
+              </span>
+            </div>
+          </div>
+        </div>
+      </CollapsibleSection>
+
       <CollapsibleSection title="Accent Colors">
         <div className="space-y-3">
           <div className="flex items-center justify-between">
@@ -84,7 +107,94 @@ export function StylePanel({
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded border border-border bg-accent" />
               <span className="text-xs text-muted-foreground font-mono">
-                217.2 32.6% 17.5%
+                210 40% 96.1%
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center justify-between">
+            <label className="text-sm text-foreground">Accent Foreground</label>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded border border-border bg-accent-foreground" />
+              <span className="text-xs text-muted-foreground font-mono">
+                222.2 47.4% 11.2%
+              </span>
+            </div>
+          </div>
+        </div>
+      </CollapsibleSection>
+
+      <CollapsibleSection title="Muted Colors">
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <label className="text-sm text-foreground">Muted</label>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded border border-border bg-muted" />
+              <span className="text-xs text-muted-foreground font-mono">
+                210 40% 96.1%
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center justify-between">
+            <label className="text-sm text-foreground">Muted Foreground</label>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded border border-border bg-muted-foreground" />
+              <span className="text-xs text-muted-foreground font-mono">
+                215.4 16.3% 46.9%
+              </span>
+            </div>
+          </div>
+        </div>
+      </CollapsibleSection>
+
+      <CollapsibleSection title="Card Colors">
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <label className="text-sm text-foreground">Card</label>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded border border-border bg-card" />
+              <span className="text-xs text-muted-foreground font-mono">
+                0 0% 100%
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center justify-between">
+            <label className="text-sm text-foreground">Card Foreground</label>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded border border-border bg-card-foreground" />
+              <span className="text-xs text-muted-foreground font-mono">
+                222.2 47.4% 11.2%
+              </span>
+            </div>
+          </div>
+        </div>
+      </CollapsibleSection>
+
+      <CollapsibleSection title="Border Colors">
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <label className="text-sm text-foreground">Border</label>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded border border-border bg-border" />
+              <span className="text-xs text-muted-foreground font-mono">
+                214.3 31.8% 91.4%
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center justify-between">
+            <label className="text-sm text-foreground">Input</label>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded border border-border bg-input" />
+              <span className="text-xs text-muted-foreground font-mono">
+                214.3 31.8% 91.4%
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center justify-between">
+            <label className="text-sm text-foreground">Ring (Focus)</label>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded border-2 border-ring" />
+              <span className="text-xs text-muted-foreground font-mono">
+                217.2 91.2% 59.8%
               </span>
             </div>
           </div>
@@ -102,6 +212,76 @@ export function StylePanel({
               </span>
             </div>
           </div>
+          <div className="flex items-center justify-between">
+            <label className="text-sm text-foreground">Destructive Foreground</label>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded border border-border bg-destructive-foreground" />
+              <span className="text-xs text-muted-foreground font-mono">
+                210 40% 98%
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center justify-between">
+            <label className="text-sm text-foreground">Success</label>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded border border-border" style={{ backgroundColor: 'hsl(142.1 76.2% 36.3%)' }} />
+              <span className="text-xs text-muted-foreground font-mono">
+                142.1 76.2% 36.3%
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center justify-between">
+            <label className="text-sm text-foreground">Success Foreground</label>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded border border-border" style={{ backgroundColor: 'hsl(355.7 100% 97.3%)' }} />
+              <span className="text-xs text-muted-foreground font-mono">
+                355.7 100% 97.3%
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center justify-between">
+            <label className="text-sm text-foreground">Warning</label>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded border border-border" style={{ backgroundColor: 'hsl(38 92% 50%)' }} />
+              <span className="text-xs text-muted-foreground font-mono">
+                38 92% 50%
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center justify-between">
+            <label className="text-sm text-foreground">Warning Foreground</label>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded border border-border" style={{ backgroundColor: 'hsl(355.7 100% 97.3%)' }} />
+              <span className="text-xs text-muted-foreground font-mono">
+                355.7 100% 97.3%
+              </span>
+            </div>
+          </div>
+        </div>
+      </CollapsibleSection>
+
+      <CollapsibleSection title="Chart Colors">
+        <div className="space-y-3">
+          {[
+            { label: 'Chart 1', value: '12 76% 61%' },
+            { label: 'Chart 2', value: '173 58% 39%' },
+            { label: 'Chart 3', value: '197 37% 24%' },
+            { label: 'Chart 4', value: '43 74% 66%' },
+            { label: 'Chart 5', value: '27 87% 67%' },
+          ].map((chart) => (
+            <div key={chart.label} className="flex items-center justify-between">
+              <label className="text-sm text-foreground">{chart.label}</label>
+              <div className="flex items-center gap-2">
+                <div
+                  className="w-8 h-8 rounded border border-border"
+                  style={{ backgroundColor: `hsl(${chart.value})` }}
+                />
+                <span className="text-xs text-muted-foreground font-mono">
+                  {chart.value}
+                </span>
+              </div>
+            </div>
+          ))}
         </div>
       </CollapsibleSection>
 
@@ -133,25 +313,22 @@ export function StylePanel({
 
       <CollapsibleSection title="Font Sizes">
         <div className="space-y-2">
-          {['xs', 'sm', 'base', 'lg', 'xl', '2xl', '3xl', '4xl'].map((size) => (
+          {[
+            { size: 'xs', value: '0.75rem (12px)' },
+            { size: 'sm', value: '0.875rem (14px)' },
+            { size: 'base', value: '1rem (16px)' },
+            { size: 'lg', value: '1.125rem (18px)' },
+            { size: 'xl', value: '1.25rem (20px)' },
+            { size: '2xl', value: '1.5rem (24px)' },
+            { size: '3xl', value: '1.875rem (30px)' },
+            { size: '4xl', value: '2.25rem (36px)' },
+            { size: '5xl', value: '3rem (48px)' },
+            { size: '6xl', value: '3.75rem (60px)' },
+          ].map(({ size, value }) => (
             <div key={size} className="flex items-center justify-between">
               <span className="text-sm text-foreground">{size}</span>
               <span className="text-xs text-muted-foreground font-mono">
-                {size === 'xs'
-                  ? '0.75rem (12px)'
-                  : size === 'sm'
-                  ? '0.875rem (14px)'
-                  : size === 'base'
-                  ? '1rem (16px)'
-                  : size === 'lg'
-                  ? '1.125rem (18px)'
-                  : size === 'xl'
-                  ? '1.25rem (20px)'
-                  : size === '2xl'
-                  ? '1.5rem (24px)'
-                  : size === '3xl'
-                  ? '1.875rem (30px)'
-                  : '2.25rem (36px)'}
+                {value}
               </span>
             </div>
           ))}
@@ -187,7 +364,20 @@ export function StylePanel({
     <div className="p-4 space-y-4">
       <CollapsibleSection title="Spacing Scale" defaultCollapsed={false}>
         <div className="space-y-2">
-          {['0', '1', '2', '3', '4', '6', '8', '12', '16', '24'].map((scale) => (
+          {[
+            { scale: '0', pixels: '0px', rem: 0 },
+            { scale: '1', pixels: '4px', rem: 0.25 },
+            { scale: '2', pixels: '8px', rem: 0.5 },
+            { scale: '3', pixels: '12px', rem: 0.75 },
+            { scale: '4', pixels: '16px', rem: 1 },
+            { scale: '6', pixels: '24px', rem: 1.5 },
+            { scale: '8', pixels: '32px', rem: 2 },
+            { scale: '10', pixels: '40px', rem: 2.5 },
+            { scale: '12', pixels: '48px', rem: 3 },
+            { scale: '16', pixels: '64px', rem: 4 },
+            { scale: '20', pixels: '80px', rem: 5 },
+            { scale: '24', pixels: '96px', rem: 6 },
+          ].map(({ scale, pixels, rem }) => (
             <div key={scale} className="flex items-center justify-between">
               <span className="text-sm text-foreground">{scale}</span>
               <div className="flex items-center gap-2">
@@ -195,49 +385,11 @@ export function StylePanel({
                   className="bg-primary"
                   style={{
                     height: '1rem',
-                    width: `${
-                      scale === '0'
-                        ? 0
-                        : scale === '1'
-                        ? 0.25
-                        : scale === '2'
-                        ? 0.5
-                        : scale === '3'
-                        ? 0.75
-                        : scale === '4'
-                        ? 1
-                        : scale === '6'
-                        ? 1.5
-                        : scale === '8'
-                        ? 2
-                        : scale === '12'
-                        ? 3
-                        : scale === '16'
-                        ? 4
-                        : 6
-                    }rem`,
+                    width: `${rem}rem`,
                   }}
                 />
                 <span className="text-xs text-muted-foreground font-mono">
-                  {scale === '0'
-                    ? '0px'
-                    : scale === '1'
-                    ? '4px'
-                    : scale === '2'
-                    ? '8px'
-                    : scale === '3'
-                    ? '12px'
-                    : scale === '4'
-                    ? '16px'
-                    : scale === '6'
-                    ? '24px'
-                    : scale === '8'
-                    ? '32px'
-                    : scale === '12'
-                    ? '48px'
-                    : scale === '16'
-                    ? '64px'
-                    : '96px'}
+                  {pixels}
                 </span>
               </div>
             </div>
@@ -303,6 +455,7 @@ export function StylePanel({
     <BasePanel
       title="Style Editor"
       subtitle="Customize colors, typography, and spacing"
+      showHeader={false}
     >
       <div className="flex flex-col h-full">
         {/* Style Tabs */}

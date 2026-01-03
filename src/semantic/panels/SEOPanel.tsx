@@ -62,6 +62,7 @@ export function SEOPanel({
     <BasePanel
       title="SEO Manager"
       subtitle="Meta tags, structured data, and sitemap"
+      showHeader={false}
     >
       <div className="flex flex-col h-full">
         <div className="flex-1 overflow-y-auto">

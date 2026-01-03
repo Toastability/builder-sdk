@@ -93,6 +93,7 @@ export function DataPanel({
       <BasePanel
         title="Data Sources"
         subtitle="Connect external data and APIs"
+        showHeader={false}
       >
         <EmptyState
           icon={<Database className="w-12 h-12" />}
@@ -112,6 +113,7 @@ export function DataPanel({
       <BasePanel
         title="Add Data Source"
         subtitle="Connect a new external data source"
+        showHeader={false}
         actions={
           <button
             onClick={() => setShowAddForm(false)}
@@ -234,6 +236,7 @@ export function DataPanel({
     <BasePanel
       title="Data Sources"
       subtitle="Connect external data and APIs"
+      showHeader={false}
       actions={
         <button
           onClick={() => setShowAddForm(true)}

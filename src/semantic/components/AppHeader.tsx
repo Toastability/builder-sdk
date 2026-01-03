@@ -6,6 +6,7 @@
  */
 
 import React from 'react';
+import { X } from 'lucide-react';
 import { NavigationTab } from '../types/semantic-builder';
 
 interface AppHeaderProps {
@@ -29,6 +30,9 @@ interface AppHeaderProps {
 
   /** Optional callback when title changes (makes title editable) */
   onTitleChange?: (newTitle: string) => void;
+
+  /** Optional callback when close button is clicked */
+  onClose?: () => void;
 }
 
 interface TabItem {
@@ -50,6 +54,7 @@ export function AppHeader({
   actions,
   className = '',
   onTitleChange,
+  onClose,
 }: AppHeaderProps) {
   const [isEditingTitle, setIsEditingTitle] = React.useState(false);
   const [editedTitle, setEditedTitle] = React.useState(title || '');
@@ -154,10 +159,24 @@ export function AppHeader({
         </nav>
       </div>
 
-      {/* Right side: Actions */}
-      {actions && (
-        <div className="flex items-center gap-2">{actions}</div>
-      )}
+      {/* Right side: Actions and Close button */}
+      <div className="flex items-center gap-2">
+        {actions}
+        {onClose && (
+          <button
+            onClick={onClose}
+            className="
+              p-2 rounded-md
+              text-muted-foreground hover:text-foreground
+              hover:bg-accent transition-colors
+            "
+            aria-label="Close"
+            title="Close"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
+      </div>
     </header>
   );
 }

@@ -219,7 +219,7 @@ export function AIPanel({
   };
 
   return (
-    <BasePanel title="AI Content Brief" subtitle="AI-generated SEO content strategy and chat">
+    <BasePanel title="AI Content Brief" subtitle="AI-generated SEO content strategy and chat" showHeader={false}>
       <MotionConfig transition={SPRING_CONFIG}>
         <div className="relative flex h-full flex-col">
           {/* Content Brief Display */}
