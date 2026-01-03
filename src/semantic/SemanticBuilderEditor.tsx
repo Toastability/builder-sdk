@@ -66,7 +66,7 @@ export function SemanticBuilderEditor({
       const success = await onSave({
         blocks: page.blocks,
         slug,
-        title,
+        title: page.title,
         seo_title: seoTitle,
         seo_description: seoDescription,
       });
@@ -80,7 +80,7 @@ export function SemanticBuilderEditor({
     } finally {
       setIsSaving(false);
     }
-  }, [page.blocks, slug, title, seoTitle, seoDescription, onSave, preview]);
+  }, [page.blocks, page.title, slug, seoTitle, seoDescription, onSave, preview]);
 
   // Handle slug change
   const handleSlugChange = useCallback((newSlug: string) => {
