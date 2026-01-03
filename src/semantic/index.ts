@@ -26,6 +26,7 @@ export {
   PreviewIframe,
   usePreviewIframe,
 } from './components/PreviewIframe';
+export { ComponentsPanel } from './components/ComponentsPanel';
 
 // Panels
 export { ChatPanel } from './panels/ChatPanel';

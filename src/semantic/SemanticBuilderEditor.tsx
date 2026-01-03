@@ -12,6 +12,7 @@ import { SideNavigation } from './components/SideNavigation';
 import { AppHeader, ActionButton } from './components/AppHeader';
 import { PreviewIframe, usePreviewIframe } from './components/PreviewIframe';
 import { BasePanel, EmptyState } from './components/BasePanel';
+import { ComponentsPanel } from './components/ComponentsPanel';
 import { ChatPanel } from './panels/ChatPanel';
 import { AIPanel } from './panels/AIPanel';
 import { StylePanel } from './panels/StylePanel';
@@ -135,20 +136,15 @@ export function SemanticBuilderEditor({
 
       case 'components':
         return (
-          <BasePanel
-            title="Components"
-            subtitle="Search for UI components"
-          >
-            <EmptyState
-              icon={<div className="text-4xl">🧩</div>}
-              title="Component Registry"
-              description="Search and browse 604 UI components from @opensite/ui. Use natural language to find the perfect component."
-              action={{
-                label: 'Search Components',
-                onClick: () => console.log('Search components'),
-              }}
-            />
-          </BasePanel>
+          <ComponentsPanel
+            pageId={page.id}
+            websiteId={websiteId}
+            blocks={page.blocks}
+            onBlocksChange={(newBlocks) => {
+              // TODO: Handle blocks update
+              console.log('Blocks updated from ComponentsPanel:', newBlocks);
+            }}
+          />
         );
 
       case 'preview':
