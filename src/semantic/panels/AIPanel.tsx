@@ -25,6 +25,33 @@ const BUTTON_BASE_STYLES =
 
 const BUTTON_ACTIVE_STYLES = "bg-primary/15 hover:bg-primary/19 border-primary/10 text-primary";
 
+// Helper function to parse word count from string format (e.g., "1,200-1,600" -> 1400)
+const parseWordCount = (wordCount: string | number): number => {
+  // If already a number, return it
+  if (typeof wordCount === "number") {
+    return wordCount;
+  }
+
+  // Remove commas and whitespace
+  const cleaned = wordCount.replace(/,/g, "").trim();
+
+  // Check if it's a range (e.g., "1200-1600")
+  if (cleaned.includes("-")) {
+    const parts = cleaned.split("-");
+    const min = parseInt(parts[0], 10);
+    const max = parseInt(parts[1], 10);
+
+    // Return midpoint of range
+    if (!isNaN(min) && !isNaN(max)) {
+      return Math.round((min + max) / 2);
+    }
+  }
+
+  // Try to parse as single number
+  const parsed = parseInt(cleaned, 10);
+  return isNaN(parsed) ? 0 : parsed;
+};
+
 // Helper Components for Visualizations
 
 const SearchIntentBadge = ({ intent }: { intent: string }) => {
@@ -324,7 +351,7 @@ export function AIPanel({
                 {/* Recommended Word Count */}
                 {contentBrief.recommended_word_count && (
                   <CollapsibleSection title="Recommended Word Count" defaultCollapsed={false}>
-                    <WordCountGauge targetCount={contentBrief.recommended_word_count} />
+                    <WordCountGauge targetCount={parseWordCount(contentBrief.recommended_word_count)} />
                   </CollapsibleSection>
                 )}
 

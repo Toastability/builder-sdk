@@ -112,7 +112,7 @@ export function ResizableLayout({
       <div className="border bg-border" data-divider />
 
       {/* Right Panel */}
-      <div className="flex-1 overflow-hidden" data-panel="right">
+      <div className="flex-1 overflow-hidden" style={{ minWidth: "450px" }} data-panel="right">
         {rightPanel}
       </div>
     </div>
