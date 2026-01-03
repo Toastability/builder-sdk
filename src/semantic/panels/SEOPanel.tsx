@@ -36,18 +36,37 @@ export function SEOPanel({
     robots: 'index, follow',
   });
 
+  // Debug logging
+  useEffect(() => {
+    console.log('[SEOPanel] Props received:', {
+      seoTitle,
+      seoDescription,
+      contentBrief: contentBrief ? 'present' : 'null/undefined',
+      hasSecondaryKeywords: !!contentBrief?.secondary_keywords,
+    });
+  }, [seoTitle, seoDescription, contentBrief]);
+
   // Update state when props change (e.g., when page data loads)
   useEffect(() => {
-    if (seoTitle || seoDescription || contentBrief) {
-      setSeoData((prev) => ({
+    console.log('[SEOPanel] useEffect triggered, updating state with:', {
+      seoTitle,
+      seoDescription,
+      hasContentBrief: !!contentBrief,
+    });
+
+    // Always update if we have any data, even if just empty strings
+    setSeoData((prev) => {
+      const newData = {
         ...prev,
         title: seoTitle || prev.title,
         description: seoDescription || prev.description,
         keywords: contentBrief?.secondary_keywords?.join(', ') || prev.keywords,
         ogTitle: seoTitle || prev.ogTitle,
         ogDescription: seoDescription || prev.ogDescription,
-      }));
-    }
+      };
+      console.log('[SEOPanel] Setting seoData to:', newData);
+      return newData;
+    });
   }, [seoTitle, seoDescription, contentBrief]);
 
   const handleChange = (field: string, value: string) => {

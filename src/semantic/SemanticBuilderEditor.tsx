@@ -97,6 +97,16 @@ export function SemanticBuilderEditor({
       contentBrief,
     };
 
+    // Debug logging
+    console.log('[SemanticBuilderEditor] Panel props:', {
+      activePanel,
+      page_seo_title: page.seo_title,
+      page_seo_description: page.seo_description,
+      panelProps_seoTitle: panelProps.seoTitle,
+      panelProps_seoDescription: panelProps.seoDescription,
+      contentBrief_present: !!contentBrief,
+    });
+
     switch (activePanel) {
       case 'chat':
         return <ChatPanel {...panelProps} />;
