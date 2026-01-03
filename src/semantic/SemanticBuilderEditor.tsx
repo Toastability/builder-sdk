@@ -28,6 +28,7 @@ import {
 export function SemanticBuilderEditor({
   page,
   websiteId,
+  contentBrief,
   onSave,
   onStyleChange: _onStyleChange,
   initialPanel = 'chat',
@@ -91,6 +92,9 @@ export function SemanticBuilderEditor({
         // TODO: Update blocks and trigger save
         console.log('Blocks changed:', newBlocks);
       },
+      seoTitle: page.seo_title,
+      seoDescription: page.seo_description,
+      contentBrief,
     };
 
     switch (activePanel) {

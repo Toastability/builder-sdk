@@ -5,7 +5,7 @@
  * TODO: Implement SEO editing with backend integration
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Code } from 'lucide-react';
 import { BasePanel, CollapsibleSection } from '../components/BasePanel';
 import { BasePanelProps } from '../types/semantic-builder';
@@ -17,18 +17,38 @@ export function SEOPanel({
   websiteId: _websiteId,
   blocks: _blocks,
   onBlocksChange: _onBlocksChange,
+  seoTitle,
+  seoDescription,
+  contentBrief,
 }: SEOPanelProps) {
+  // Extract keywords from content brief if available
+  const initialKeywords = contentBrief?.secondary_keywords?.join(', ') || '';
+
   const [seoData, setSeoData] = useState({
-    title: '',
-    description: '',
-    keywords: '',
-    ogTitle: '',
-    ogDescription: '',
+    title: seoTitle || '',
+    description: seoDescription || '',
+    keywords: initialKeywords,
+    ogTitle: seoTitle || '',
+    ogDescription: seoDescription || '',
     ogImage: '',
     twitterCard: 'summary_large_image',
     canonical: '',
     robots: 'index, follow',
   });
+
+  // Update state when props change (e.g., when page data loads)
+  useEffect(() => {
+    if (seoTitle || seoDescription || contentBrief) {
+      setSeoData((prev) => ({
+        ...prev,
+        title: seoTitle || prev.title,
+        description: seoDescription || prev.description,
+        keywords: contentBrief?.secondary_keywords?.join(', ') || prev.keywords,
+        ogTitle: seoTitle || prev.ogTitle,
+        ogDescription: seoDescription || prev.ogDescription,
+      }));
+    }
+  }, [seoTitle, seoDescription, contentBrief]);
 
   const handleChange = (field: string, value: string) => {
     setSeoData((prev) => ({ ...prev, [field]: value }));

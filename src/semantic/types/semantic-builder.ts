@@ -26,10 +26,15 @@ export interface SemanticBuilderEditorProps {
     blocks: ChaiBlock[];
     slug: string;
     title: string;
+    seo_title?: string;
+    seo_description?: string;
   };
 
   /** Website ID for context */
   websiteId: string | number;
+
+  /** Optional content brief data for SEO panel */
+  contentBrief?: any;
 
   /** Callback when page is saved */
   onSave: (data: {
@@ -65,6 +70,9 @@ export interface BasePanelProps {
   websiteId: string | number;
   blocks: ChaiBlock[];
   onBlocksChange?: (blocks: ChaiBlock[]) => void;
+  seoTitle?: string;
+  seoDescription?: string;
+  contentBrief?: any;
 }
 
 /**
