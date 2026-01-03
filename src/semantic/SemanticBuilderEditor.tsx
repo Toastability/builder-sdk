@@ -33,6 +33,7 @@ export function SemanticBuilderEditor({
   onSave,
   onStyleChange: _onStyleChange,
   onChatMessage,
+  onPanelChange,
   initialPanel = 'chat',
   initialTab = 'preview',
 }: SemanticBuilderEditorProps) {
@@ -61,6 +62,12 @@ export function SemanticBuilderEditor({
   useEffect(() => {
     preview.setUrl(previewUrl);
   }, [previewUrl]);
+
+  // Sync SEO fields when page prop changes (e.g., after content brief generation)
+  useEffect(() => {
+    setSeoTitle(page.seo_title || '');
+    setSeoDescription(page.seo_description || '');
+  }, [page.seo_title, page.seo_description]);
 
   // Handle save
   const handleSave = useCallback(async () => {
@@ -104,6 +111,12 @@ export function SemanticBuilderEditor({
       setSeoDescription(value);
     }
   }, []);
+
+  // Handle panel change
+  const handlePanelChange = useCallback((panel: PanelType) => {
+    setActivePanel(panel);
+    onPanelChange?.(panel);
+  }, [onPanelChange]);
 
   // Render active panel content
   const renderPanelContent = () => {
@@ -232,7 +245,7 @@ export function SemanticBuilderEditor({
       {/* Side Navigation */}
       <SideNavigation
         activePanel={activePanel}
-        onPanelChange={setActivePanel}
+        onPanelChange={handlePanelChange}
       />
 
       {/* Active Panel Content */}

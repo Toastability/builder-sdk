@@ -62,6 +62,9 @@ export interface SemanticBuilderEditorProps {
     websiteId: string | number;
   }) => Promise<string>;
 
+  /** Callback when active panel changes */
+  onPanelChange?: (panel: PanelType) => void;
+
   /** Optional initial active panel */
   initialPanel?: PanelType;
 

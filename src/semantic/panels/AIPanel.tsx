@@ -224,7 +224,66 @@ export function AIPanel({
         <div className="relative flex h-full flex-col">
           {/* Content Brief Display */}
           <div className="flex-1 space-y-4 overflow-y-auto p-4">
-            {contentBrief && (
+            {/* Skeleton Loading State */}
+            {isSending && (
+              <div className="space-y-4 animate-pulse">
+                <div className="flex items-center gap-2 border-b border-border pb-2">
+                  <div className="h-5 w-5 rounded bg-muted" />
+                  <div className="h-4 w-48 rounded bg-muted" />
+                </div>
+
+                {/* Primary Keyword Skeleton */}
+                <div className="space-y-2">
+                  <div className="h-4 w-32 rounded bg-muted" />
+                  <div className="h-10 w-full rounded-md bg-muted" />
+                </div>
+
+                {/* Secondary Keywords Skeleton */}
+                <div className="space-y-2">
+                  <div className="h-4 w-40 rounded bg-muted" />
+                  <div className="flex flex-wrap gap-2">
+                    {[...Array(5)].map((_, i) => (
+                      <div key={i} className="h-6 w-24 rounded-md bg-muted" />
+                    ))}
+                  </div>
+                </div>
+
+                {/* Search Intent Skeleton */}
+                <div className="space-y-2">
+                  <div className="h-4 w-28 rounded bg-muted" />
+                  <div className="h-8 w-32 rounded-full bg-muted" />
+                </div>
+
+                {/* Content Outline Skeleton */}
+                <div className="space-y-2">
+                  <div className="h-4 w-36 rounded bg-muted" />
+                  <div className="space-y-2">
+                    {[...Array(4)].map((_, i) => (
+                      <div key={i} className="flex items-start gap-2">
+                        <div className="h-4 w-4 rounded bg-muted flex-shrink-0 mt-0.5" />
+                        <div className="flex-1">
+                          <div className="h-4 w-full rounded bg-muted mb-2" />
+                          <div className="ml-6 space-y-1.5">
+                            {[...Array(2)].map((_, j) => (
+                              <div key={j} className="h-3 w-3/4 rounded bg-muted" />
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Word Count Skeleton */}
+                <div className="space-y-2">
+                  <div className="h-4 w-44 rounded bg-muted" />
+                  <div className="h-20 w-full rounded bg-muted" />
+                </div>
+              </div>
+            )}
+
+            {/* Actual Content Brief */}
+            {!isSending && contentBrief && (
               <div className="space-y-4">
                 <div className="flex items-center gap-2 border-b border-border pb-2">
                   <Sparkles className="h-5 w-5 text-primary" />
@@ -298,7 +357,7 @@ export function AIPanel({
             )}
 
             {/* No content brief message */}
-            {!contentBrief && (
+            {!isSending && !contentBrief && (
               <div className="flex h-full flex-col items-center justify-center py-8">
                 <Sparkles className="mb-4 h-12 w-12 text-muted-foreground" />
                 <h3 className="mb-2 text-lg font-medium text-foreground">No content brief available</h3>
