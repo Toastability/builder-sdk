@@ -5,7 +5,7 @@
  * TODO: Implement data source management and binding
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Database, Plus, Link2, RefreshCw, Settings } from 'lucide-react';
 import { BasePanel, EmptyState } from '../components/BasePanel';
 import { BasePanelProps } from '../types/semantic-builder';
@@ -22,10 +22,10 @@ interface DataSource {
 }
 
 export function DataPanel({
-  pageId,
-  websiteId,
-  blocks,
-  onBlocksChange,
+  pageId: _pageId,
+  websiteId: _websiteId,
+  blocks: _blocks,
+  onBlocksChange: _onBlocksChange,
 }: DataPanelProps) {
   // Placeholder data sources
   const [dataSources] = useState<DataSource[]>([

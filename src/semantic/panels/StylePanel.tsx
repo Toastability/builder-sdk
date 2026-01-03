@@ -5,7 +5,7 @@
  * TODO: Implement full style editing with STYLES.md integration (Phase 2)
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Palette, Type, Space, Square } from 'lucide-react';
 import { BasePanel, CollapsibleSection, EmptyState } from '../components/BasePanel';
 import { BasePanelProps } from '../types/semantic-builder';
@@ -15,10 +15,10 @@ interface StylePanelProps extends BasePanelProps {}
 type StyleTab = 'colors' | 'typography' | 'spacing' | 'components';
 
 export function StylePanel({
-  pageId,
-  websiteId,
-  blocks,
-  onBlocksChange,
+  pageId: _pageId,
+  websiteId: _websiteId,
+  blocks: _blocks,
+  onBlocksChange: _onBlocksChange,
 }: StylePanelProps) {
   const [activeTab, setActiveTab] = useState<StyleTab>('colors');
 

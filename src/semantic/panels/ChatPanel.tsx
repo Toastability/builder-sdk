@@ -5,7 +5,7 @@
  * TODO: Implement AI chat with Octane integration
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Send, User, Bot } from 'lucide-react';
 import { BasePanel, EmptyState } from '../components/BasePanel';
 import { BasePanelProps } from '../types/semantic-builder';
@@ -20,10 +20,10 @@ interface Message {
 interface ChatPanelProps extends BasePanelProps {}
 
 export function ChatPanel({
-  pageId,
-  websiteId,
-  blocks,
-  onBlocksChange,
+  pageId: _pageId,
+  websiteId: _websiteId,
+  blocks: _blocks,
+  onBlocksChange: _onBlocksChange,
 }: ChatPanelProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');

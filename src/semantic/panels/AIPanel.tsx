@@ -5,7 +5,7 @@
  * TODO: Implement AI generation with Octane integration
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Sparkles, Wand2, FileText, Palette } from 'lucide-react';
 import { BasePanel, EmptyState, CollapsibleSection } from '../components/BasePanel';
 import { BasePanelProps } from '../types/semantic-builder';
@@ -15,10 +15,10 @@ interface AIPanelProps extends BasePanelProps {}
 type GenerationType = 'component' | 'content' | 'style';
 
 export function AIPanel({
-  pageId,
-  websiteId,
-  blocks,
-  onBlocksChange,
+  pageId: _pageId,
+  websiteId: _websiteId,
+  blocks: _blocks,
+  onBlocksChange: _onBlocksChange,
 }: AIPanelProps) {
   const [generationType, setGenerationType] = useState<GenerationType | null>(null);
   const [prompt, setPrompt] = useState('');

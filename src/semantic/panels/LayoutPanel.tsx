@@ -5,11 +5,11 @@
  * TODO: Implement drag-and-drop reordering and block management
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Layout, ChevronRight, ChevronDown, Eye, EyeOff, Trash2, Copy } from 'lucide-react';
 import { BasePanel, EmptyState } from '../components/BasePanel';
 import { BasePanelProps } from '../types/semantic-builder';
-import { ChaiBlock } from '@chaibuilder/sdk';
+import { ChaiBlock } from '../../types/chai-block';
 
 interface LayoutPanelProps extends BasePanelProps {}
 
@@ -143,10 +143,10 @@ function BlockTreeItem({
 }
 
 export function LayoutPanel({
-  pageId,
-  websiteId,
+  pageId: _pageId,
+  websiteId: _websiteId,
   blocks,
-  onBlocksChange,
+  onBlocksChange: _onBlocksChange,
 }: LayoutPanelProps) {
   // Convert ChaiBlocks to tree structure
   const buildTree = (blocks: ChaiBlock[]): TreeNode[] => {

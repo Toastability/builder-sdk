@@ -5,7 +5,6 @@
  * (Chat, AI, Style, SEO, Data, Layout)
  */
 
-import React from 'react';
 import {
   MessageSquare,
   Sparkles,

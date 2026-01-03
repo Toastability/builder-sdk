@@ -4,7 +4,7 @@
  * TypeScript interfaces for the semantic UI builder system
  */
 
-import { ChaiBlock } from '../../core/types/ChaiBlock';
+import { ChaiBlock } from '../../types/chai-block';
 
 /**
  * Panel types available in the semantic builder

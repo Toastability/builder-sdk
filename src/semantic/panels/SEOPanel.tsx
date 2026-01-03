@@ -5,18 +5,18 @@
  * TODO: Implement SEO editing with backend integration
  */
 
-import React, { useState } from 'react';
-import { Search, FileText, Share2, Code } from 'lucide-react';
+import { useState } from 'react';
+import { Code } from 'lucide-react';
 import { BasePanel, CollapsibleSection } from '../components/BasePanel';
 import { BasePanelProps } from '../types/semantic-builder';
 
 interface SEOPanelProps extends BasePanelProps {}
 
 export function SEOPanel({
-  pageId,
-  websiteId,
-  blocks,
-  onBlocksChange,
+  pageId: _pageId,
+  websiteId: _websiteId,
+  blocks: _blocks,
+  onBlocksChange: _onBlocksChange,
 }: SEOPanelProps) {
   const [seoData, setSeoData] = useState({
     title: '',

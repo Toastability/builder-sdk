@@ -5,7 +5,7 @@
  * Combines ResizableLayout, SideNavigation, AppHeader, and PreviewIframe
  */
 
-import React, { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import { Save, Settings } from 'lucide-react';
 import { ResizableLayout, usePersistedWidth } from './components/ResizableLayout';
 import { SideNavigation } from './components/SideNavigation';
@@ -28,7 +28,7 @@ export function SemanticBuilderEditor({
   page,
   websiteId,
   onSave,
-  onStyleChange,
+  onStyleChange: _onStyleChange,
   initialPanel = 'chat',
   initialTab = 'preview',
 }: SemanticBuilderEditorProps) {
@@ -46,12 +46,12 @@ export function SemanticBuilderEditor({
   const [leftWidth, setLeftWidth] = usePersistedWidth('semantic-builder', 30);
 
   // Generate preview URL
-  const previewUrl = React.useMemo(() => {
+  const previewUrl = useMemo(() => {
     if (!page.id) return null;
     return `/api/preview/${page.id}`;
   }, [page.id]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     preview.setUrl(previewUrl);
   }, [previewUrl]);
 
