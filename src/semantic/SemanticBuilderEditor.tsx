@@ -40,6 +40,8 @@ export function SemanticBuilderEditor({
   const [isSaving, setIsSaving] = useState(false);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [slug, setSlug] = useState(page.slug || '');
+  const [seoTitle, setSeoTitle] = useState(page.seo_title || '');
+  const [seoDescription, setSeoDescription] = useState(page.seo_description || '');
 
   // Preview state
   const preview = usePreviewIframe();
@@ -63,6 +65,10 @@ export function SemanticBuilderEditor({
     try {
       const success = await onSave({
         blocks: page.blocks,
+        slug,
+        title,
+        seo_title: seoTitle,
+        seo_description: seoDescription,
       });
 
       if (success) {
@@ -74,12 +80,21 @@ export function SemanticBuilderEditor({
     } finally {
       setIsSaving(false);
     }
-  }, [page.blocks, onSave, preview]);
+  }, [page.blocks, slug, title, seoTitle, seoDescription, onSave, preview]);
 
   // Handle slug change
   const handleSlugChange = useCallback((newSlug: string) => {
     setSlug(newSlug);
     // TODO: Trigger save with new slug
+  }, []);
+
+  // Handle SEO field changes
+  const handleSeoChange = useCallback((field: 'title' | 'description', value: string) => {
+    if (field === 'title') {
+      setSeoTitle(value);
+    } else {
+      setSeoDescription(value);
+    }
   }, []);
 
   // Render active panel content
@@ -92,9 +107,10 @@ export function SemanticBuilderEditor({
         // TODO: Update blocks and trigger save
         console.log('Blocks changed:', newBlocks);
       },
-      seoTitle: page.seo_title,
-      seoDescription: page.seo_description,
+      seoTitle,
+      seoDescription,
       contentBrief,
+      onSeoChange: handleSeoChange,
     };
 
     // Debug logging

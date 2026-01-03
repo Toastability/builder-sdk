@@ -40,6 +40,10 @@ export interface SemanticBuilderEditorProps {
   onSave: (data: {
     blocks: ChaiBlock[];
     theme?: any;
+    slug?: string;
+    title?: string;
+    seo_title?: string;
+    seo_description?: string;
   }) => Promise<boolean>;
 
   /** Callback when style changes */
@@ -73,6 +77,7 @@ export interface BasePanelProps {
   seoTitle?: string;
   seoDescription?: string;
   contentBrief?: any;
+  onSeoChange?: (field: 'title' | 'description', value: string) => void;
 }
 
 /**

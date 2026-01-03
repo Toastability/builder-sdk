@@ -20,6 +20,7 @@ export function SEOPanel({
   seoTitle,
   seoDescription,
   contentBrief,
+  onSeoChange,
 }: SEOPanelProps) {
   // Extract keywords from content brief if available
   const initialKeywords = contentBrief?.secondary_keywords?.join(', ') || '';
@@ -67,7 +68,11 @@ export function SEOPanel({
 
   const handleChange = (field: string, value: string) => {
     setSeoData((prev) => ({ ...prev, [field]: value }));
-    // TODO: Trigger auto-save or debounced save
+
+    // Notify parent component of SEO field changes
+    if (onSeoChange && (field === 'title' || field === 'description')) {
+      onSeoChange(field, value);
+    }
   };
 
   const characterCount = (text: string, max: number) => {

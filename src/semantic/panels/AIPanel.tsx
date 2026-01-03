@@ -245,7 +245,11 @@ export function AIPanel({
                   value={chatMessage}
                   onChange={(e) => setChatMessage(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="e.g., 'Add more focus on local keywords' or 'Suggest alternative meta descriptions'"
+                  placeholder={
+                    contentBrief
+                      ? "e.g., 'Add more focus on local keywords' or 'Suggest alternative meta descriptions'"
+                      : "e.g., 'Generate a content brief for this about page'"
+                  }
                   className="
                     flex-1 px-3 py-2 rounded-md
                     bg-background text-foreground text-sm
@@ -253,11 +257,10 @@ export function AIPanel({
                     outline-none
                     focus:ring-2 focus:ring-primary
                   "
-                  disabled={!contentBrief}
                 />
                 <button
                   onClick={handleSendMessage}
-                  disabled={!chatMessage.trim() || isSending || !contentBrief}
+                  disabled={!chatMessage.trim() || isSending}
                   className="
                     px-4 py-2 rounded-md
                     bg-primary text-primary-foreground
