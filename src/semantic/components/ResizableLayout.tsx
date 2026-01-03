@@ -51,12 +51,6 @@ export function ResizableLayout({
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Handle mouse down on divider
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  }, []);
-
   // Handle mouse move during drag
   const handleMouseMove = useCallback(
     (e: MouseEvent) => {
