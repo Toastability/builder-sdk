@@ -6,7 +6,7 @@
  */
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
-import { Save, X } from 'lucide-react';
+import { Save, X, FileText, Box, Eye } from 'lucide-react';
 import { ResizableLayout, usePersistedWidth } from './components/ResizableLayout';
 import { SideNavigation } from './components/SideNavigation';
 import { AppHeader, ActionButton } from './components/AppHeader';
@@ -19,11 +19,19 @@ import { StylePanel } from './panels/StylePanel';
 import { SEOPanel } from './panels/SEOPanel';
 import { DataPanel } from './panels/DataPanel';
 import { LayoutPanel } from './panels/LayoutPanel';
+import { ExpandableIconTabs } from '../core/components/ui/expandable-icon-tabs';
 import {
   SemanticBuilderEditorProps,
   PanelType,
   NavigationTab,
 } from './types/semantic-builder';
+
+// Tab definitions for ExpandableIconTabs
+const PREVIEW_TABS = [
+  { title: "Templates", icon: FileText },
+  { title: "Components", icon: Box },
+  { title: "Preview", icon: Eye },
+] as const;
 
 export function SemanticBuilderEditor({
   page,
@@ -53,6 +61,17 @@ export function SemanticBuilderEditor({
 
   // Persisted layout width
   const [leftWidth, setLeftWidth] = usePersistedWidth('semantic-builder', 30);
+
+  // Tab management for ExpandableIconTabs
+  const selectedTabIndex = useMemo(() => {
+    return PREVIEW_TABS.findIndex(tab => tab.title.toLowerCase() === activeTab);
+  }, [activeTab]);
+
+  const handleTabChange = useCallback((index: number | null) => {
+    if (index === null) return;
+    const nextTab = PREVIEW_TABS[index].title.toLowerCase() as NavigationTab;
+    setActiveTab(nextTab);
+  }, []);
 
   // Generate preview URL
   const previewUrl = useMemo(() => {
@@ -261,10 +280,7 @@ export function SemanticBuilderEditor({
     <div className="flex flex-col h-full">
       {/* App Header */}
       <AppHeader
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
         title={title}
-        subtitle={slug || undefined}
         onTitleChange={handleTitleChange}
         actions={
           <>
@@ -290,6 +306,19 @@ export function SemanticBuilderEditor({
           </>
         }
       />
+
+      {/* Expandable Icon Tabs */}
+      <div className="flex-shrink-0 px-4 py-3 border-b border-border">
+        <div className="bg-white border border-[#e3e8ee] p-1 h-auto flex flex-wrap rounded-lg">
+          <ExpandableIconTabs
+            tabs={PREVIEW_TABS}
+            selectedIndex={selectedTabIndex >= 0 ? selectedTabIndex : 0}
+            onSelectedIndexChange={handleTabChange}
+            selectionRequired
+            tooltipVariant="bottom"
+          />
+        </div>
+      </div>
 
       {/* Active Tab Content */}
       <div className="flex-1 overflow-hidden">

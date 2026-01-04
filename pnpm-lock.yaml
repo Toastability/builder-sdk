@@ -20,6 +20,9 @@ importers:
       '@mhsdesign/jit-browser-tailwindcss':
         specifier: 0.4.2
         version: 0.4.2(ts-node@10.9.2(@swc/core@1.10.4(@swc/helpers@0.5.2))(@types/node@20.17.11)(typescript@5.7.3))
+      '@opensite/hooks':
+        specifier: 2.0.0
+        version: 2.0.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@page-speed/forms':
         specifier: ^0.2.2
         version: 0.2.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(typescript@5.7.3)
@@ -1250,6 +1253,13 @@ packages:
 
   '@open-draft/until@2.1.0':
     resolution: {integrity: sha512-U69T3ItWHvLwGg5eJ0n3I62nWuE6ilHlmz7zM0npLBRvPRd7e6NYmg54vvRtP5mZG7kZqZCFVdsTWo7BPtBujg==}
+
+  '@opensite/hooks@2.0.0':
+    resolution: {integrity: sha512-1ulfGAczQG86fjAh0V/KaVu4uiwtTpzcJBNARemEX2ulvtrh2WLftEsL6gz0afrqd/LzServIaI9s6kUCjX9DQ==}
+    engines: {node: '>=18.0.0', pnpm: '>=9.0.0'}
+    peerDependencies:
+      react: '>=17.0.0'
+      react-dom: '>=17.0.0'
 
   '@page-speed/forms@0.2.2':
     resolution: {integrity: sha512-Nn61IlJQFT/t9Ff5MbTmMejxjOathptHsoHq5p6tyoGpDWvZflEnzFKe62437SMLUuUAopGn2Yf++Up7Shthxw==}
@@ -7152,6 +7162,11 @@ snapshots:
       outvariant: 1.4.3
 
   '@open-draft/until@2.1.0': {}
+
+  '@opensite/hooks@2.0.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+    dependencies:
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
 
   '@page-speed/forms@0.2.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(typescript@5.7.3)':
     dependencies:

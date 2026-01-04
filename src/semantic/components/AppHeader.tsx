@@ -1,26 +1,15 @@
 /**
  * AppHeader Component
  *
- * Top navigation bar with Templates | Components | Preview tabs
- * Matches the UI design from header.png screenshot
+ * Top navigation bar with page title and action buttons
  */
 
-import React from 'react';
-import { X } from 'lucide-react';
-import { NavigationTab } from '../types/semantic-builder';
+import React from "react";
+import { X } from "lucide-react";
 
 interface AppHeaderProps {
-  /** Currently active tab */
-  activeTab: NavigationTab;
-
-  /** Callback when tab is selected */
-  onTabChange: (tab: NavigationTab) => void;
-
   /** Optional title for the header */
   title?: string;
-
-  /** Optional subtitle/page path */
-  subtitle?: string;
 
   /** Optional action buttons */
   actions?: React.ReactNode;
@@ -35,32 +24,18 @@ interface AppHeaderProps {
   onClose?: () => void;
 }
 
-interface TabItem {
-  type: NavigationTab;
-  label: string;
-}
-
-const TABS: TabItem[] = [
-  { type: 'templates', label: 'Templates' },
-  { type: 'components', label: 'Components' },
-  { type: 'preview', label: 'Preview' },
-];
-
 export function AppHeader({
-  activeTab,
-  onTabChange,
   title,
-  subtitle: _subtitle,
   actions,
-  className = '',
+  className = "",
   onTitleChange,
   onClose,
 }: AppHeaderProps) {
   const [isEditingTitle, setIsEditingTitle] = React.useState(false);
-  const [editedTitle, setEditedTitle] = React.useState(title || '');
+  const [editedTitle, setEditedTitle] = React.useState(title || "");
 
   React.useEffect(() => {
-    setEditedTitle(title || '');
+    setEditedTitle(title || "");
   }, [title]);
 
   const handleTitleSubmit = () => {
@@ -71,25 +46,19 @@ export function AppHeader({
   };
 
   const handleTitleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       e.preventDefault();
       handleTitleSubmit();
-    } else if (e.key === 'Escape') {
-      setEditedTitle(title || '');
+    } else if (e.key === "Escape") {
+      setEditedTitle(title || "");
       setIsEditingTitle(false);
     }
   };
 
   return (
     <header
-      className={`
-        flex items-center justify-between
-        px-6 py-2 border-b border-border
-        bg-background
-        ${className}
-      `}
-    >
-      {/* Left side: Title and tabs */}
+      className={`flex items-center justify-between border-b border-border bg-background px-6 py-2 ${className} `}>
+      {/* Left side: Title */}
       <div className="flex items-center gap-6">
         {/* Title */}
         {title && (
@@ -102,58 +71,18 @@ export function AppHeader({
                 onBlur={handleTitleSubmit}
                 onKeyDown={handleTitleKeyDown}
                 autoFocus
-                className="
-                  text-lg font-semibold text-foreground
-                  bg-muted border border-border rounded px-2 py-1
-                  outline-none focus:ring-2 focus:ring-primary
-                "
+                className="rounded border border-border bg-muted px-2 py-1 text-lg font-semibold text-foreground outline-none focus:ring-2 focus:ring-primary"
               />
             ) : (
-              <h1
-                className={`
-                  text-lg font-semibold text-foreground
-                  ${onTitleChange ? 'cursor-pointer hover:text-primary transition-colors' : ''}
-                `}
+              <div
+                className={`text-lg font-semibold text-foreground ${onTitleChange ? "cursor-pointer transition-colors hover:text-primary" : ""} `}
                 onClick={() => onTitleChange && setIsEditingTitle(true)}
-                title={onTitleChange ? 'Click to edit page name' : undefined}
-              >
+                title={onTitleChange ? "Click to edit page name" : undefined}>
                 {title}
-              </h1>
+              </div>
             )}
           </div>
         )}
-
-        {/* Tabs */}
-        <nav
-          className="flex items-center gap-1"
-          role="tablist"
-          aria-label="Builder navigation"
-        >
-          {TABS.map((tab) => {
-            const isActive = activeTab === tab.type;
-
-            return (
-              <button
-                key={tab.type}
-                onClick={() => onTabChange(tab.type)}
-                role="tab"
-                aria-selected={isActive}
-                aria-controls={`panel-${tab.type}`}
-                className={`
-                  px-3 py-1.5 text-sm font-medium
-                  rounded-md transition-all duration-200
-                  ${
-                    isActive
-                      ? 'bg-primary text-primary-foreground shadow-sm'
-                      : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-                  }
-                `}
-              >
-                {tab.label}
-              </button>
-            );
-          })}
-        </nav>
       </div>
 
       {/* Right side: Actions and Close button */}
@@ -162,15 +91,10 @@ export function AppHeader({
         {onClose && (
           <button
             onClick={onClose}
-            className="
-              p-2 rounded-md
-              text-muted-foreground hover:text-foreground
-              hover:bg-accent transition-colors
-            "
+            className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
             aria-label="Close"
-            title="Close"
-          >
-            <X className="w-5 h-5" />
+            title="Close">
+            <X className="h-5 w-5" />
           </button>
         )}
       </div>
@@ -184,7 +108,7 @@ export function AppHeader({
 interface ActionButtonProps {
   onClick: () => void;
   children: React.ReactNode;
-  variant?: 'default' | 'primary' | 'ghost';
+  variant?: "default" | "primary" | "ghost";
   disabled?: boolean;
   loading?: boolean;
   icon?: React.ReactNode;
@@ -194,11 +118,11 @@ interface ActionButtonProps {
 export function ActionButton({
   onClick,
   children,
-  variant = 'default',
+  variant = "default",
   disabled = false,
   loading = false,
   icon,
-  className = '',
+  className = "",
 }: ActionButtonProps) {
   const baseStyles = `
     inline-flex items-center gap-2 px-3 py-1.5
@@ -208,37 +132,22 @@ export function ActionButton({
   `;
 
   const variantStyles = {
-    default: 'bg-background text-foreground border border-border hover:bg-accent',
-    primary: 'bg-primary text-primary-foreground hover:bg-primary/90',
-    ghost: 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+    default: "bg-background text-foreground border border-border hover:bg-accent",
+    primary: "bg-primary text-primary-foreground hover:bg-primary/90",
+    ghost: "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
   };
 
   return (
     <button
       onClick={onClick}
       disabled={disabled || loading}
-      className={`${baseStyles} ${variantStyles[variant]} ${className}`}
-    >
+      className={`${baseStyles} ${variantStyles[variant]} ${className}`}>
       {loading ? (
-        <div className="animate-spin rounded-full h-4 w-4 border-2 border-current border-t-transparent" />
+        <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
       ) : (
         icon
       )}
       {children}
     </button>
   );
-}
-
-/**
- * Get tab by type
- */
-export function getTab(type: NavigationTab): TabItem | undefined {
-  return TABS.find((tab) => tab.type === type);
-}
-
-/**
- * Get all tabs
- */
-export function getAllTabs(): readonly TabItem[] {
-  return TABS;
 }

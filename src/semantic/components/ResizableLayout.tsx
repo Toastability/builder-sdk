@@ -109,7 +109,7 @@ export function ResizableLayout({
       </div>
 
       {/* Divider */}
-      <div className="border bg-border" data-divider />
+      <div className="border-r border-border" data-divider />
 
       {/* Right Panel */}
       <div style={{ flex: "1 0 450px" }} data-panel="right">

@@ -6,6 +6,7 @@
  */
 
 import { MessageSquare, Sparkles, Palette, Search, Database, Layout, type LucideIcon } from "lucide-react";
+import * as AnimatedTooltip from "../../core/components/ui/animated-tooltip";
 import { PanelType } from "../types/semantic-builder";
 
 interface SideNavProps {
@@ -68,36 +69,36 @@ const NAV_ITEMS: NavItem[] = [
 export function SideNavigation({ activePanel, onPanelChange, className = "" }: SideNavProps) {
   return (
     <nav
-      className={`flex w-16 flex-shrink-0 flex-col items-center space-y-2 border-r border-border bg-muted py-4 ${className} `}
+      className={`flex w-16 flex-shrink-0 flex-col border-r border-border bg-muted py-4 ${className} `}
       aria-label="Panel navigation">
-      {NAV_ITEMS.map((item) => {
-        const Icon = item.icon;
-        const isActive = activePanel === item.type;
+      <AnimatedTooltip.Root side="right" className="flex flex-col items-center space-y-2">
+        {NAV_ITEMS.map((item, index) => {
+          const Icon = item.icon;
+          const isActive = activePanel === item.type;
 
-        return (
-          <button
-            key={item.type}
-            onClick={() => onPanelChange(item.type)}
-            className={`group relative z-50 flex h-12 w-12 items-center justify-center rounded-xl transition-all ${
-              isActive
-                ? "bg-primary text-primary-foreground shadow-md"
-                : "text-muted-foreground !shadow-none hover:bg-accent hover:text-accent-foreground hover:!shadow-md"
-            } `}
-            title={item.tooltip}
-            aria-label={item.label}
-            aria-current={isActive ? "true" : undefined}>
-            <Icon className="h-5 w-5" />
+          return (
+            <AnimatedTooltip.Item key={item.type} index={index}>
+              <AnimatedTooltip.Trigger>
+                <button
+                  onClick={() => onPanelChange(item.type)}
+                  className={`relative z-50 flex h-12 w-12 items-center justify-center rounded-xl transition-all ${
+                    isActive
+                      ? "bg-primary text-primary-foreground shadow-md"
+                      : "text-muted-foreground !shadow-none hover:bg-accent hover:text-accent-foreground hover:!shadow-md"
+                  } `}
+                  aria-label={item.label}
+                  aria-current={isActive ? "true" : undefined}>
+                  <Icon className="h-5 w-5" />
 
-            {/* Active indicator */}
-            {isActive && <div className="absolute left-0 top-1/2 h-8 w-1 -translate-y-1/2 rounded-r bg-primary" />}
-
-            {/* Tooltip on hover */}
-            <span className="!group-hover:opacity-100 pointer-events-none absolute left-full ml-2 whitespace-nowrap rounded-lg bg-popover px-2 py-1 text-sm text-popover-foreground opacity-0 shadow-lg transition-opacity">
-              {item.tooltip}
-            </span>
-          </button>
-        );
-      })}
+                  {/* Active indicator */}
+                  {isActive && <div className="absolute left-0 top-1/2 h-8 w-1 -translate-y-1/2 rounded-r bg-primary" />}
+                </button>
+              </AnimatedTooltip.Trigger>
+              <AnimatedTooltip.Content>{item.tooltip}</AnimatedTooltip.Content>
+            </AnimatedTooltip.Item>
+          );
+        })}
+      </AnimatedTooltip.Root>
     </nav>
   );
 }

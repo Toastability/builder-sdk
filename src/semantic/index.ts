@@ -13,8 +13,6 @@ export { SideNavigation, getNavItem, getAllNavItems } from './components/SideNav
 export {
   AppHeader,
   ActionButton,
-  getTab,
-  getAllTabs,
 } from './components/AppHeader';
 export {
   BasePanel,
