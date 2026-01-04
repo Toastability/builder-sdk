@@ -6,7 +6,7 @@
  */
 
 import { useState, useCallback, useMemo, useEffect } from 'react';
-import { Save } from 'lucide-react';
+import { Save, X } from 'lucide-react';
 import { ResizableLayout, usePersistedWidth } from './components/ResizableLayout';
 import { SideNavigation } from './components/SideNavigation';
 import { AppHeader, ActionButton } from './components/AppHeader';
@@ -34,6 +34,7 @@ export function SemanticBuilderEditor({
   onStyleChange: _onStyleChange,
   onChatMessage,
   onPanelChange,
+  onCancel,
   initialPanel = 'chat',
   initialTab = 'preview',
 }: SemanticBuilderEditorProps) {
@@ -266,15 +267,27 @@ export function SemanticBuilderEditor({
         subtitle={slug || undefined}
         onTitleChange={handleTitleChange}
         actions={
-          <ActionButton
-            onClick={handleSave}
-            variant="primary"
-            disabled={isSaving}
-            loading={isSaving}
-            icon={<Save className="w-4 h-4" />}
-          >
-            {isSaving ? 'Saving...' : 'Save'}
-          </ActionButton>
+          <>
+            {onCancel && (
+              <ActionButton
+                onClick={onCancel}
+                variant="ghost"
+                disabled={isSaving}
+                icon={<X className="w-4 h-4" />}
+              >
+                Cancel
+              </ActionButton>
+            )}
+            <ActionButton
+              onClick={handleSave}
+              variant="primary"
+              disabled={isSaving}
+              loading={isSaving}
+              icon={<Save className="w-4 h-4" />}
+            >
+              {isSaving ? 'Saving...' : 'Save'}
+            </ActionButton>
+          </>
         }
       />
 

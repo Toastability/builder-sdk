@@ -104,7 +104,7 @@ export function ResizableLayout({
   return (
     <div ref={containerRef} className={`flex h-full gap-0 ${className}`} data-resizable-layout>
       {/* Left Panel */}
-      <div className="flex-shrink-0 overflow-hidden" style={{ width: `${leftWidth}%` }} data-panel="left">
+      <div className="flex-shrink-0" style={{ width: `${leftWidth}%` }} data-panel="left">
         {leftPanel}
       </div>
 
@@ -112,7 +112,7 @@ export function ResizableLayout({
       <div className="border bg-border" data-divider />
 
       {/* Right Panel */}
-      <div className="flex-1 overflow-hidden" style={{ minWidth: "450px" }} data-panel="right">
+      <div style={{ flex: "1 0 450px" }} data-panel="right">
         {rightPanel}
       </div>
     </div>

@@ -50,7 +50,7 @@ export function AppHeader({
   activeTab,
   onTabChange,
   title,
-  subtitle,
+  subtitle: _subtitle,
   actions,
   className = '',
   onTitleChange,
@@ -84,7 +84,7 @@ export function AppHeader({
     <header
       className={`
         flex items-center justify-between
-        px-6 py-3 border-b border-border
+        px-6 py-2 border-b border-border
         bg-background
         ${className}
       `}
@@ -120,9 +120,6 @@ export function AppHeader({
                 {title}
               </h1>
             )}
-            {subtitle && (
-              <p className="text-xs text-muted-foreground">{subtitle}</p>
-            )}
           </div>
         )}
 
@@ -143,7 +140,7 @@ export function AppHeader({
                 aria-selected={isActive}
                 aria-controls={`panel-${tab.type}`}
                 className={`
-                  px-4 py-2 text-sm font-medium
+                  px-3 py-1.5 text-sm font-medium
                   rounded-md transition-all duration-200
                   ${
                     isActive
@@ -204,7 +201,7 @@ export function ActionButton({
   className = '',
 }: ActionButtonProps) {
   const baseStyles = `
-    inline-flex items-center gap-2 px-4 py-2
+    inline-flex items-center gap-2 px-3 py-1.5
     text-sm font-medium rounded-md
     transition-all duration-200
     disabled:opacity-50 disabled:cursor-not-allowed

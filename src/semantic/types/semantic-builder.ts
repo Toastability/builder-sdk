@@ -65,6 +65,9 @@ export interface SemanticBuilderEditorProps {
   /** Callback when active panel changes */
   onPanelChange?: (panel: PanelType) => void;
 
+  /** Callback when cancel button is clicked (e.g., to navigate away without saving) */
+  onCancel?: () => void;
+
   /** Optional initial active panel */
   initialPanel?: PanelType;
 
