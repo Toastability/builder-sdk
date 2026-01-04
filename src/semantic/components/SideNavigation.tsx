@@ -78,10 +78,10 @@ export function SideNavigation({ activePanel, onPanelChange, className = "" }: S
           <button
             key={item.type}
             onClick={() => onPanelChange(item.type)}
-            className={`group relative flex h-12 w-12 items-center justify-center rounded-lg transition-all duration-200 ${
+            className={`group relative z-50 flex h-12 w-12 items-center justify-center rounded-xl transition-all ${
               isActive
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                ? "bg-primary text-primary-foreground shadow-md"
+                : "text-muted-foreground !shadow-none hover:bg-accent hover:text-accent-foreground hover:!shadow-md"
             } `}
             title={item.tooltip}
             aria-label={item.label}
@@ -92,7 +92,7 @@ export function SideNavigation({ activePanel, onPanelChange, className = "" }: S
             {isActive && <div className="absolute left-0 top-1/2 h-8 w-1 -translate-y-1/2 rounded-r bg-primary" />}
 
             {/* Tooltip on hover */}
-            <span className="pointer-events-none absolute left-full z-[2147483647] ml-2 whitespace-nowrap rounded bg-popover px-2 py-1 text-sm text-popover-foreground opacity-0 shadow-md transition-opacity group-hover:opacity-100">
+            <span className="!group-hover:opacity-100 pointer-events-none absolute left-full ml-2 whitespace-nowrap rounded-lg bg-popover px-2 py-1 text-sm text-popover-foreground opacity-0 shadow-lg transition-opacity">
               {item.tooltip}
             </span>
           </button>
