@@ -93,7 +93,7 @@ export function CollapsibleSection({
   };
 
   return (
-    <div className={`border-b border-border ${className}`}>
+    <div className={`${className}`}>
       {/* Section Header - Clickable */}
       <button
         onClick={handleToggle}

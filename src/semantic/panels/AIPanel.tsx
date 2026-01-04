@@ -13,6 +13,8 @@ import { cn } from "../../lib/utils";
 
 interface AIPanelProps extends BasePanelProps {}
 
+const intentClassNames = "h-4 w-4 min-h-4 min-w-4 max-h-4 max-w-4 flex-1 mt-0.5";
+
 // Animation constants
 const SPRING_CONFIG = {
   type: "spring" as const,
@@ -21,7 +23,7 @@ const SPRING_CONFIG = {
 };
 
 const BUTTON_BASE_STYLES =
-  "bg-muted/50 hover:bg-muted border border-muted cursor-pointer rounded-xl h-10 px-4 flex items-center gap-2 text-sm focus-visible:outline-[1px] -outline-offset-1 outline-primary";
+  "bg-muted hover:bg-primary/15 border cursor-pointer rounded-lg h-8 px-4 flex items-center gap-2 text-sm focus-visible:outline-[1px] -outline-offset-1 outline-primary duration-[1000ms] ease-in-out transition-all";
 
 const BUTTON_ACTIVE_STYLES = "bg-primary/15 hover:bg-primary/19 border-primary/10 text-primary";
 
@@ -62,7 +64,7 @@ const SearchIntentBadge = ({ intent }: { intent: string }) => {
         bg: "bg-blue-500/10",
         text: "text-blue-600",
         border: "border-blue-500/20",
-        icon: <Info className="h-3 w-3" />,
+        icon: <Info className={intentClassNames} />,
       };
     }
     if (intentLower.includes("transactional") || intentLower.includes("commercial")) {
@@ -70,7 +72,7 @@ const SearchIntentBadge = ({ intent }: { intent: string }) => {
         bg: "bg-green-500/10",
         text: "text-green-600",
         border: "border-green-500/20",
-        icon: <TrendingUp className="h-3 w-3" />,
+        icon: <TrendingUp className={intentClassNames} />,
       };
     }
     if (intentLower.includes("navigational")) {
@@ -78,22 +80,21 @@ const SearchIntentBadge = ({ intent }: { intent: string }) => {
         bg: "bg-purple-500/10",
         text: "text-purple-600",
         border: "border-purple-500/20",
-        icon: <Target className="h-3 w-3" />,
+        icon: <Target className={intentClassNames} />,
       };
     }
     return {
       bg: "bg-gray-500/10",
       text: "text-gray-600",
       border: "border-gray-500/20",
-      icon: <Search className="h-3 w-3" />,
+      icon: <Search className={intentClassNames} />,
     };
   };
 
   const styles = getIntentStyles(intent);
 
   return (
-    <div
-      className={cn("inline-flex items-center gap-1.5 rounded-md border p-2", styles.bg, styles.text, styles.border)}>
+    <div className={cn("inline-flex items-start gap-1.5 rounded-md border p-2", styles.bg, styles.text, styles.border)}>
       {styles.icon}
       <span className="text-sm font-medium capitalize">{intent}</span>
     </div>
@@ -146,13 +147,13 @@ const ContentOutlineTree = ({ outline }: { outline: Array<{ section: string; sub
           <div className="flex items-start gap-2 rounded-md bg-muted/50 p-2">
             <List className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
             <div className="flex-1 space-y-2">
-              <h4 className="text-sm font-semibold leading-tight text-foreground">
+              <h4 className="text-xs font-bold uppercase leading-tight text-foreground">
                 {index + 1}. {section.section}
               </h4>
               {section.subsections && section.subsections.length > 0 && (
                 <ul className="space-y-1.5">
                   {section.subsections.map((subsection: string, subIndex: number) => (
-                    <li key={subIndex} className="flex items-start gap-2 pl-6">
+                    <li key={subIndex} className="flex items-start gap-1 pl-3">
                       <span className="mt-0.5 text-xs text-muted-foreground">•</span>
                       <span className="text-xs leading-relaxed text-muted-foreground">{subsection}</span>
                     </li>
@@ -307,7 +308,7 @@ export function AIPanel({
             {/* Actual Content Brief */}
             {!isSending && contentBrief && (
               <div className="space-y-4">
-                <div className="flex items-center gap-2 border-b border-border pb-2">
+                <div className="flex items-center gap-2 border-b border-border pb-4">
                   <Sparkles className="h-5 w-5 text-primary" />
                   <h3 className="text-sm font-semibold text-foreground">Generated Content Brief</h3>
                 </div>
@@ -404,9 +405,9 @@ export function AIPanel({
                       ? "Describe what changes you'd like to make to the content brief..."
                       : "Describe your page topic to generate a content brief..."
                   }
-                  rows={2}
+                  rows={3}
                   style={{ minHeight: "60px" }}
-                  className="max-h-52 w-full resize-none rounded-xl border-none !bg-background p-4 !text-base leading-[1.2] shadow-none placeholder:text-muted-foreground focus-visible:outline-0 focus-visible:ring-0"
+                  className="max-h-52 w-full resize-none border-none !bg-background !p-0 !pb-4 !text-base leading-[1.2] shadow-none placeholder:text-muted-foreground focus-visible:outline-0 focus-visible:ring-0"
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
                       e.preventDefault();
@@ -427,7 +428,7 @@ export function AIPanel({
                   disabled={!userInput.trim() || isSending}
                   className={cn(
                     BUTTON_BASE_STYLES,
-                    "flex w-10 items-center justify-center p-0 transition-all ease-in-out active:scale-95",
+                    "flex w-8 items-center justify-center p-0 transition-all ease-in-out active:scale-95",
                     userInput.trim() && !isSending && BUTTON_ACTIVE_STYLES,
                     (!userInput.trim() || isSending) && "cursor-not-allowed opacity-50",
                   )}>
