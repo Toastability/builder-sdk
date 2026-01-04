@@ -144,7 +144,7 @@ const ContentOutlineTree = ({ outline }: { outline: Array<{ section: string; sub
     <div className="space-y-3">
       {outline.map((section, index) => (
         <div key={index} className="space-y-2">
-          <div className="flex items-start gap-2 rounded-md bg-muted/50 p-2">
+          <div className="flex items-start gap-2 rounded-md border border-border bg-muted/30 p-2">
             <List className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
             <div className="flex-1 space-y-2">
               <h4 className="text-xs font-bold uppercase leading-tight text-foreground">
@@ -154,8 +154,8 @@ const ContentOutlineTree = ({ outline }: { outline: Array<{ section: string; sub
                 <ul className="space-y-1.5">
                   {section.subsections.map((subsection: string, subIndex: number) => (
                     <li key={subIndex} className="flex items-start gap-1 pl-3">
-                      <span className="mt-0.5 text-xs text-muted-foreground">•</span>
-                      <span className="text-xs leading-relaxed text-muted-foreground">{subsection}</span>
+                      <span className="mt-0.5 text-xs text-primary/60">•</span>
+                      <span className="text-xs leading-relaxed text-primary/60">{subsection}</span>
                     </li>
                   ))}
                 </ul>
@@ -246,7 +246,7 @@ export function AIPanel({
       <MotionConfig transition={SPRING_CONFIG}>
         <div className="relative flex h-full flex-col">
           {/* Content Brief Display */}
-          <div className="flex-1 space-y-4 overflow-y-auto p-4">
+          <div className="thin-scrollbars flex-1 space-y-4 overflow-y-auto p-4">
             {/* Skeleton Loading State */}
             {isSending && (
               <div className="animate-pulse space-y-4">
@@ -393,21 +393,17 @@ export function AIPanel({
 
           {/* Input Container - Fixed at bottom */}
           <motion.div ref={inputContainerRef} className="flex-shrink-0 border-t border-border bg-background p-4">
-            <div className="rounded-2xl border border-muted bg-muted p-1">
+            <div className="rounded-md border bg-white p-2">
               {/* Text Input Area */}
               <div className="relative">
                 <textarea
                   ref={textareaRef}
                   value={userInput}
                   autoFocus
-                  placeholder={
-                    contentBrief
-                      ? "Describe what changes you'd like to make to the content brief..."
-                      : "Describe your page topic to generate a content brief..."
-                  }
-                  rows={3}
+                  placeholder={contentBrief ? "Enter new primary page topic..." : "Enter primary page topic..."}
+                  rows={2}
                   style={{ minHeight: "60px" }}
-                  className="max-h-52 w-full resize-none border-none !bg-background !p-0 !pb-4 !text-base leading-[1.2] shadow-none placeholder:text-muted-foreground focus-visible:outline-0 focus-visible:ring-0"
+                  className="max-h-52 w-full resize-none border-none !bg-transparent !p-0 !pb-4 !text-base leading-[1.2] shadow-none placeholder:text-muted-foreground focus-visible:outline-0 focus-visible:ring-0"
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && !e.shiftKey) {
                       e.preventDefault();
@@ -420,7 +416,7 @@ export function AIPanel({
               </div>
 
               {/* Control Buttons Row */}
-              <div className="flex justify-end rounded-2xl border border-muted bg-transparent p-1">
+              <div className="flex justify-end bg-transparent p-1">
                 {/* Send Button */}
                 <button
                   type="button"

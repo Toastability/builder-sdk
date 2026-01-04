@@ -5,16 +5,8 @@
  * (Chat, AI, Style, SEO, Data, Layout)
  */
 
-import {
-  MessageSquare,
-  Sparkles,
-  Palette,
-  Search,
-  Database,
-  Layout,
-  type LucideIcon,
-} from 'lucide-react';
-import { PanelType } from '../types/semantic-builder';
+import { MessageSquare, Sparkles, Palette, Search, Database, Layout, type LucideIcon } from "lucide-react";
+import { PanelType } from "../types/semantic-builder";
 
 interface SideNavProps {
   /** Currently active panel */
@@ -36,58 +28,48 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   {
-    type: 'chat',
+    type: "chat",
     icon: MessageSquare,
-    label: 'Chat',
-    tooltip: 'AI Chat Assistant',
+    label: "Chat",
+    tooltip: "AI Chat Assistant",
   },
   {
-    type: 'ai',
+    type: "ai",
     icon: Sparkles,
-    label: 'AI',
-    tooltip: 'AI Content Brief',
+    label: "AI",
+    tooltip: "AI Content Brief",
   },
   {
-    type: 'style',
+    type: "style",
     icon: Palette,
-    label: 'Style',
-    tooltip: 'Style Editor',
+    label: "Style",
+    tooltip: "Style Editor",
   },
   {
-    type: 'seo',
+    type: "seo",
     icon: Search,
-    label: 'SEO',
-    tooltip: 'SEO Management',
+    label: "SEO",
+    tooltip: "SEO Management",
   },
   {
-    type: 'data',
+    type: "data",
     icon: Database,
-    label: 'Data',
-    tooltip: 'Data Sources',
+    label: "Data",
+    tooltip: "Data Sources",
   },
   {
-    type: 'layout',
+    type: "layout",
     icon: Layout,
-    label: 'Layout',
-    tooltip: 'Page Structure',
+    label: "Layout",
+    tooltip: "Page Structure",
   },
 ];
 
-export function SideNavigation({
-  activePanel,
-  onPanelChange,
-  className = '',
-}: SideNavProps) {
+export function SideNavigation({ activePanel, onPanelChange, className = "" }: SideNavProps) {
   return (
     <nav
-      className={`
-        flex flex-col items-center py-4 space-y-2
-        bg-muted border-r border-border
-        w-16 flex-shrink-0
-        ${className}
-      `}
-      aria-label="Panel navigation"
-    >
+      className={`flex w-16 flex-shrink-0 flex-col items-center space-y-2 border-r border-border bg-muted py-4 ${className} `}
+      aria-label="Panel navigation">
       {NAV_ITEMS.map((item) => {
         const Icon = item.icon;
         const isActive = activePanel === item.type;
@@ -96,39 +78,21 @@ export function SideNavigation({
           <button
             key={item.type}
             onClick={() => onPanelChange(item.type)}
-            className={`
-              relative group
-              flex items-center justify-center
-              w-12 h-12 rounded-lg
-              transition-all duration-200
-              ${
-                isActive
-                  ? 'bg-primary text-primary-foreground shadow-sm'
-                  : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-              }
-            `}
+            className={`group relative flex h-12 w-12 items-center justify-center rounded-lg transition-all duration-200 ${
+              isActive
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+            } `}
             title={item.tooltip}
             aria-label={item.label}
-            aria-current={isActive ? 'true' : undefined}
-          >
-            <Icon className="w-5 h-5" />
+            aria-current={isActive ? "true" : undefined}>
+            <Icon className="h-5 w-5" />
 
             {/* Active indicator */}
-            {isActive && (
-              <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-primary rounded-r" />
-            )}
+            {isActive && <div className="absolute left-0 top-1/2 h-8 w-1 -translate-y-1/2 rounded-r bg-primary" />}
 
             {/* Tooltip on hover */}
-            <span
-              className="
-                absolute left-full ml-2 px-2 py-1
-                bg-popover text-popover-foreground text-sm
-                rounded shadow-md whitespace-nowrap
-                opacity-0 group-hover:opacity-100
-                pointer-events-none transition-opacity
-                z-50
-              "
-            >
+            <span className="pointer-events-none absolute left-full z-[2147483647] ml-2 whitespace-nowrap rounded bg-popover px-2 py-1 text-sm text-popover-foreground opacity-0 shadow-md transition-opacity group-hover:opacity-100">
               {item.tooltip}
             </span>
           </button>
