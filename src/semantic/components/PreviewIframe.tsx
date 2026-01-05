@@ -114,10 +114,10 @@ export function PreviewIframe({
   return (
     <div className={`flex h-full flex-col bg-background ${className}`} data-preview-iframe>
       {/* Left Section: View Tabs */}
-      {viewTabs && <div className="flex flex-1 justify-center">{viewTabs}</div>}
 
       {/* Preview Navigation Bar */}
-      <div className="flex flex-shrink-0 items-center gap-3 border-b border-border px-4 py-3">
+      <div className="flex flex-shrink-0 items-center justify-between gap-3 border-b border-border p-2">
+        {viewTabs && <div className="flex">{viewTabs}</div>}
         {/* Left Section: Actions and Slug */}
         <div className="flex items-center gap-2">
           {/* URL/Slug Input - Much Narrower */}
