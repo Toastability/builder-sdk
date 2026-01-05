@@ -146,7 +146,7 @@ export function ExpandableIconTabs({
           onClick={() => handleSelect(index)}
           transition={transition}
           className={cn(
-            "relative flex items-center text-nowrap rounded-md px-4 py-2 text-sm font-semibold transition-colors duration-300",
+            "relative flex items-center text-nowrap rounded-md px-4 py-2 text-xs font-semibold transition-colors duration-300",
             isSelected
               ? cn("bg-primary !text-white", activeColor)
               : "text-muted-foreground hover:bg-muted hover:text-foreground",

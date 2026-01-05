@@ -5,11 +5,11 @@
  * Adapted from v0-clone WebPreview pattern
  */
 
-import React, { useState, useRef, useEffect } from 'react';
-import { RefreshCw, Maximize2, Minimize2, ExternalLink, Monitor, Tablet, Smartphone } from 'lucide-react';
-import { ExpandableIconTabs } from '../../core/components/ui/expandable-icon-tabs';
+import React, { useState, useRef, useEffect } from "react";
+import { RefreshCw, Maximize2, Minimize2, ExternalLink, Monitor, Tablet, Smartphone } from "lucide-react";
+import { ExpandableIconTabs } from "../../core/components/ui/expandable-icon-tabs";
 
-export type DeviceType = 'desktop' | 'tablet' | 'phone';
+export type DeviceType = "desktop" | "tablet" | "phone";
 
 interface PreviewIframeProps {
   /** Preview URL to render */
@@ -45,21 +45,21 @@ interface PreviewIframeProps {
 
 // Device viewport dimensions
 const DEVICE_DIMENSIONS = {
-  desktop: { width: '100%', height: '100%', maxWidth: '100%' },
-  tablet: { width: '768px', height: '1024px', maxWidth: '100%' },
-  phone: { width: '375px', height: '667px', maxWidth: '100%' },
+  desktop: { width: "100%", height: "100%", maxWidth: "100%" },
+  tablet: { width: "768px", height: "1024px", maxWidth: "100%" },
+  phone: { width: "375px", height: "667px", maxWidth: "100%" },
 } as const;
 
 // Device preview tabs
 const DEVICE_TABS = [
-  { title: 'Desktop', icon: Monitor },
-  { title: 'Tablet', icon: Tablet },
-  { title: 'Phone', icon: Smartphone },
+  { title: "Desktop", icon: Monitor },
+  { title: "Tablet", icon: Tablet },
+  { title: "Phone", icon: Smartphone },
 ] as const;
 
 export function PreviewIframe({
   url,
-  slug = '',
+  slug = "",
   onSlugChange,
   isFullscreen = false,
   onFullscreenToggle,
@@ -67,11 +67,11 @@ export function PreviewIframe({
   onRefresh,
   isLoading = false,
   viewTabs,
-  className = '',
+  className = "",
 }: PreviewIframeProps) {
   const [isEditingSlug, setIsEditingSlug] = useState(false);
   const [draftSlug, setDraftSlug] = useState(slug);
-  const [selectedDevice, setSelectedDevice] = useState<DeviceType>('desktop');
+  const [selectedDevice, setSelectedDevice] = useState<DeviceType>("desktop");
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -96,9 +96,9 @@ export function PreviewIframe({
   };
 
   const handleSlugKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       handleSlugSubmit();
-    } else if (e.key === 'Escape') {
+    } else if (e.key === "Escape") {
       setDraftSlug(slug);
       setIsEditingSlug(false);
     }
@@ -106,45 +106,29 @@ export function PreviewIframe({
 
   const handleOpenInNewTab = () => {
     if (url) {
-      window.open(url, '_blank', 'noopener,noreferrer');
+      window.open(url, "_blank", "noopener,noreferrer");
     }
   };
 
   const handleDeviceChange = (index: number | null) => {
     if (index === null) return;
-    const deviceTypes: DeviceType[] = ['desktop', 'tablet', 'phone'];
+    const deviceTypes: DeviceType[] = ["desktop", "tablet", "phone"];
     setSelectedDevice(deviceTypes[index]);
   };
 
   const deviceDimensions = DEVICE_DIMENSIONS[selectedDevice];
 
   return (
-    <div
-      className={`flex flex-col h-full bg-background ${className}`}
-      data-preview-iframe
-    >
+    <div className={`flex h-full flex-col bg-background ${className}`} data-preview-iframe>
+      {/* Left Section: View Tabs */}
+      {viewTabs && <div className="flex flex-1 justify-center">{viewTabs}</div>}
+
       {/* Preview Navigation Bar */}
-      <div className="flex-shrink-0 flex items-center gap-3 px-4 py-3 border-b border-border">
+      <div className="flex flex-shrink-0 items-center gap-3 border-b border-border px-4 py-3">
         {/* Left Section: Actions and Slug */}
         <div className="flex items-center gap-2">
-          {/* Refresh Button */}
-          <button
-            onClick={onRefresh}
-            disabled={isLoading}
-            className="
-              p-2 rounded-md
-              text-muted-foreground hover:text-foreground
-              hover:bg-accent transition-colors
-              disabled:opacity-50 disabled:cursor-not-allowed
-            "
-            title="Refresh preview"
-            aria-label="Refresh preview"
-          >
-            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-          </button>
-
           {/* URL/Slug Input - Much Narrower */}
-          <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-muted w-48 min-w-[12rem] max-w-[16rem]">
+          <div className="flex w-48 min-w-[12rem] max-w-[24rem] items-center gap-2 rounded-md bg-muted px-3 py-2">
             {isEditingSlug ? (
               <input
                 ref={inputRef}
@@ -153,58 +137,27 @@ export function PreviewIframe({
                 onChange={(e) => setDraftSlug(e.target.value)}
                 onBlur={handleSlugSubmit}
                 onKeyDown={handleSlugKeyDown}
-                className="
-                  w-full bg-transparent text-sm font-mono
-                  text-foreground outline-none
-                "
+                className="w-full bg-transparent !p-0 font-mono text-sm text-foreground !outline-none"
                 placeholder="/page-slug"
               />
             ) : (
               <button
                 onClick={() => setIsEditingSlug(true)}
-                className="
-                  w-full text-left text-sm font-mono
-                  text-foreground hover:text-primary
-                  transition-colors truncate
-                "
-                title={slug || '/untitled'}
-              >
-                {slug || '/untitled'}
+                className="w-full truncate text-left font-mono text-sm text-foreground transition-colors hover:text-primary"
+                title={slug || "/untitled"}>
+                {slug || "/untitled"}
               </button>
             )}
           </div>
-
-          {/* Open in New Tab */}
-          <button
-            onClick={handleOpenInNewTab}
-            disabled={!url}
-            className="
-              p-2 rounded-md
-              text-muted-foreground hover:text-foreground
-              hover:bg-accent transition-colors
-              disabled:opacity-50 disabled:cursor-not-allowed
-            "
-            title="Open in new tab"
-            aria-label="Open in new tab"
-          >
-            <ExternalLink className="w-4 h-4" />
-          </button>
         </div>
-
-        {/* Center Section: View Tabs */}
-        {viewTabs && (
-          <div className="flex-1 flex justify-center">
-            {viewTabs}
-          </div>
-        )}
 
         {/* Right Section: Device Tabs and Fullscreen */}
         <div className="flex items-center gap-2">
           {/* Device Preview Tabs */}
-          <div className="bg-white border border-[#e3e8ee] p-1 h-auto flex flex-wrap rounded-lg">
+          <div className="flex h-auto flex-wrap rounded-lg border border-[#e3e8ee] bg-white p-1">
             <ExpandableIconTabs
               tabs={DEVICE_TABS}
-              selectedIndex={['desktop', 'tablet', 'phone'].indexOf(selectedDevice)}
+              selectedIndex={["desktop", "tablet", "phone"].indexOf(selectedDevice)}
               onSelectedIndexChange={handleDeviceChange}
               selectionRequired
               tooltipVariant="bottom"
@@ -215,35 +168,21 @@ export function PreviewIframe({
           {onFullscreenToggle && (
             <button
               onClick={onFullscreenToggle}
-              className="
-                p-2 rounded-md
-                text-muted-foreground hover:text-foreground
-                hover:bg-accent transition-colors
-              "
-              title={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
-              aria-label={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
-            >
-              {isFullscreen ? (
-                <Minimize2 className="w-4 h-4" />
-              ) : (
-                <Maximize2 className="w-4 h-4" />
-              )}
+              className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+              title={isFullscreen ? "Exit fullscreen" : "Fullscreen"}
+              aria-label={isFullscreen ? "Exit fullscreen" : "Fullscreen"}>
+              {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
             </button>
           )}
         </div>
       </div>
 
       {/* Preview Body */}
-      <div className="flex-1 relative bg-muted/50 overflow-auto">
+      <div className="relative flex-1 overflow-auto bg-muted/50">
         {!url ? (
-          <div className="flex flex-col items-center justify-center h-full text-center p-8">
-            <div className="text-muted-foreground mb-2">
-              <svg
-                className="w-16 h-16 mx-auto"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
+          <div className="flex h-full flex-col items-center justify-center p-8 text-center">
+            <div className="mb-2 text-muted-foreground">
+              <svg className="mx-auto h-16 w-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -252,28 +191,23 @@ export function PreviewIframe({
                 />
               </svg>
             </div>
-            <p className="text-sm font-medium text-foreground">
-              No preview available
-            </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Your page will appear here when you add content
-            </p>
+            <p className="text-sm font-medium text-foreground">No preview available</p>
+            <p className="mt-1 text-xs text-muted-foreground">Your page will appear here when you add content</p>
           </div>
         ) : (
-          <div className="flex items-start justify-center min-h-full p-4">
+          <div className="flex min-h-full items-start justify-center p-0">
             <div
-              className="bg-white shadow-2xl border border-border transition-all duration-300"
+              className="border-none bg-white transition-all duration-300"
               style={{
                 width: deviceDimensions.width,
                 height: deviceDimensions.height,
                 maxWidth: deviceDimensions.maxWidth,
-              }}
-            >
+              }}>
               <iframe
                 key={refreshKey}
                 ref={iframeRef}
                 src={url}
-                className="w-full h-full border-0"
+                className="h-full w-full border-0"
                 title="Page preview"
                 sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
                 loading="lazy"
@@ -284,12 +218,10 @@ export function PreviewIframe({
 
         {/* Loading Overlay */}
         {isLoading && (
-          <div className="absolute inset-0 bg-background/50 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center justify-center bg-background/50">
             <div className="flex flex-col items-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent" />
-              <p className="text-sm text-muted-foreground mt-2">
-                Loading preview...
-              </p>
+              <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+              <p className="mt-2 text-sm text-muted-foreground">Loading preview...</p>
             </div>
           </div>
         )}
