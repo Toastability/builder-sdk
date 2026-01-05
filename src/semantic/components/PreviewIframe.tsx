@@ -6,7 +6,7 @@
  */
 
 import React, { useState, useRef, useEffect } from "react";
-import { RefreshCw, Maximize2, Minimize2, ExternalLink, Monitor, Tablet, Smartphone } from "lucide-react";
+import { Maximize2, Minimize2, Monitor, Tablet, Smartphone } from "lucide-react";
 import { ExpandableIconTabs } from "../../core/components/ui/expandable-icon-tabs";
 
 export type DeviceType = "desktop" | "tablet" | "phone";
@@ -64,7 +64,6 @@ export function PreviewIframe({
   isFullscreen = false,
   onFullscreenToggle,
   refreshKey = 0,
-  onRefresh,
   isLoading = false,
   viewTabs,
   className = "",
@@ -101,12 +100,6 @@ export function PreviewIframe({
     } else if (e.key === "Escape") {
       setDraftSlug(slug);
       setIsEditingSlug(false);
-    }
-  };
-
-  const handleOpenInNewTab = () => {
-    if (url) {
-      window.open(url, "_blank", "noopener,noreferrer");
     }
   };
 
