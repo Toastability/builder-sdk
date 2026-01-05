@@ -21,8 +21,8 @@ importers:
         specifier: 0.4.2
         version: 0.4.2(ts-node@10.9.2(@swc/core@1.10.4(@swc/helpers@0.5.2))(@types/node@20.17.11)(typescript@5.7.3))
       '@opensite/hooks':
-        specifier: 2.0.0
-        version: 2.0.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        specifier: 2.0.2
+        version: 2.0.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@page-speed/forms':
         specifier: ^0.2.2
         version: 0.2.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(typescript@5.7.3)
@@ -1254,8 +1254,8 @@ packages:
   '@open-draft/until@2.1.0':
     resolution: {integrity: sha512-U69T3ItWHvLwGg5eJ0n3I62nWuE6ilHlmz7zM0npLBRvPRd7e6NYmg54vvRtP5mZG7kZqZCFVdsTWo7BPtBujg==}
 
-  '@opensite/hooks@2.0.0':
-    resolution: {integrity: sha512-1ulfGAczQG86fjAh0V/KaVu4uiwtTpzcJBNARemEX2ulvtrh2WLftEsL6gz0afrqd/LzServIaI9s6kUCjX9DQ==}
+  '@opensite/hooks@2.0.2':
+    resolution: {integrity: sha512-fINjBUTst/qD5a7dN87taciU0rRvfO5UXRFTJAS4o8Z3JbRKRdAqbPkcs/tCSYTpa+YDr+T0odJW1ToGbx5wMw==}
     engines: {node: '>=18.0.0', pnpm: '>=9.0.0'}
     peerDependencies:
       react: '>=17.0.0'
@@ -7163,7 +7163,7 @@ snapshots:
 
   '@open-draft/until@2.1.0': {}
 
-  '@opensite/hooks@2.0.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+  '@opensite/hooks@2.0.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)

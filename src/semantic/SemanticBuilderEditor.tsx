@@ -237,6 +237,19 @@ export function SemanticBuilderEditor({
         );
 
       case 'preview':
+        // Create view tabs component to pass to PreviewIframe
+        const viewTabsComponent = (
+          <div className="bg-white border border-[#e3e8ee] p-1 h-auto flex flex-wrap rounded-lg">
+            <ExpandableIconTabs
+              tabs={PREVIEW_TABS}
+              selectedIndex={selectedTabIndex >= 0 ? selectedTabIndex : 0}
+              onSelectedIndexChange={handleTabChange}
+              selectionRequired
+              tooltipVariant="bottom"
+            />
+          </div>
+        );
+
         return (
           <div className="h-full p-4">
             <div className="h-full max-h-full rounded-lg border border-border bg-card shadow-sm overflow-hidden">
@@ -249,6 +262,7 @@ export function SemanticBuilderEditor({
                 refreshKey={preview.refreshKey}
                 onRefresh={preview.refresh}
                 isLoading={preview.isLoading}
+                viewTabs={viewTabsComponent}
               />
             </div>
           </div>
@@ -307,20 +321,7 @@ export function SemanticBuilderEditor({
         }
       />
 
-      {/* Expandable Icon Tabs */}
-      <div className="flex-shrink-0 px-4 py-3 border-b border-border">
-        <div className="bg-white border border-[#e3e8ee] p-1 h-auto flex flex-wrap rounded-lg">
-          <ExpandableIconTabs
-            tabs={PREVIEW_TABS}
-            selectedIndex={selectedTabIndex >= 0 ? selectedTabIndex : 0}
-            onSelectedIndexChange={handleTabChange}
-            selectionRequired
-            tooltipVariant="bottom"
-          />
-        </div>
-      </div>
-
-      {/* Active Tab Content */}
+      {/* Active Tab Content - Now includes view tabs in preview */}
       <div className="flex-1 overflow-hidden">
         {renderTabContent()}
       </div>

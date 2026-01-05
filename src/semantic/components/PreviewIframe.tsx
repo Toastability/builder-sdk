@@ -1,12 +1,15 @@
 /**
  * PreviewIframe Component
  *
- * Renders page preview in sandboxed iframe
+ * Renders page preview in sandboxed iframe with device preview options
  * Adapted from v0-clone WebPreview pattern
  */
 
 import React, { useState, useRef, useEffect } from 'react';
-import { RefreshCw, Maximize2, Minimize2, ExternalLink } from 'lucide-react';
+import { RefreshCw, Maximize2, Minimize2, ExternalLink, Monitor, Tablet, Smartphone } from 'lucide-react';
+import { ExpandableIconTabs } from '../../core/components/ui/expandable-icon-tabs';
+
+export type DeviceType = 'desktop' | 'tablet' | 'phone';
 
 interface PreviewIframeProps {
   /** Preview URL to render */
@@ -33,9 +36,26 @@ interface PreviewIframeProps {
   /** Loading state */
   isLoading?: boolean;
 
+  /** View tabs to render in header (Templates/Components/Preview) */
+  viewTabs?: React.ReactNode;
+
   /** CSS classes for container */
   className?: string;
 }
+
+// Device viewport dimensions
+const DEVICE_DIMENSIONS = {
+  desktop: { width: '100%', height: '100%', maxWidth: '100%' },
+  tablet: { width: '768px', height: '1024px', maxWidth: '100%' },
+  phone: { width: '375px', height: '667px', maxWidth: '100%' },
+} as const;
+
+// Device preview tabs
+const DEVICE_TABS = [
+  { title: 'Desktop', icon: Monitor },
+  { title: 'Tablet', icon: Tablet },
+  { title: 'Phone', icon: Smartphone },
+] as const;
 
 export function PreviewIframe({
   url,
@@ -46,10 +66,12 @@ export function PreviewIframe({
   refreshKey = 0,
   onRefresh,
   isLoading = false,
+  viewTabs,
   className = '',
 }: PreviewIframeProps) {
   const [isEditingSlug, setIsEditingSlug] = useState(false);
   const [draftSlug, setDraftSlug] = useState(slug);
+  const [selectedDevice, setSelectedDevice] = useState<DeviceType>('desktop');
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -88,98 +110,131 @@ export function PreviewIframe({
     }
   };
 
+  const handleDeviceChange = (index: number | null) => {
+    if (index === null) return;
+    const deviceTypes: DeviceType[] = ['desktop', 'tablet', 'phone'];
+    setSelectedDevice(deviceTypes[index]);
+  };
+
+  const deviceDimensions = DEVICE_DIMENSIONS[selectedDevice];
+
   return (
     <div
       className={`flex flex-col h-full bg-background ${className}`}
       data-preview-iframe
     >
       {/* Preview Navigation Bar */}
-      <div className="flex-shrink-0 flex items-center gap-2 px-4 py-3 border-b border-border">
-        {/* Refresh Button */}
-        <button
-          onClick={onRefresh}
-          disabled={isLoading}
-          className="
-            p-2 rounded-md
-            text-muted-foreground hover:text-foreground
-            hover:bg-accent transition-colors
-            disabled:opacity-50 disabled:cursor-not-allowed
-          "
-          title="Refresh preview"
-          aria-label="Refresh preview"
-        >
-          <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-        </button>
-
-        {/* URL/Slug Input */}
-        <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-md bg-muted">
-          {isEditingSlug ? (
-            <input
-              ref={inputRef}
-              type="text"
-              value={draftSlug}
-              onChange={(e) => setDraftSlug(e.target.value)}
-              onBlur={handleSlugSubmit}
-              onKeyDown={handleSlugKeyDown}
-              className="
-                flex-1 bg-transparent text-sm font-mono
-                text-foreground outline-none
-              "
-              placeholder="/page-slug"
-            />
-          ) : (
-            <button
-              onClick={() => setIsEditingSlug(true)}
-              className="
-                flex-1 text-left text-sm font-mono
-                text-foreground hover:text-primary
-                transition-colors
-              "
-            >
-              {slug || '/untitled'}
-            </button>
-          )}
-        </div>
-
-        {/* Open in New Tab */}
-        <button
-          onClick={handleOpenInNewTab}
-          disabled={!url}
-          className="
-            p-2 rounded-md
-            text-muted-foreground hover:text-foreground
-            hover:bg-accent transition-colors
-            disabled:opacity-50 disabled:cursor-not-allowed
-          "
-          title="Open in new tab"
-          aria-label="Open in new tab"
-        >
-          <ExternalLink className="w-4 h-4" />
-        </button>
-
-        {/* Fullscreen Toggle */}
-        {onFullscreenToggle && (
+      <div className="flex-shrink-0 flex items-center gap-3 px-4 py-3 border-b border-border">
+        {/* Left Section: Actions and Slug */}
+        <div className="flex items-center gap-2">
+          {/* Refresh Button */}
           <button
-            onClick={onFullscreenToggle}
+            onClick={onRefresh}
+            disabled={isLoading}
             className="
               p-2 rounded-md
               text-muted-foreground hover:text-foreground
               hover:bg-accent transition-colors
+              disabled:opacity-50 disabled:cursor-not-allowed
             "
-            title={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
-            aria-label={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
+            title="Refresh preview"
+            aria-label="Refresh preview"
           >
-            {isFullscreen ? (
-              <Minimize2 className="w-4 h-4" />
-            ) : (
-              <Maximize2 className="w-4 h-4" />
-            )}
+            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
           </button>
+
+          {/* URL/Slug Input - Much Narrower */}
+          <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-muted w-48 min-w-[12rem] max-w-[16rem]">
+            {isEditingSlug ? (
+              <input
+                ref={inputRef}
+                type="text"
+                value={draftSlug}
+                onChange={(e) => setDraftSlug(e.target.value)}
+                onBlur={handleSlugSubmit}
+                onKeyDown={handleSlugKeyDown}
+                className="
+                  w-full bg-transparent text-sm font-mono
+                  text-foreground outline-none
+                "
+                placeholder="/page-slug"
+              />
+            ) : (
+              <button
+                onClick={() => setIsEditingSlug(true)}
+                className="
+                  w-full text-left text-sm font-mono
+                  text-foreground hover:text-primary
+                  transition-colors truncate
+                "
+                title={slug || '/untitled'}
+              >
+                {slug || '/untitled'}
+              </button>
+            )}
+          </div>
+
+          {/* Open in New Tab */}
+          <button
+            onClick={handleOpenInNewTab}
+            disabled={!url}
+            className="
+              p-2 rounded-md
+              text-muted-foreground hover:text-foreground
+              hover:bg-accent transition-colors
+              disabled:opacity-50 disabled:cursor-not-allowed
+            "
+            title="Open in new tab"
+            aria-label="Open in new tab"
+          >
+            <ExternalLink className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Center Section: View Tabs */}
+        {viewTabs && (
+          <div className="flex-1 flex justify-center">
+            {viewTabs}
+          </div>
         )}
+
+        {/* Right Section: Device Tabs and Fullscreen */}
+        <div className="flex items-center gap-2">
+          {/* Device Preview Tabs */}
+          <div className="bg-white border border-[#e3e8ee] p-1 h-auto flex flex-wrap rounded-lg">
+            <ExpandableIconTabs
+              tabs={DEVICE_TABS}
+              selectedIndex={['desktop', 'tablet', 'phone'].indexOf(selectedDevice)}
+              onSelectedIndexChange={handleDeviceChange}
+              selectionRequired
+              tooltipVariant="bottom"
+            />
+          </div>
+
+          {/* Fullscreen Toggle */}
+          {onFullscreenToggle && (
+            <button
+              onClick={onFullscreenToggle}
+              className="
+                p-2 rounded-md
+                text-muted-foreground hover:text-foreground
+                hover:bg-accent transition-colors
+              "
+              title={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
+              aria-label={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
+            >
+              {isFullscreen ? (
+                <Minimize2 className="w-4 h-4" />
+              ) : (
+                <Maximize2 className="w-4 h-4" />
+              )}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Preview Body */}
-      <div className="flex-1 relative bg-muted/50">
+      <div className="flex-1 relative bg-muted/50 overflow-auto">
         {!url ? (
           <div className="flex flex-col items-center justify-center h-full text-center p-8">
             <div className="text-muted-foreground mb-2">
@@ -205,15 +260,26 @@ export function PreviewIframe({
             </p>
           </div>
         ) : (
-          <iframe
-            key={refreshKey}
-            ref={iframeRef}
-            src={url}
-            className="w-full h-full border-0"
-            title="Page preview"
-            sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-            loading="lazy"
-          />
+          <div className="flex items-start justify-center min-h-full p-4">
+            <div
+              className="bg-white shadow-2xl border border-border transition-all duration-300"
+              style={{
+                width: deviceDimensions.width,
+                height: deviceDimensions.height,
+                maxWidth: deviceDimensions.maxWidth,
+              }}
+            >
+              <iframe
+                key={refreshKey}
+                ref={iframeRef}
+                src={url}
+                className="w-full h-full border-0"
+                title="Page preview"
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                loading="lazy"
+              />
+            </div>
+          </div>
         )}
 
         {/* Loading Overlay */}
