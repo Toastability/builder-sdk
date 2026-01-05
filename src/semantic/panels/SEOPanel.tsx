@@ -116,7 +116,7 @@ export function SEOPanel({
                   {/* Title and description */}
                   <div className="min-w-0 flex-1">
                     <a
-                      href={`${activeSite?.label || ""}${slug || ""}`}
+                      href={`https://${activeSite?.label || ""}${slug || ""}`}
                       target="_blank"
                       className="truncate text-xs font-bold text-primary underline">
                       {seoData.title || "Page Title"}

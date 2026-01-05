@@ -6,10 +6,18 @@
  */
 
 import React, { useState, useRef, useEffect } from "react";
-import { Maximize2, Minimize2, Monitor, Tablet, Smartphone } from "lucide-react";
+import { Maximize2, Minimize2, Monitor, Tablet, Smartphone, ChevronDown, type LucideIcon } from "lucide-react";
 import { ExpandableIconTabs } from "../../core/components/ui/expandable-icon-tabs";
+import { SemanticEngineEmptyState } from "./SemanticEngineEmptyState";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 
 export type DeviceType = "desktop" | "tablet" | "phone";
+
+export interface ViewTab {
+  title: string;
+  icon: LucideIcon;
+  type?: undefined;
+}
 
 interface PreviewIframeProps {
   /** Preview URL to render */
@@ -36,8 +44,12 @@ interface PreviewIframeProps {
   /** Loading state */
   isLoading?: boolean;
 
-  /** View tabs to render in header (Templates/Components/Preview) */
-  viewTabs?: React.ReactNode;
+  /** View tabs configuration for responsive rendering */
+  viewTabs?: {
+    tabs: readonly ViewTab[];
+    selectedIndex: number;
+    onSelectedIndexChange: (index: number | null) => void;
+  };
 
   /** CSS classes for container */
   className?: string;
@@ -45,9 +57,9 @@ interface PreviewIframeProps {
 
 // Device viewport dimensions
 const DEVICE_DIMENSIONS = {
-  desktop: { width: "100%", height: "100%", maxWidth: "100%" },
-  tablet: { width: "768px", height: "1024px", maxWidth: "100%" },
-  phone: { width: "375px", height: "667px", maxWidth: "100%" },
+  desktop: { width: "100%", height: "100%", maxWidth: "100%", maxHeight: "100%" },
+  tablet: { width: "1024px", height: "768px", maxWidth: "100%", maxHeight: "100%" },
+  phone: { width: "375px", height: "600px", maxWidth: "100%", maxHeight: "600px" },
 } as const;
 
 // Device preview tabs
@@ -113,8 +125,66 @@ export function PreviewIframe({
 
   // Apply device-specific wrapper constraints
   const wrapperStyle = selectedDevice !== 'desktop'
-    ? { maxWidth: deviceDimensions.width, margin: '0 auto' }
+    ? { maxWidth: deviceDimensions.width, maxHeight: deviceDimensions.maxHeight, margin: '0 auto' }
     : {};
+
+  // Render view tabs responsively based on device
+  const renderViewTabs = () => {
+    if (!viewTabs) return null;
+
+    const { tabs, selectedIndex, onSelectedIndexChange } = viewTabs;
+    const selectedTab = tabs[selectedIndex];
+
+    // Desktop: show full ExpandableIconTabs
+    if (selectedDevice === 'desktop') {
+      return (
+        <div className="bg-white border border-[#e3e8ee] p-1 h-auto flex flex-wrap rounded-lg overflow-visible">
+          <ExpandableIconTabs
+            tabs={tabs}
+            selectedIndex={selectedIndex}
+            onSelectedIndexChange={onSelectedIndexChange}
+            selectionRequired
+            tooltipVariant="bottom"
+          />
+        </div>
+      );
+    }
+
+    // Tablet/Phone: show compact dropdown menu
+    const SelectedIcon = selectedTab?.icon;
+
+    return (
+      <DropdownMenu.Root>
+        <DropdownMenu.Trigger asChild>
+          <button className="inline-flex items-center gap-2 rounded-md bg-white border border-[#e3e8ee] px-3 py-2 text-sm font-medium text-foreground hover:bg-accent transition-colors">
+            {SelectedIcon && <SelectedIcon className="h-4 w-4" />}
+            <span>{selectedTab?.title || 'Select view'}</span>
+            <ChevronDown className="h-3 w-3 opacity-50" />
+          </button>
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Portal>
+          <DropdownMenu.Content
+            className="z-50 min-w-[12rem] rounded-md border border-border bg-white p-1 shadow-md"
+            sideOffset={5}
+          >
+            {tabs.map((tab, index) => {
+              const Icon = tab.icon;
+              return (
+                <DropdownMenu.Item
+                  key={tab.title}
+                  className="flex items-center gap-2 rounded-sm px-3 py-2 text-sm cursor-pointer outline-none hover:bg-accent hover:text-accent-foreground data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground"
+                  onSelect={() => onSelectedIndexChange(index)}
+                >
+                  <Icon className="h-4 w-4" />
+                  <span>{tab.title}</span>
+                </DropdownMenu.Item>
+              );
+            })}
+          </DropdownMenu.Content>
+        </DropdownMenu.Portal>
+      </DropdownMenu.Root>
+    );
+  };
 
   return (
     <div
@@ -126,10 +196,8 @@ export function PreviewIframe({
 
       {/* Preview Navigation Bar */}
       <div className="flex flex-shrink-0 items-center justify-between gap-3 border-b border-border p-2">
-        {/* Conditionally render view tabs - hidden on phone */}
-        {viewTabs && selectedDevice !== "phone" && (
-          <div className="flex overflow-visible">{viewTabs}</div>
-        )}
+        {/* Responsive view tabs */}
+        {renderViewTabs()}
 
         {/* Left Section: Actions and Slug */}
         <div className="flex items-center gap-2">
@@ -170,8 +238,8 @@ export function PreviewIframe({
             />
           </div>
 
-          {/* Fullscreen Toggle */}
-          {onFullscreenToggle && (
+          {/* Fullscreen Toggle - Only show on desktop */}
+          {onFullscreenToggle && selectedDevice === "desktop" && (
             <button
               onClick={onFullscreenToggle}
               className="rounded-md p-2 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
@@ -186,19 +254,8 @@ export function PreviewIframe({
       {/* Preview Body */}
       <div className="relative flex-1 overflow-auto bg-muted/50">
         {!url ? (
-          <div className="flex h-full flex-col items-center justify-center p-8 text-center">
-            <div className="mb-2 text-muted-foreground">
-              <svg className="mx-auto h-16 w-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                />
-              </svg>
-            </div>
-            <p className="text-sm font-medium text-foreground">No preview available</p>
-            <p className="mt-1 text-xs text-muted-foreground">Your page will appear here when you add content</p>
+          <div className="flex h-full items-center justify-center p-8">
+            <SemanticEngineEmptyState />
           </div>
         ) : (
           <div className="flex min-h-full items-center justify-center p-0">

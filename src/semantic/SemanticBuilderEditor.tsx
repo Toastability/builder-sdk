@@ -19,7 +19,6 @@ import { StylePanel } from './panels/StylePanel';
 import { SEOPanel } from './panels/SEOPanel';
 import { DataPanel } from './panels/DataPanel';
 import { LayoutPanel } from './panels/LayoutPanel';
-import { ExpandableIconTabs } from '../core/components/ui/expandable-icon-tabs';
 import {
   SemanticBuilderEditorProps,
   PanelType,
@@ -237,19 +236,6 @@ export function SemanticBuilderEditor({
         );
 
       case 'preview':
-        // Create view tabs component to pass to PreviewIframe
-        const viewTabsComponent = (
-          <div className="bg-white border border-[#e3e8ee] p-1 h-auto flex flex-wrap rounded-lg overflow-visible">
-            <ExpandableIconTabs
-              tabs={PREVIEW_TABS}
-              selectedIndex={selectedTabIndex >= 0 ? selectedTabIndex : 0}
-              onSelectedIndexChange={handleTabChange}
-              selectionRequired
-              tooltipVariant="bottom"
-            />
-          </div>
-        );
-
         return (
           <div className="h-full p-4">
             <div className="h-full max-h-full rounded-lg border border-border bg-card shadow-sm overflow-hidden">
@@ -261,7 +247,11 @@ export function SemanticBuilderEditor({
                 onFullscreenToggle={preview.toggleFullscreen}
                 refreshKey={preview.refreshKey}
                 isLoading={preview.isLoading}
-                viewTabs={viewTabsComponent}
+                viewTabs={{
+                  tabs: PREVIEW_TABS,
+                  selectedIndex: selectedTabIndex >= 0 ? selectedTabIndex : 0,
+                  onSelectedIndexChange: handleTabChange,
+                }}
               />
             </div>
           </div>
