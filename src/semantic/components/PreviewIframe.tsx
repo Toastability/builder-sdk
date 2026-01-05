@@ -111,17 +111,30 @@ export function PreviewIframe({
 
   const deviceDimensions = DEVICE_DIMENSIONS[selectedDevice];
 
+  // Apply device-specific wrapper constraints
+  const wrapperStyle = selectedDevice !== 'desktop'
+    ? { maxWidth: deviceDimensions.width, margin: '0 auto' }
+    : {};
+
   return (
-    <div className={`flex h-full flex-col bg-background ${className}`} data-preview-iframe>
+    <div
+      className={`flex h-full flex-col bg-background ${className}`}
+      style={wrapperStyle}
+      data-preview-iframe
+    >
       {/* Left Section: View Tabs */}
 
       {/* Preview Navigation Bar */}
       <div className="flex flex-shrink-0 items-center justify-between gap-3 border-b border-border p-2">
-        {viewTabs && <div className="flex">{viewTabs}</div>}
+        {/* Conditionally render view tabs - hidden on phone */}
+        {viewTabs && selectedDevice !== "phone" && (
+          <div className="flex overflow-visible">{viewTabs}</div>
+        )}
+
         {/* Left Section: Actions and Slug */}
         <div className="flex items-center gap-2">
-          {/* URL/Slug Input - Much Narrower */}
-          <div className="flex w-48 min-w-[12rem] max-w-[24rem] items-center gap-2 rounded-md bg-muted px-3 py-2">
+          {/* URL/Slug Input - Responsive width */}
+          <div className="flex w-48 min-w-[12rem] max-w-[24rem] items-center gap-2 rounded-md bg-muted px-3 py-2 sm:w-64 md:w-80 lg:w-96">
             {isEditingSlug ? (
               <input
                 ref={inputRef}
@@ -188,14 +201,8 @@ export function PreviewIframe({
             <p className="mt-1 text-xs text-muted-foreground">Your page will appear here when you add content</p>
           </div>
         ) : (
-          <div className="flex min-h-full items-start justify-center p-0">
-            <div
-              className="border-none bg-white transition-all duration-300"
-              style={{
-                width: deviceDimensions.width,
-                height: deviceDimensions.height,
-                maxWidth: deviceDimensions.maxWidth,
-              }}>
+          <div className="flex min-h-full items-center justify-center p-0">
+            <div className="w-full h-full border-none bg-white transition-all duration-300">
               <iframe
                 key={refreshKey}
                 ref={iframeRef}

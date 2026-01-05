@@ -35,22 +35,20 @@ export function SEOPanel({
     if (!activeSite?.label || !slug) return null;
 
     // Ensure URL has protocol
-    const domain = activeSite.label.startsWith('http')
-      ? activeSite.label
-      : `https://${activeSite.label}`;
+    const domain = activeSite.label.startsWith("http") ? activeSite.label : `https://${activeSite.label}`;
 
     // Remove trailing slash from domain
-    const cleanDomain = domain.replace(/\/$/, '');
+    const cleanDomain = domain.replace(/\/$/, "");
 
     // Add leading slash to slug if needed
-    const cleanSlug = slug.startsWith('/') ? slug : `/${slug}`;
+    const cleanSlug = slug.startsWith("/") ? slug : `/${slug}`;
 
     return `${cleanDomain}${cleanSlug}`;
   }, [activeSite?.label, slug]);
 
   // Extract OpenGraph data using the hook
   const { data: openGraphData, loading: ogLoading } = useOpenGraphExtractor({
-    url: pageUrl || '',
+    url: pageUrl || "",
     enabled: !!pageUrl,
   });
 
@@ -87,27 +85,27 @@ export function SEOPanel({
           <div className="space-y-4 p-4">
             {/* Search Preview */}
             <CollapsibleSection title="Search Preview">
-              <div className="space-y-2 rounded-md bg-muted p-3">
+              <div className="space-y-2 rounded-none bg-white p-0">
                 {/* URL breadcrumb */}
                 <div className="overflow-hidden truncate text-ellipsis font-mono text-xs text-muted-foreground">
                   {activeSite?.label || "yoursite.com"}
-                  {slug ? ` / ${slug.replace(/^\//, '')}` : ""}
+                  {slug ? ` / ${slug.replace(/^\//, "")}` : ""}
                 </div>
 
                 {/* Search result preview with favicon */}
                 <div className="flex items-start gap-2">
                   {/* Favicon */}
-                  <div className="flex-shrink-0 mt-0.5">
+                  <div className="mt-0.5 flex-shrink-0">
                     {ogLoading ? (
-                      <div className="h-4 w-4 rounded-sm bg-muted-foreground/20 animate-pulse" />
+                      <div className="h-4 w-4 animate-pulse rounded-sm bg-muted-foreground/20" />
                     ) : openGraphData?.favicon ? (
                       <img
                         src={openGraphData.favicon}
                         alt="Site favicon"
-                        className="h-4 w-4 rounded-sm object-contain"
+                        className="h-6 w-6 rounded-sm object-contain"
                         onError={(e) => {
                           // Hide on error
-                          e.currentTarget.style.display = 'none';
+                          e.currentTarget.style.display = "none";
                         }}
                       />
                     ) : (
@@ -116,11 +114,14 @@ export function SEOPanel({
                   </div>
 
                   {/* Title and description */}
-                  <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium text-primary truncate">
+                  <div className="min-w-0 flex-1">
+                    <a
+                      href={`${activeSite?.label || ""}${slug || ""}`}
+                      target="_blank"
+                      className="truncate text-xs font-bold text-primary underline">
                       {seoData.title || "Page Title"}
-                    </div>
-                    <div className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
+                    </a>
+                    <div className="mt-0.5 text-xs text-muted-foreground">
                       {seoData.description || "Meta description will appear here..."}
                     </div>
                   </div>
@@ -167,23 +168,24 @@ export function SEOPanel({
             <CollapsibleSection title="Open Graph">
               <div className="space-y-3">
                 <p className="text-xs text-muted-foreground">
-                  Open Graph tags control how your page appears when shared on social media platforms like Facebook, Twitter, and LinkedIn.
+                  Open Graph tags control how your page appears when shared on social media platforms like Facebook,
+                  Twitter, and LinkedIn.
                 </p>
 
                 {/* Open Graph Image */}
                 {ogLoading ? (
                   <div className="space-y-2">
                     <div className="text-sm font-medium text-foreground">Preview Image</div>
-                    <div className="aspect-video w-full rounded-md bg-muted-foreground/20 animate-pulse" />
+                    <div className="aspect-video w-full animate-pulse rounded-md bg-muted-foreground/20" />
                   </div>
                 ) : openGraphData?.image ? (
                   <div className="space-y-2">
                     <div className="text-sm font-medium text-foreground">Preview Image</div>
-                    <div className="rounded-md border border-border overflow-hidden bg-muted">
+                    <div className="overflow-hidden rounded-md border border-border bg-muted">
                       <img
                         src={openGraphData.image}
                         alt="Open Graph preview"
-                        className="w-full h-auto object-cover"
+                        className="h-auto w-full object-cover"
                         onError={(e) => {
                           e.currentTarget.parentElement!.innerHTML =
                             '<div class="aspect-video flex items-center justify-center text-muted-foreground text-sm">Failed to load image</div>';
@@ -198,11 +200,11 @@ export function SEOPanel({
                 ) : (
                   <div className="space-y-2">
                     <div className="text-sm font-medium text-foreground">Preview Image</div>
-                    <div className="aspect-video w-full rounded-md border border-dashed border-border bg-muted/50 flex items-center justify-center">
+                    <div className="aspect-video flex w-full items-center justify-center rounded-md border border-dashed border-border bg-muted/50">
                       <div className="text-center text-muted-foreground">
-                        <Globe className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                        <Globe className="mx-auto mb-2 h-8 w-8 opacity-50" />
                         <p className="text-xs">No Open Graph image found</p>
-                        <p className="text-xs mt-1">Custom upload coming soon</p>
+                        <p className="mt-1 text-xs">Custom upload coming soon</p>
                       </div>
                     </div>
                   </div>

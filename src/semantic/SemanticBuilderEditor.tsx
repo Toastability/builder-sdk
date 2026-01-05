@@ -239,7 +239,7 @@ export function SemanticBuilderEditor({
       case 'preview':
         // Create view tabs component to pass to PreviewIframe
         const viewTabsComponent = (
-          <div className="bg-white border border-[#e3e8ee] p-1 h-auto flex flex-wrap rounded-lg">
+          <div className="bg-white border border-[#e3e8ee] p-1 h-auto flex flex-wrap rounded-lg overflow-visible">
             <ExpandableIconTabs
               tabs={PREVIEW_TABS}
               selectedIndex={selectedTabIndex >= 0 ? selectedTabIndex : 0}
@@ -260,7 +260,6 @@ export function SemanticBuilderEditor({
                 isFullscreen={preview.isFullscreen}
                 onFullscreenToggle={preview.toggleFullscreen}
                 refreshKey={preview.refreshKey}
-                onRefresh={preview.refresh}
                 isLoading={preview.isLoading}
                 viewTabs={viewTabsComponent}
               />
